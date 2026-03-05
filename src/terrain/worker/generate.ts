@@ -216,6 +216,23 @@ onmessage = (
         noise.get(x / noise.coalGap, z / noise.coalGap, noise.coalSeed) *
         noise.coalAmp
 
+      // Water Sea Level Logic
+      if (yOffset < -1) {
+        // Generate water from sea level down to just above the terrain
+        // Sea level is 29 (y + -1 where y=30)
+        for (let wy = -1; wy > yOffset; wy--) {
+          const wx = x;
+          const wz = z;
+          const wpy = y + wy;
+          matrix.setPosition(wx, wpy, wz);
+          idMap.set(`${wx}_${wpy}_${wz}`, blocksCount[BlockType.water]);
+          blocks[BlockType.water].setMatrixAt(
+            blocksCount[BlockType.water]++,
+            matrix
+          );
+        }
+      }
+
       if (stoneOffset > noise.stoneThreshold) {
         if (coalOffset > noise.coalThreshold) {
           // coal
@@ -240,18 +257,6 @@ onmessage = (
             blocksCount[BlockType.sand]++,
             matrix
           )
-
-          // Generate water above sand up to sea level (-1)
-          // Optimization: Only top layer of water is often enough for visibility if underwater is not rendered, 
-          // but for "instant" feel we just make sure the loop is tight.
-          for (let wy = -1; wy > yOffset; wy--) {
-            matrix.setPosition(x, y + wy, z)
-            idMap.set(`${x}_${y + wy}_${z}`, blocksCount[BlockType.water])
-            blocks[BlockType.water].setMatrixAt(
-              blocksCount[BlockType.water]++,
-              matrix
-            )
-          }
         } else {
           // grass
           idMap.set(`${x}_${y + yOffset}_${z}`, blocksCount[BlockType.grass])
