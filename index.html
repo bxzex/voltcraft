@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voxelcraft: Origins</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Voltcraft</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
     <style>
-        body { margin: 0; overflow: hidden; background-color: #87CEEB; font-family: 'VT323', monospace; user-select: none; }
+        body { margin: 0; overflow: hidden; background-color: #87CEEB; font-family: 'VT323', monospace; user-select: none; -webkit-user-select: none; }
         canvas { display: block; width: 100vw; height: 100vh; image-rendering: pixelated; }
         
         /* UI Elements */
@@ -14,7 +14,7 @@
             position: absolute; top: 50%; left: 50%; width: 24px; height: 24px;
             transform: translate(-50%, -50%); pointer-events: none;
             display: flex; justify-content: center; align-items: center;
-            opacity: 0.8;
+            opacity: 0.8; z-index: 4;
         }
         #crosshair::before, #crosshair::after {
             content: ''; position: absolute; background-color: rgba(255, 255, 255, 1);
@@ -26,7 +26,7 @@
         #ui {
             position: absolute; top: 10px; left: 10px; color: white;
             text-shadow: 2px 2px 0px #3f3f3f; pointer-events: none;
-            font-size: 24px;
+            font-size: 24px; z-index: 4;
         }
         
         /* Minecraft Style Hotbar */
@@ -34,7 +34,7 @@
             position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
             display: flex; gap: 0; background: #8b8b8b; padding: 4px; 
             border: 2px solid #373737; border-top-color: #ffffff; border-left-color: #ffffff;
-            border-bottom-color: #373737; border-right-color: #373737;
+            border-bottom-color: #373737; border-right-color: #373737; z-index: 6;
         }
         .slot {
             width: 48px; height: 48px; background: #8b8b8b;
@@ -42,7 +42,7 @@
             border-bottom-color: #ffffff; border-right-color: #ffffff;
             color: white; display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-end; 
             font-weight: bold; font-size: 20px; text-shadow: 2px 2px 0px #3f3f3f;
-            position: relative; box-sizing: border-box;
+            position: relative; box-sizing: border-box; cursor: pointer;
             background-size: 32px 32px; background-position: center; background-repeat: no-repeat;
         }
         .slot.active { 
@@ -62,20 +62,20 @@
         .inv-window {
             background: #c6c6c6; border: 4px solid #000; border-top-color: #fff; border-left-color: #fff;
             border-bottom-color: #555; border-right-color: #555;
-            padding: 20px; width: 600px; color: #373737; text-shadow: none;
+            padding: 20px; max-width: 90vw; color: #373737; text-shadow: none;
             display: flex; flex-direction: column; align-items: flex-start;
         }
         .inv-title { font-size: 32px; margin-bottom: 10px; font-family: 'Press Start 2P', cursive; font-size: 16px;}
         .inventory-grid {
-            display: grid; grid-template-columns: repeat(9, 1fr); gap: 4px;
-            background: #c6c6c6; margin-bottom: 20px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(48px, 1fr)); gap: 4px;
+            background: #c6c6c6; margin-bottom: 20px; width: 100%; max-height: 50vh; overflow-y: auto;
         }
         .inv-slot {
-            width: 52px; height: 52px; background: #8b8b8b;
+            width: 48px; height: 48px; background: #8b8b8b;
             border: 2px solid #373737; border-top-color: #373737; border-left-color: #373737;
             border-bottom-color: #ffffff; border-right-color: #ffffff;
             cursor: pointer; position: relative;
-            background-size: 36px 36px; background-position: center; background-repeat: no-repeat;
+            background-size: 32px 32px; background-position: center; background-repeat: no-repeat;
         }
         .inv-slot:hover { background-color: #a0a0a0; }
         .inv-slot::after {
@@ -102,27 +102,78 @@
         .controls-list { font-size: 24px; text-align: left; margin-bottom: 30px; }
         .controls-list p { margin: 10px 0; }
         .key { color: #ffff00; text-shadow: 2px 2px 0px #3f3f3f; }
+
+        /* Mobile Controls */
+        #mobile-controls {
+            display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none; z-index: 5;
+        }
+        #dpad {
+            position: absolute; bottom: 80px; left: 20px; width: 160px; height: 160px;
+            pointer-events: auto;
+        }
+        .dbtn {
+            position: absolute; width: 50px; height: 50px; background: rgba(255,255,255,0.4);
+            border: 2px solid rgba(0,0,0,0.5); border-radius: 8px; display: flex; justify-content: center;
+            align-items: center; font-size: 24px; font-weight: bold; color: #000;
+        }
+        .dbtn:active { background: rgba(255,255,255,0.8); }
+        #btn-up { top: 0; left: 55px; }
+        #btn-left { top: 55px; left: 0; }
+        #btn-right { top: 55px; left: 110px; }
+        #btn-down { top: 110px; left: 55px; }
+
+        #action-btns {
+            position: absolute; bottom: 80px; right: 20px; pointer-events: auto;
+            display: grid; grid-template-columns: 60px 60px; gap: 10px;
+        }
+        .abtn {
+            width: 60px; height: 60px; background: rgba(255,255,255,0.4);
+            border: 2px solid rgba(0,0,0,0.5); border-radius: 50%; display: flex; justify-content: center;
+            align-items: center; font-size: 16px; font-weight: bold; color: #000;
+        }
+        .abtn:active { background: rgba(255,255,255,0.8); }
+        #btn-jump { grid-column: span 2; width: 130px; border-radius: 12px; }
+        
+        #top-btns {
+            position: absolute; top: 10px; right: 10px; pointer-events: auto;
+            display: flex; gap: 10px;
+        }
+        .tbtn {
+            width: 40px; height: 40px; background: rgba(255,255,255,0.4);
+            border: 2px solid rgba(0,0,0,0.5); border-radius: 8px; display: flex; justify-content: center;
+            align-items: center; font-size: 14px; font-weight: bold; color: #000;
+        }
+        .tbtn:active { background: rgba(255,255,255,0.8); }
+        
+        @media (max-width: 768px) {
+            #hotbar-container { bottom: 10px; transform: translateX(-50%) scale(0.8); transform-origin: bottom center; }
+            .inv-grid { grid-template-columns: repeat(5, 1fr); }
+            h1 { font-size: 24px; }
+            .mc-btn { font-size: 20px; padding: 10px 20px; }
+            .controls-list { font-size: 18px; }
+        }
     </style>
 </head>
 <body>
     <div id="instructions">
         <h1>VOLTCRAFT</h1>
         <div class="controls-list">
-            <p><span class="key">MOUSE</span> Look Around</p>
-            <p><span class="key">L-CLICK</span> Break Block / Attack</p>
-            <p><span class="key">R-CLICK</span> Place Block / Use</p>
-            <p><span class="key">WASD</span> Move</p>
-            <p><span class="key">SPACE</span> Jump (Double tap to fly)</p>
-            <p><span class="key">E</span> Inventory</p>
-            <p><span class="key">V</span> 1st/3rd Person</p>
+            <p><span class="key">MOUSE/TOUCH</span> Look Around</p>
+            <p><span class="key">L-CLICK/BREAK</span> Break Block</p>
+            <p><span class="key">R-CLICK/PLACE</span> Place Block</p>
+            <p><span class="key">WASD/DPAD</span> Move</p>
+            <p><span class="key">SPACE/JUMP</span> Jump (Double to fly)</p>
+            <p><span class="key">E/INV</span> Inventory</p>
+            <p><span class="key">V/CAM</span> 1st/3rd Person</p>
             <p><span class="key">ESC</span> Pause</p>
         </div>
-        <button class="mc-btn" id="start-btn">Back to Game</button>
+        <button class="mc-btn" id="start-btn">Enter World</button>
     </div>
     
     <div id="pause-menu">
-        <h1>Game Menu</h1>
-        <button class="mc-btn" id="resume-btn">Back to Game</button>
+        <h1>Game Paused</h1>
+        <button class="mc-btn" id="resume-btn">Resume</button>
         <button class="mc-btn" id="regen-btn">Regenerate World</button>
     </div>
     
@@ -130,16 +181,37 @@
         <div class="inv-window">
             <div class="inv-title">Inventory</div>
             <div class="inventory-grid" id="inventory-grid"></div>
+            <button class="mc-btn" id="close-inv-btn" style="align-self: center;">Close</button>
         </div>
     </div>
     
     <div id="crosshair"></div>
-    <div id="ui">Voltcraft v1.1</div>
+    <div id="ui">Voltcraft v1.2</div>
     
     <div id="hotbar-container">
         <!-- Populated by JS -->
     </div>
     
+    <!-- Mobile UI Overlays -->
+    <div id="mobile-controls">
+        <div id="top-btns">
+            <div class="tbtn" id="btn-inv">INV</div>
+            <div class="tbtn" id="btn-cam">CAM</div>
+            <div class="tbtn" id="btn-pause">||</div>
+        </div>
+        <div id="dpad">
+            <div class="dbtn" id="btn-up">▲</div>
+            <div class="dbtn" id="btn-left">◀</div>
+            <div class="dbtn" id="btn-right">▶</div>
+            <div class="dbtn" id="btn-down">▼</div>
+        </div>
+        <div id="action-btns">
+            <div class="abtn" id="btn-break">Break</div>
+            <div class="abtn" id="btn-place">Place</div>
+            <div class="abtn" id="btn-jump">Jump</div>
+        </div>
+    </div>
+
     <script type="importmap">
         {
             "imports": {

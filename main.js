@@ -25,6 +25,8 @@ const inventoryItems = [
 let hotbarSlots = ['grass', 'cobblestone', 'planks', 'crafting_table', 'furnace', 'diamond_ore', 'tnt', 'pickaxe', 'sword'];
 state.selectedItem = hotbarSlots[state.activeSlot];
 
+const isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
 // --- 2. ASSETS & MATERIALS ---
 const ASSET_URL = 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.19.2/assets/minecraft/';
 const texLoader = new THREE.TextureLoader();
@@ -236,19 +238,18 @@ function updateInstances() {
     allTypes.forEach(t => { if(blockMeshes[t]){ blockMeshes[t].count = counts[t]; blockMeshes[t].instanceMatrix.needsUpdate = true; } });
 }
 
-// --- 5. CLEAN ENTITIES ---
+// --- 5. ENTITIES ---
 const entities = [];
 
-// Creating mob models with solid clean colors that look aesthetic instead of weirdly mapped textures.
 function createMobModel(type) {
     const g = new THREE.Group();
     let isQuad = false;
-    let bC, hC, lC; // Colors for body, head, legs
+    let bC, hC, lC; 
     
     if (type === 'pig') { isQuad=true; bC=0xffb6c1; hC=0xff99aa; lC=0xffb6c1; }
-    else if (type === 'cow') { isQuad=true; bC=0x4a3a2a; hC=0x3a2a1a; lC=0x3a2a1a; } // Brown cow look
-    else if (type === 'villager') { isQuad=false; bC=0x5c4033; hC=0xe0ac69; lC=0x3c2013; } // Brown coat, skin head
-    else { isQuad=false; bC=0x00aaaa; hC=0xe0ac69; lC=0x222288; } // Player (Cyan shirt, skin, blue pants)
+    else if (type === 'cow') { isQuad=true; bC=0x4a3a2a; hC=0x3a2a1a; lC=0x3a2a1a; }
+    else if (type === 'villager') { isQuad=false; bC=0x5c4033; hC=0xe0ac69; lC=0x3c2013; }
+    else { isQuad=false; bC=0x00aaaa; hC=0xe0ac69; lC=0x222288; }
 
     const matB = new THREE.MeshLambertMaterial({ color: bC });
     const matH = new THREE.MeshLambertMaterial({ color: hC });
@@ -271,7 +272,6 @@ function createMobModel(type) {
             const lp = new THREE.Group(); lp.position.set(p[0], 0.4, p[1]);
             const l = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.4, 0.25), matL); l.position.y = -0.2; lp.add(l); g.add(lp); legs.push(lp);
         });
-        // Arms for player/villager
         const arms = [];
         [[0.35, 0.8], [-0.35, 0.8]].forEach(p => {
             const ap = new THREE.Group(); ap.position.set(p[0], 1.2, 0);
@@ -294,7 +294,6 @@ function spawnVillager(x, y, z) { spawnMob('villager', x, y, z); }
 
 for(let i=0; i<12; i++) spawnMob(Math.random()>0.5 ? 'pig' : 'cow', (Math.random()-0.5)*40, 20, (Math.random()-0.5)*40);
 
-// --- PLAYER ---
 const player = new THREE.Group(); player.position.set(0, 30, 0); scene.add(player);
 const pitchPivot = new THREE.Group(); player.add(pitchPivot); pitchPivot.add(camera);
 const pModel = createMobModel('player'); pModel.g.position.y = -1.5; pModel.g.rotation.y = Math.PI; player.add(pModel.g);
@@ -318,7 +317,6 @@ function createTool(type) {
 const hotbarEl = document.getElementById('hotbar-container');
 const invGrid = document.getElementById('inventory-grid');
 const invMenu = document.getElementById('inventory-menu');
-const closeInvBtn = document.getElementById('close-inv-btn');
 
 function getIconUrl(t) {
     if(t === 'wood') return 'oak_log';
@@ -338,10 +336,10 @@ function renderUI() {
             if(t !== '' && t !== 'sword' && t !== 'pickaxe') {
                 s.style.backgroundImage = `url(${ASSET_URL}textures/block/${getIconUrl(t)}.png)`;
             } else if (t === 'sword' || t === 'pickaxe') {
-                // Add default tool icons from URL
                 s.style.backgroundImage = `url(${ASSET_URL}textures/item/${t === 'sword' ? 'iron_sword' : 'iron_pickaxe'}.png)`;
             }
             s.innerText = i+1;
+            s.onclick = () => { state.activeSlot = i; state.selectedItem = t; renderUI(); };
             hotbarEl.appendChild(s);
         });
     }
@@ -363,13 +361,30 @@ if (invGrid) {
 function toggleInventory() {
     state.inventoryOpen = !state.inventoryOpen;
     if (invMenu) invMenu.style.display = state.inventoryOpen ? 'flex' : 'none';
-    if (state.inventoryOpen) document.exitPointerLock(); 
-    else if (state.gameStarted) document.body.requestPointerLock();
+    if (!isMobile) {
+        if (state.inventoryOpen) document.exitPointerLock(); 
+        else if (state.gameStarted) document.body.requestPointerLock();
+    }
 }
+document.getElementById('close-inv-btn').onclick = toggleInventory;
 
-document.getElementById('start-btn').onclick = () => { state.gameStarted = true; document.getElementById('instructions').style.display = 'none'; document.body.requestPointerLock(); };
-document.getElementById('resume-btn').onclick = () => { document.getElementById('pause-menu').style.display = 'none'; document.body.requestPointerLock(); };
-document.getElementById('regen-btn').onclick = () => { setupInstancedMeshes(); generateWorld(); document.getElementById('pause-menu').style.display = 'none'; document.body.requestPointerLock(); };
+document.getElementById('start-btn').onclick = () => { 
+    state.gameStarted = true; 
+    document.getElementById('instructions').style.display = 'none'; 
+    if(!isMobile) document.body.requestPointerLock();
+    if(isMobile) document.getElementById('mobile-controls').style.display = 'block';
+};
+document.getElementById('resume-btn').onclick = () => { 
+    document.getElementById('pause-menu').style.display = 'none'; 
+    if(!isMobile) document.body.requestPointerLock();
+    if(isMobile) document.getElementById('mobile-controls').style.display = 'block';
+};
+document.getElementById('regen-btn').onclick = () => { 
+    setupInstancedMeshes(); generateWorld(); 
+    document.getElementById('pause-menu').style.display = 'none'; 
+    if(!isMobile) document.body.requestPointerLock();
+    if(isMobile) document.getElementById('mobile-controls').style.display = 'block';
+};
 
 function toggleCamera() {
     state.firstPerson = !state.firstPerson;
@@ -379,10 +394,18 @@ function toggleCamera() {
 }
 
 document.addEventListener('pointerlockchange', () => {
-    if (document.pointerLockElement !== document.body && state.gameStarted && !state.inventoryOpen) {
+    if (!isMobile && document.pointerLockElement !== document.body && state.gameStarted && !state.inventoryOpen) {
         document.getElementById('pause-menu').style.display = 'flex';
     }
 });
+
+function handlePause() {
+    if(state.gameStarted && !state.inventoryOpen) {
+        document.getElementById('pause-menu').style.display = 'flex';
+        if(isMobile) document.getElementById('mobile-controls').style.display = 'none';
+        if(!isMobile) document.exitPointerLock();
+    }
+}
 
 // --- 7. INTERACTION & CONTROLS ---
 function getTarget() {
@@ -404,13 +427,12 @@ function getTarget() {
     return null;
 }
 
-document.addEventListener('mousedown', (e) => {
-    if (document.pointerLockElement !== document.body) return;
+function handleBlockAction(type) {
     state.actionTime = performance.now();
     const t = getTarget();
-    if (e.button === 0) {
+    if (type === 'break') {
         if (t && world.get(t.k).type !== 'bedrock') { world.delete(t.k); updateInstances(); playSound('break'); }
-    } else if (e.button === 2) {
+    } else if (type === 'place') {
         if (t) {
             const pk = getBlockKey(t.pos.x + t.normal.x, t.pos.y + t.normal.y, t.pos.z + t.normal.z);
             if (!world.has(pk)) {
@@ -426,10 +448,26 @@ document.addEventListener('mousedown', (e) => {
             }
         }
     }
+}
+
+// Desktop Mouse
+document.addEventListener('mousedown', (e) => {
+    if (isMobile || document.pointerLockElement !== document.body) return;
+    if (e.button === 0) handleBlockAction('break');
+    else if (e.button === 2) handleBlockAction('place');
 });
 document.addEventListener('contextmenu', e => e.preventDefault());
 
+document.addEventListener('mousemove', (e) => {
+    if (isMobile || document.pointerLockElement !== document.body) return;
+    state.yaw -= e.movementX * CONFIG.mouseSensitivity; state.pitch -= e.movementY * CONFIG.mouseSensitivity;
+    state.pitch = Math.max(-Math.PI/2, Math.min(Math.PI/2, state.pitch));
+    player.rotation.y = state.yaw; pitchPivot.rotation.x = state.pitch;
+});
+
+// Desktop Keyboard
 document.addEventListener('keydown', (e) => {
+    if(e.code === 'Escape') { handlePause(); return; }
     if (e.code === 'KeyE') { toggleInventory(); return; }
     if (state.inventoryOpen) return;
     const now = performance.now();
@@ -448,12 +486,55 @@ document.addEventListener('keyup', (e) => {
     if (e.code === 'Space') state.move.u = 0; if (e.code === 'ShiftLeft') state.move.d = 0;
 });
 
-document.addEventListener('mousemove', (e) => {
-    if (document.pointerLockElement !== document.body) return;
-    state.yaw -= e.movementX * CONFIG.mouseSensitivity; state.pitch -= e.movementY * CONFIG.mouseSensitivity;
+// Mobile Controls
+let touchStartX = 0, touchStartY = 0;
+document.addEventListener('touchstart', (e) => {
+    if (!isMobile || !state.gameStarted || state.inventoryOpen) return;
+    if(e.target.closest('#mobile-controls') || e.target.closest('#hotbar-container')) return;
+    touchStartX = e.touches[0].clientX; touchStartY = e.touches[0].clientY;
+}, {passive: false});
+
+document.addEventListener('touchmove', (e) => {
+    if (!isMobile || !state.gameStarted || state.inventoryOpen) return;
+    if(e.target.closest('#mobile-controls') || e.target.closest('#hotbar-container')) return;
+    e.preventDefault(); // Stop scrolling
+    const moveX = e.touches[0].clientX - touchStartX;
+    const moveY = e.touches[0].clientY - touchStartY;
+    touchStartX = e.touches[0].clientX; touchStartY = e.touches[0].clientY;
+    state.yaw -= moveX * CONFIG.mouseSensitivity; 
+    state.pitch -= moveY * CONFIG.mouseSensitivity;
     state.pitch = Math.max(-Math.PI/2, Math.min(Math.PI/2, state.pitch));
     player.rotation.y = state.yaw; pitchPivot.rotation.x = state.pitch;
-});
+}, {passive: false});
+
+const bindTouch = (id, key, val) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('touchstart', (e) => { e.preventDefault(); state.move[key] = val; });
+    el.addEventListener('touchend', (e) => { e.preventDefault(); state.move[key] = 0; });
+    el.addEventListener('touchcancel', (e) => { e.preventDefault(); state.move[key] = 0; });
+};
+bindTouch('btn-up', 'f', 1); bindTouch('btn-down', 'b', 1);
+bindTouch('btn-left', 'l', 1); bindTouch('btn-right', 'r', 1);
+
+const btnJump = document.getElementById('btn-jump');
+if(btnJump) {
+    btnJump.addEventListener('touchstart', (e) => { 
+        e.preventDefault(); 
+        const now = performance.now();
+        if (state.lastTaps['btnJump'] && now - state.lastTaps['btnJump'] < 300) { state.isFlying = !state.isFlying; state.velocity.y = 0; }
+        state.lastTaps['btnJump'] = now;
+        if (state.isFlying) state.move.u = 1; else if (state.velocity.y === 0) state.velocity.y = CONFIG.jumpForce; 
+    });
+    btnJump.addEventListener('touchend', (e) => { e.preventDefault(); state.move.u = 0; });
+    btnJump.addEventListener('touchcancel', (e) => { e.preventDefault(); state.move.u = 0; });
+}
+
+document.getElementById('btn-break').addEventListener('touchstart', (e) => { e.preventDefault(); handleBlockAction('break'); });
+document.getElementById('btn-place').addEventListener('touchstart', (e) => { e.preventDefault(); handleBlockAction('place'); });
+document.getElementById('btn-inv').addEventListener('touchstart', (e) => { e.preventDefault(); toggleInventory(); });
+document.getElementById('btn-cam').addEventListener('touchstart', (e) => { e.preventDefault(); toggleCamera(); });
+document.getElementById('btn-pause').addEventListener('touchstart', (e) => { e.preventDefault(); handlePause(); });
 
 // --- 8. ANIMATION LOOP ---
 function animate() {
