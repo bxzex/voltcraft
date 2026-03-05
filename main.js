@@ -29,15 +29,25 @@ state.selectedItem = hotbarSlots[state.activeSlot];
 
 const isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 
-// --- 2. MULTIPLAYER (PeerJS) ---
+// --- 2. MULTIPLAYER (PeerJS) & CHAT ---
 let peer = null;
 let connections = {};
 let myId = null;
+let myUsername = 'Player';
 
 const mpStatus = document.getElementById('mp-status');
 const hostBtn = document.getElementById('host-btn');
 const joinBtn = document.getElementById('join-btn');
 const worldIdInput = document.getElementById('world-id-input');
+const usernameInput = document.getElementById('username-input');
+
+function appendChat(msg) {
+    const box = document.getElementById('chat-messages');
+    const m = document.createElement('div');
+    m.className = 'chat-msg'; m.innerText = msg;
+    box.appendChild(m);
+    if(box.children.length > 5) box.removeChild(box.children[0]);
+}
 
 function setupPeerEvents(conn) {
     conn.on('open', () => {
@@ -52,6 +62,10 @@ function setupPeerEvents(conn) {
             setWeather(msg.weather);
             updateInstances();
             mpStatus.innerText = "World downloaded! Ready to play.";
+            startSetup(); // Pop right into game
+            appendChat(`[Server] Joined world ${conn.peer}`);
+        } else if (msg.type === 'chat') {
+            appendChat(msg.text);
         } else if (msg.type === 'place') {
             world.set(msg.k, { type: msg.blockType });
             updateInstances();
@@ -80,22 +94,26 @@ function broadcast(msg) {
 }
 
 if(hostBtn) hostBtn.onclick = () => {
+    myUsername = usernameInput.value.trim() || 'Player';
     peer = new window.Peer();
     peer.on('open', (id) => {
         myId = id;
         worldIdInput.value = id;
         mpStatus.innerText = `Hosting World: ${id} (Waiting...)`;
+        appendChat(`[Server] Hosting world. Invite friends with ID: ${id}`);
     });
     peer.on('connection', (conn) => {
         connections[conn.peer] = conn;
         setupPeerEvents(conn);
+        appendChat(`[Server] A player joined!`);
     });
 };
 
 if(joinBtn) joinBtn.onclick = () => {
+    myUsername = usernameInput.value.trim() || 'Player';
     const targetId = worldIdInput.value.trim();
     if(!targetId) return alert("Enter a World ID");
-    mpStatus.innerText = "Connecting...";
+    mpStatus.innerText = "Connecting... (Please wait to jump in)";
     peer = new window.Peer();
     peer.on('open', (id) => {
         const conn = peer.connect(targetId);
@@ -779,6 +797,7 @@ document.getElementById('close-inv-btn').onclick = toggleInventory;
 const startSetup = () => {
     state.gameStarted = true; 
     document.getElementById('instructions').style.display = 'none'; 
+    document.getElementById('chat-container').style.display = 'flex';
     if(!isMobile) document.body.requestPointerLock();
     if(isMobile) document.getElementById('mobile-controls').style.display = 'block';
 };
@@ -890,8 +909,40 @@ document.addEventListener('mousemove', (e) => {
     player.rotation.y = state.yaw; pitchPivot.rotation.x = state.pitch;
 });
 
+// Chat Interaction
+const chatInputWrapper = document.getElementById('chat-input-wrapper');
+const chatInput = document.getElementById('chat-input');
+
+function toggleChat() {
+    const isChatOpen = chatInputWrapper.style.display === 'block';
+    if(isChatOpen) {
+        const text = chatInput.value.trim();
+        if(text) {
+            const formatted = `[${myUsername}] ${text}`;
+            appendChat(formatted);
+            broadcast({ type: 'chat', text: formatted });
+        }
+        chatInput.value = '';
+        chatInputWrapper.style.display = 'none';
+        chatInput.blur();
+        if(!isMobile && state.gameStarted) document.body.requestPointerLock();
+    } else {
+        chatInputWrapper.style.display = 'block';
+        chatInput.focus();
+        if(!isMobile) document.exitPointerLock();
+    }
+}
+
 // Desktop Keyboard
 document.addEventListener('keydown', (e) => {
+    if(chatInputWrapper.style.display === 'block') {
+        if(e.code === 'Enter') toggleChat();
+        if(e.code === 'Escape') { chatInputWrapper.style.display = 'none'; chatInput.blur(); if(!isMobile && state.gameStarted) document.body.requestPointerLock(); }
+        return; // Don't process other keys when typing
+    }
+    
+    if(e.code === 'KeyT' || e.code === 'Enter') { e.preventDefault(); toggleChat(); return; }
+    
     if(e.code === 'Escape') { handlePause(); return; }
     if (e.code === 'KeyE') { toggleInventory(); return; }
     if (state.inventoryOpen) return;
