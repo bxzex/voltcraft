@@ -6,4 +6,5 @@ export const htmlToDom = (html: string) => {
 
 export const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(
   navigator.userAgent
-)
+) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+

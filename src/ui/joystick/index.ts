@@ -94,6 +94,11 @@ export default class Joystick {
   init = () => {
     htmlToDom(UI)
 
+    // Disable context menu on all joystick buttons to prevent "copy" behavior on long press
+    document.querySelectorAll('.joystick *').forEach(el => {
+      el.addEventListener('contextmenu', e => e.preventDefault());
+    });
+
     this.initButton({ actionKey: ActionKey.FRONT, key: 'w' })
     this.initButton({ actionKey: ActionKey.LEFT, key: 'a' })
     this.initButton({ actionKey: ActionKey.RIGHT, key: 'd' })
