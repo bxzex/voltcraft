@@ -11,7 +11,7 @@ import * as THREE from 'three'
 export default class UI {
   constructor(terrain: Terrain, control: Control) {
     this.fps = new FPS()
-    this.bag = new Bag()
+    this.bag = new Bag(control)
     this.joystick = new Joystick(control)
 
     this.crossHair.className = 'cross-hair'
@@ -155,7 +155,11 @@ export default class UI {
     document.body.addEventListener('keydown', (e: KeyboardEvent) => {
       // menu
       if (e.key === 'e' && document.pointerLockElement) {
-        !isMobile && control.control.unlock()
+        const inv = document.getElementById('inventory-menu');
+        if (inv) {
+          inv.classList.remove('hidden');
+          !isMobile && control.control.unlock();
+        }
       }
 
       // fullscreen
@@ -175,10 +179,16 @@ export default class UI {
 
     // play / pause handler
     document.addEventListener('pointerlockchange', () => {
+      const inv = document.getElementById('inventory-menu');
       if (document.pointerLockElement) {
         this.onPlay()
       } else {
-        this.onPause()
+        if (inv && !inv.classList.contains('hidden')) {
+          // Inventory is open, do not pause
+          this.crossHair.classList.add('hidden')
+        } else {
+          this.onPause()
+        }
       }
     })
 

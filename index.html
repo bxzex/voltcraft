@@ -110,6 +110,19 @@
         <button id="weather-thunder" class="button" style="width: auto; padding: 5px 10px; font-size: 16px;">Thunder</button>
       </div>
 
+      <p>Skin:</p>
+      <div style="display: flex; gap: 5px; flex-wrap: wrap; justify-content: center; margin-bottom: 10px;">
+        <button class="button skin-btn" data-skin="steve" style="width: auto; padding: 5px 10px; font-size: 16px;">Steve</button>
+        <button class="button skin-btn" data-skin="alex" style="width: auto; padding: 5px 10px; font-size: 16px;">Alex</button>
+        <button class="button skin-btn" data-skin="batman" style="width: auto; padding: 5px 10px; font-size: 16px;">Batman</button>
+        <button class="button skin-btn" data-skin="spiderman" style="width: auto; padding: 5px 10px; font-size: 16px;">Spidey</button>
+        <button class="button skin-btn" data-skin="superman" style="width: auto; padding: 5px 10px; font-size: 16px;">Superman</button>
+        <button class="button skin-btn" data-skin="deadpool" style="width: auto; padding: 5px 10px; font-size: 16px;">Deadpool</button>
+        <button class="button skin-btn" data-skin="ironman" style="width: auto; padding: 5px 10px; font-size: 16px;">Iron Man</button>
+        <button class="button skin-btn" data-skin="wolverine" style="width: auto; padding: 5px 10px; font-size: 16px;">Wolverine</button>
+        <button class="button skin-btn" data-skin="masterchief" style="width: auto; padding: 5px 10px; font-size: 16px;">Chief</button>
+      </div>
+
       <p>Multiplayer ID:</p>
       <div style="display: flex; gap: 5px;">
         <input type="text" id="my-world-id" readonly class="button" style="text-align: center; background-color: #fff; color: #000; font-size: 14px; width: 100%;" />
@@ -122,5 +135,14 @@
 
     <div class="save-modal hidden">Game Saved!</div>
     <div class="load-modal hidden">Game Loaded!</div>
+
+    <!-- Inventory Menu Overlay -->
+    <div id="inventory-menu" class="hidden" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 50; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; font-family: Minecraft;">
+      <h2 style="margin-bottom: 20px; font-size: 2rem;">Inventory</h2>
+      <div id="inventory-grid" style="display: grid; grid-template-columns: repeat(6, 60px); gap: 10px; background: #c6c6c6; padding: 20px; border: 4px solid #000; border-top-color: #fff; border-left-color: #fff; border-bottom-color: #555; border-right-color: #555;">
+        <!-- Blocks will be injected here -->
+      </div>
+      <p style="margin-top: 20px;">Click a block to equip it to your current hotbar slot. Press E or ESC to close.</p>
+    </div>
   </body>
 </html>
