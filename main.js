@@ -391,7 +391,9 @@ function noise2D(x, z) {
 }
 
 function isCave(x, y, z) {
-    return (Math.sin(x*0.1) * Math.cos(y*0.1) * Math.sin(z*0.1)) > 0.4;
+    let n1 = Math.sin(x*0.08) * Math.cos(y*0.08) * Math.sin(z*0.08);
+    let n2 = Math.sin(x*0.15) * Math.cos(y*0.15) * Math.sin(z*0.15);
+    return (n1 + n2 * 0.5) > 0.3; 
 }
 
 function buildTree(wx, wy, wz) {
@@ -421,10 +423,29 @@ function buildHouse(wx, wy, wz) {
     world.set(getBlockKey(wx - 1, wy + 1, wz + 1), { type: 'bookshelf' });
 }
 
+function buildWell(wx, wy, wz) {
+    for(let x=-1; x<=1; x++) {
+        for(let z=-1; z<=1; z++) {
+            world.set(getBlockKey(wx+x, wy, wz+z), { type: 'cobblestone' });
+            if(Math.abs(x)===1 || Math.abs(z)===1) {
+                world.set(getBlockKey(wx+x, wy+1, wz+z), { type: 'cobblestone' });
+                world.set(getBlockKey(wx+x, wy+3, wz+z), { type: 'wood' });
+            } else {
+                world.set(getBlockKey(wx+x, wy, wz+z), { type: 'water' });
+            }
+        }
+    }
+    world.set(getBlockKey(wx-1, wy+2, wz-1), { type: 'planks' });
+    world.set(getBlockKey(wx+1, wy+2, wz-1), { type: 'planks' });
+    world.set(getBlockKey(wx-1, wy+2, wz+1), { type: 'planks' });
+    world.set(getBlockKey(wx+1, wy+2, wz+1), { type: 'planks' });
+}
+
 function generateWorld() {
     world.clear();
     const villageCenters = [];
-    if(Math.random() > 0.1) villageCenters.push({x: 10, z: 10});
+    if(Math.random() > 0.05) villageCenters.push({x: 10, z: 10});
+    if(Math.random() > 0.4) villageCenters.push({x: -30, z: 20});
     
     for (let cx = -CONFIG.worldSize; cx < CONFIG.worldSize; cx++) {
         for (let cz = -CONFIG.worldSize; cz < CONFIG.worldSize; cz++) {
@@ -436,13 +457,13 @@ function generateWorld() {
                     villageCenters.forEach(v => { const d = Math.sqrt((wx-v.x)**2 + (wz-v.z)**2); if(d < vDist) vDist = d; });
                     
                     let rawH = noise2D(wx, wz);
-                    if (vDist < 15) rawH = rawH * (vDist/15); 
+                    if (vDist < 20) rawH = rawH * (vDist/20); 
                     const h = Math.floor(rawH) + 10;
                     
                     for (let y = h; y >= CONFIG.bedrockDepth; y--) {
                         if (y === CONFIG.bedrockDepth) { world.set(getBlockKey(wx, y, wz), { type: 'bedrock' }); continue; }
                         
-                        if (y > h && y <= 6) { world.set(getBlockKey(wx, y, wz), { type: 'water' }); continue; }
+                        if (y > h && y <= 8) { world.set(getBlockKey(wx, y, wz), { type: 'water' }); continue; }
                         if (y > h) continue;
 
                         if (y < h - 3 && isCave(wx, y, wz)) {
@@ -452,8 +473,8 @@ function generateWorld() {
 
                         let type = 'stone';
                         if (y === h) {
-                            if (y <= 6) type = 'sand';
-                            else type = (vDist < 15 && Math.random()<0.3) ? 'dirt' : 'grass';
+                            if (y <= 9) type = 'sand';
+                            else type = (vDist < 20 && Math.random()<0.3) ? 'dirt' : 'grass';
                         }
                         else if (y > h - 4) type = 'dirt';
                         else {
@@ -465,8 +486,8 @@ function generateWorld() {
                         world.set(getBlockKey(wx, y, wz), { type });
                     }
                     
-                    if (h > 6 && vDist >= 15 && Math.random() < 0.01) buildTree(wx, h, wz);
-                    else if (h > 6 && vDist >= 15 && Math.random() < 0.05) world.set(getBlockKey(wx, h+1, wz), { type: Math.random() > 0.5 ? 'dandelion' : 'poppy' });
+                    if (h > 8 && vDist >= 20 && Math.random() < 0.015) buildTree(wx, h, wz);
+                    else if (h > 8 && vDist >= 20 && Math.random() < 0.05) world.set(getBlockKey(wx, h+1, wz), { type: Math.random() > 0.5 ? 'dandelion' : 'poppy' });
                 }
             }
         }
@@ -474,7 +495,22 @@ function generateWorld() {
     
     villageCenters.forEach(v => {
         const vh = Math.floor(noise2D(v.x, v.z))+10;
-        if(vh > 6) spawnVillager(v.x + 4, vh+1, v.z + 4);
+        if(vh > 8) {
+            buildHouse(v.x, vh, v.z);
+            buildHouse(v.x + 10, vh, v.z);
+            buildHouse(v.x, vh, v.z + 10);
+            buildHouse(v.x + 10, vh, v.z + 10);
+            buildWell(v.x + 5, vh, v.z + 5);
+            
+            for(let p=-2; p<=12; p++) {
+                world.set(getBlockKey(v.x + p, vh, v.z + 5), {type: 'sand'});
+                world.set(getBlockKey(v.x + 5, vh, v.z + p), {type: 'sand'});
+            }
+            
+            spawnVillager(v.x + 5, vh+1, v.z + 2);
+            spawnVillager(v.x + 2, vh+1, v.z + 5);
+            spawnVillager(v.x + 8, vh+1, v.z + 5);
+        }
     });
     updateInstances();
 }
