@@ -390,10 +390,22 @@ function noise2D(x, z) {
     const s = 0.05; return Math.sin(x * s) * Math.cos(z * s) * 4 + Math.sin(x * s * 0.5) * 6;
 }
 
+// 3D Noise function for realistic winding caves
+function noise3D(x, y, z) {
+    let nx = x * 0.07; let ny = y * 0.07; let nz = z * 0.07;
+    let val1 = Math.sin(nx) * Math.cos(ny) * Math.sin(nz);
+    let val2 = Math.cos(nx * 1.5 + 2) * Math.sin(ny * 1.5) * Math.cos(nz * 1.5 + 2);
+    let val3 = Math.sin(nx * 2.5) * Math.cos(ny * 2.5) * Math.sin(nz * 2.5);
+    return val1 + val2 * 0.5 + val3 * 0.25;
+}
+
 function isCave(x, y, z) {
-    let n1 = Math.sin(x*0.08) * Math.cos(y*0.08) * Math.sin(z*0.08);
-    let n2 = Math.sin(x*0.15) * Math.cos(y*0.15) * Math.sin(z*0.15);
-    return (n1 + n2 * 0.5) > 0.3; 
+    // We create worm-like tunnels by carving out areas where the 3D noise is close to zero (a ridged noise technique)
+    let n = noise3D(x, y, z);
+    // Cave logic: only hollow out if the noise is tightly around 0 (creates winding tunnels)
+    // and make caves rarer the higher up they are
+    let threshold = 0.15 + (y * 0.005); // Tunnels get thinner/stop near surface
+    return Math.abs(n) < threshold;
 }
 
 function buildTree(wx, wy, wz) {
