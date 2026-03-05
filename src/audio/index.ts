@@ -50,32 +50,43 @@ import pig_step from '../static/sounds/mob/pig/step1.ogg'
 import { isMobile } from '../utils'
 
 export default class Audio {
+  bgm: THREE.Audio | null = null
+  listener: THREE.AudioListener | null = null
+  mobSounds: Record<string, THREE.Audio[]> = {}
+  soundSet: THREE.Audio[][] = []
+  index = 0
+  disabled = false
+  musicVolume = 1
+  soundVolume = 1
+
   constructor(camera: THREE.PerspectiveCamera) {
     if (isMobile) return
 
-    const listener = new THREE.AudioListener()
+    this.listener = new THREE.AudioListener()
     const audioLoader = new THREE.AudioLoader()
-    camera.add(listener)
+    camera.add(this.listener)
 
     // load bgm
-    const bgm = new THREE.Audio(listener)
-    bgm.autoplay = false
+    this.bgm = new THREE.Audio(this.listener)
+    this.bgm.autoplay = false
     audioLoader.load(hal3, buffer => {
-      bgm.setBuffer(buffer)
-      bgm.setVolume(0.1)
-      bgm.setLoop(true)
-      if (bgm.isPlaying) {
-        bgm.pause()
-        bgm.play()
+      if (!this.bgm) return
+      this.bgm.setBuffer(buffer)
+      this.bgm.setVolume(this.musicVolume * 0.1)
+      this.bgm.setLoop(true)
+      if (this.bgm.isPlaying) {
+        this.bgm.pause()
+        this.bgm.play()
       }
     })
 
     // play / pause bgm
     document.addEventListener('pointerlockchange', () => {
-      if (document.pointerLockElement && !bgm.isPlaying && !this.disabled) {
-        bgm.play()
+      if (!this.bgm) return
+      if (document.pointerLockElement && !this.bgm.isPlaying && !this.disabled && this.musicVolume > 0) {
+        this.bgm.play()
       } else {
-        bgm.pause()
+        this.bgm.pause()
       }
     })
 
@@ -84,9 +95,9 @@ export default class Audio {
       const audios: THREE.Audio[] = []
       for (const type of types) {
         audioLoader.load(type, buffer => {
-          const audio = new THREE.Audio(listener!)
+          const audio = new THREE.Audio(this.listener!)
           audio.setBuffer(buffer)
-          audio.setVolume(0.15)
+          audio.setVolume(this.soundVolume * 0.15)
           audios.push(audio)
         })
       }
@@ -105,17 +116,40 @@ export default class Audio {
       this.mobSounds[key] = []
       for (const src of mobSources[key]) {
         audioLoader.load(src, buffer => {
-          const audio = new THREE.Audio(listener!)
+          const audio = new THREE.Audio(this.listener!)
           audio.setBuffer(buffer)
-          audio.setVolume(0.1)
+          audio.setVolume(this.soundVolume * 0.1)
           this.mobSounds[key].push(audio)
         })
       }
     }
   }
 
-  disabled = false
-  mobSounds: Record<string, THREE.Audio[]> = {}
+  setMusicVolume(v: number) {
+    this.musicVolume = v
+    if (this.bgm) {
+      this.bgm.setVolume(v * 0.1)
+      if (v === 0 && this.bgm.isPlaying) {
+        this.bgm.pause()
+      } else if (v > 0 && !this.bgm.isPlaying && document.pointerLockElement) {
+        this.bgm.play()
+      }
+    }
+  }
+
+  setSoundVolume(v: number) {
+    this.soundVolume = v
+    for (const audios of this.soundSet) {
+      for (const audio of audios) {
+        audio.setVolume(v * 0.15)
+      }
+    }
+    for (const key in this.mobSounds) {
+      for (const audio of this.mobSounds[key]) {
+        audio.setVolume(v * 0.1)
+      }
+    }
+  }
 
   sourceSet = [
     [grass1, grass2, grass3, grass4],       // 0  grass

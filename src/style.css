@@ -293,11 +293,12 @@ body {
   z-index: 2;
   position: fixed;
   left: 50%;
-  top: 20%;
-  transform: translate(-50%, 0%);
+  top: 50%;
+  transform: translate(-50%, -50%);
 
-  width: 300px;
-  height: 370px;
+  width: 320px;
+  max-height: 85vh;
+  overflow-y: auto;
   color: white;
   background-color: #727272;
   border-left: 2px solid #a4a4a4;
@@ -306,12 +307,26 @@ body {
   border-right: 2px solid #545655;
   box-shadow: 0 0 0 2px black;
 
-  padding: 0px 30px 0px 30px;
+  padding: 20px 30px;
 
-  text-align: center;
-  user-select: none;
   text-align: left;
+  user-select: none;
   line-height: 1.8rem;
+}
+
+/* Custom scrollbar for settings */
+.settings::-webkit-scrollbar {
+  width: 8px;
+}
+.settings::-webkit-scrollbar-track {
+  background: #555;
+}
+.settings::-webkit-scrollbar-thumb {
+  background: #888;
+  border: 1px solid #000;
+}
+.settings::-webkit-scrollbar-thumb:hover {
+  background: #aaa;
 }
 
 #distance-input,

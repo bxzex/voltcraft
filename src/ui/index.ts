@@ -127,12 +127,29 @@ export default class UI {
       }
     })
 
-    // music
+    // music volume
     this.musicInput?.addEventListener('input', (e: Event) => {
-      if (this.fov && e.target instanceof HTMLInputElement) {
-        const disabled = e.target.value === '0'
-        control.audio.disabled = disabled
-        this.music!.innerHTML = `Music: ${disabled ? 'Off' : 'On'}`
+      if (this.music && e.target instanceof HTMLInputElement) {
+        const val = parseInt(e.target.value)
+        control.audio.setMusicVolume(val / 100)
+        this.music.innerHTML = `Music Volume: ${val}%`
+        // Also sync weather rain audio volume if it exists globally
+        if ((window as any).rainAudio) {
+          (window as any).rainAudio.volume = (val / 100) * 0.4;
+        }
+      }
+    })
+
+    // sound volume
+    this.soundInput?.addEventListener('input', (e: Event) => {
+      if (this.sound && e.target instanceof HTMLInputElement) {
+        const val = parseInt(e.target.value)
+        control.audio.setSoundVolume(val / 100)
+        this.sound.innerHTML = `Sound Volume: ${val}%`
+        // Also sync weather thunder audio volume if it exists globally
+        if ((window as any).thunderAudio) {
+          (window as any).thunderAudio.volume = (val / 100);
+        }
       }
     })
 
@@ -294,6 +311,9 @@ export default class UI {
 
   music = document.querySelector('#music')
   musicInput = document.querySelector('#music-input')
+
+  sound = document.querySelector('#sound')
+  soundInput = document.querySelector('#sound-input')
 
   fpsToggle = document.querySelector('#fps-toggle')
   fpsBtn = document.querySelector('#fps-btn')

@@ -118,14 +118,16 @@ rainSys.visible = false;
 const rainAudio = new window.Audio(ASSET_URL + 'sounds/ambient/weather/rain1.ogg');
 rainAudio.loop = true;
 rainAudio.volume = 0.4;
+(window as any).rainAudio = rainAudio;
+
 const thunderAudio = new window.Audio(ASSET_URL + 'sounds/ambient/weather/thunder1.ogg');
+(window as any).thunderAudio = thunderAudio;
 
 function setWeather(w: string) {
     weather = w;
     if (w === 'rain' || w === 'thunder') {
         rainSys.visible = true;
         if (rainAudio.paused) rainAudio.play().catch(() => { });
-        if (w === 'thunder') thunderAudio.play().catch(() => { });
     } else {
         rainSys.visible = false;
         rainAudio.pause();
@@ -453,9 +455,14 @@ let currentHeldBlock = -1;
         rainSys.position.copy(camera.position);
     }
 
-    if (weather === 'thunder' && Math.random() < 0.01) {
+    if (weather === 'thunder' && Math.random() < 0.002) {
         scene.background = new THREE.Color(0xffffff);
         scene.fog = new THREE.Fog(0xffffff, 1, 96);
+        
+        // Play thunder sound with flash
+        thunderAudio.currentTime = 0;
+        thunderAudio.play().catch(()=>{});
+
         setTimeout(() => {
             scene.background = new THREE.Color(0x333333);
             scene.fog = new THREE.Fog(0x333333, 1, 96);
