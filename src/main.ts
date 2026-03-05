@@ -7,6 +7,46 @@ import UI from './ui'
 import Audio from './audio'
 import Multiplayer from './multiplayer'
 
+import batman_skin from './static/skins/batman.png'
+import spiderman_skin from './static/skins/spiderman.png'
+import ironman_skin from './static/skins/ironman.png'
+import steve_skin from './static/skins/steve.png'
+import alex_skin from './static/skins/alex.png'
+import masterchief_skin from './static/skins/masterchief.png'
+import wolverine_skin from './static/skins/wolverine.png'
+import superman_skin from './static/skins/superman.png'
+import mario_skin from './static/skins/mario.png'
+import deadpool_skin from './static/skins/deadpool.png'
+
+import chicken_url from './static/textures/entity/chicken.png'
+import creeper_url from './static/textures/entity/creeper/creeper.png'
+import skeleton_url from './static/textures/entity/skeleton/skeleton.png'
+import cow_url from './static/textures/entity/cow/cow.png'
+import pig_url from './static/textures/entity/pig/pig.png'
+import parrot_url from './static/textures/entity/parrot/parrot_red_blue.png'
+
+const mobAssets: Record<string, string> = {
+    chicken: chicken_url,
+    creeper: creeper_url,
+    skeleton: skeleton_url,
+    cow: cow_url,
+    pig: pig_url,
+    parrot: parrot_url
+};
+
+const skinAssets: Record<string, string> = {
+    steve: steve_skin,
+    alex: alex_skin,
+    batman: batman_skin,
+    spiderman: spiderman_skin,
+    ironman: ironman_skin,
+    masterchief: masterchief_skin,
+    wolverine: wolverine_skin,
+    superman: superman_skin,
+    mario: mario_skin,
+    deadpool: deadpool_skin
+};
+
 import './style.css'
 
 const core = new Core()
@@ -33,10 +73,7 @@ function buildMobBox(type: string, u: number, v: number, w: number, h: number, d
     const getM = (ox: number, oy: number, mw: number, mh: number) => {
         const mat = new THREE.MeshLambertMaterial({ transparent: true, alphaTest: 0.5 });
         const img = new Image();
-        let path = ASSET_URL + 'textures/entity/' + type + '/' + type + '.png';
-        if (type === 'chicken') path = ASSET_URL + 'textures/entity/chicken.png';
-        if (type === 'creeper') path = ASSET_URL + 'textures/entity/creeper/creeper.png';
-        if (type === 'skeleton') path = ASSET_URL + 'textures/entity/skeleton/skeleton.png';
+        let path = mobAssets[type] || (ASSET_URL + 'textures/entity/' + type + '/' + type + '.png');
         
         img.src = path;
         img.crossOrigin = 'anonymous';
@@ -228,8 +265,11 @@ let timeMode = 'day';
 const celestialGroup = new THREE.Group();
 scene.add(celestialGroup);
 
+import sun_url from './static/textures/environment/sun.png'
+import moon_url from './static/textures/environment/moon_phases.png'
+
 // Sun
-const sunTex = texLoader.load('/voltcraft/textures/environment/sun.png');
+const sunTex = texLoader.load(sun_url);
 sunTex.magFilter = THREE.NearestFilter;
 const sunMat = new THREE.MeshBasicMaterial({ map: sunTex, transparent: true, side: THREE.DoubleSide });
 const sunMesh = new THREE.Mesh(new THREE.PlaneGeometry(50, 50), sunMat);
@@ -237,7 +277,7 @@ sunMesh.position.set(0, 0, -200); // Start on North horizon
 celestialGroup.add(sunMesh);
 
 // Moon
-const moonTex = texLoader.load('/voltcraft/textures/environment/moon_phases.png');
+const moonTex = texLoader.load(moon_url);
 moonTex.magFilter = THREE.NearestFilter;
 moonTex.repeat.set(1/4, 1/2); // Just show one phase for now
 const moonMat = new THREE.MeshBasicMaterial({ map: moonTex, transparent: true, side: THREE.DoubleSide });
@@ -286,7 +326,7 @@ if (myWorldId && copyIdBtn) {
 // Parrots
 function spawnParrot(x: number, y: number, z: number) {
     const group = new THREE.Group();
-    const parrotTexUrl = ASSET_URL + 'textures/entity/parrot/parrot_red_blue.png';
+    const parrotTexUrl = mobAssets['parrot'];
     const buildParrotBox = (u: number, v: number, w: number, h: number, d: number) => {
         const getM = (ox: number, oy: number, mw: number, mh: number) => {
             const t = texLoader.load(parrotTexUrl);
@@ -386,7 +426,7 @@ tpHand.position.set(0, -0.6, -0.4);
 
 function createPlayerMesh(skinName: string) {
     playerGroup.clear();
-    const texUrl = `/voltcraft/skins/${skinName}.png`;
+    const texUrl = skinAssets[skinName] || skinAssets['steve'];
 
     const headMat = buildSkinBox(texUrl, 0, 0, 8, 8, 8);
     playerParts.head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), headMat);
