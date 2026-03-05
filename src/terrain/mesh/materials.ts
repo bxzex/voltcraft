@@ -292,7 +292,8 @@ export default class Materials {
       transparent: true, 
       opacity: 0.9, 
       color: 0x0044ff,
-      side: THREE.DoubleSide
+      side: THREE.DoubleSide,
+      depthWrite: false
     }),
     stone: mat(stoneTex),
     coal: mat(coalTex),

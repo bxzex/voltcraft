@@ -29,28 +29,31 @@ const ASSET_URL = '/';
 const texLoader = new THREE.TextureLoader();
 const mobs: { mesh: THREE.Group, type: string, timer: number }[] = [];
 
-function buildAnimalBox(type: 'pig' | 'cow', u: number, v: number, w: number, h: number, d: number) {
+function buildAnimalBox(type: 'pig' | 'cow' | 'chicken', u: number, v: number, w: number, h: number, d: number) {
     const getM = (ox: number, oy: number, mw: number, mh: number) => {
         const mat = new THREE.MeshLambertMaterial({ transparent: true, alphaTest: 0.5 });
         const img = new Image();
-        img.src = ASSET_URL + 'textures/entity/' + type + '/' + type + '.png';
+        let path = ASSET_URL + 'textures/entity/' + type + '/' + type + '.png';
+        if (type === 'chicken') path = ASSET_URL + 'textures/entity/chicken.png';
+        
+        img.src = path;
         img.crossOrigin = 'anonymous';
         img.onload = () => {
             const canvas = document.createElement('canvas');
-            canvas.width = 64; canvas.height = 32;
+            canvas.width = 64; canvas.height = 64; // Using 64x64 for all to be safe
             const ctx = canvas.getContext('2d')!;
             ctx.drawImage(img, 0, 0);
             const tex = new THREE.CanvasTexture(canvas);
             tex.magFilter = THREE.NearestFilter;
-            tex.repeat.set(mw / 64, mh / 32);
-            tex.offset.set(ox / 64, 1 - (oy + mh) / 32);
+            tex.repeat.set(mw / 64, mh / 64);
+            tex.offset.set(ox / 64, 1 - (oy + mh) / 64);
             mat.map = tex;
             mat.needsUpdate = true;
         }
         return mat;
     };
     return [
-        getM(u + d + w, v + d, d, h), // right (left side from front)
+        getM(u + d + w, v + d, d, h), // right
         getM(u, v + d, d, h),         // left
         getM(u + d, v, w, d),         // top
         getM(u + d + w, v, w, d),     // bottom
@@ -63,51 +66,44 @@ function spawnMob(type: 'pig' | 'cow' | 'chicken', x: number, y: number, z: numb
     const group = new THREE.Group();
 
     if (type === 'chicken') {
-        const buildChickenBox = (u: number, v: number, w: number, h: number, d: number) => {
-            const getM = (ox: number, oy: number, mw: number, mh: number) => {
-                const mat = new THREE.MeshLambertMaterial({ transparent: true, alphaTest: 0.5 });
-                const img = new Image();
-                img.src = ASSET_URL + 'textures/entity/chicken/chicken.png';
-                img.crossOrigin = 'anonymous';
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = 64; canvas.height = 32;
-                    const ctx = canvas.getContext('2d')!;
-                    ctx.drawImage(img, 0, 0);
-                    const tex = new THREE.CanvasTexture(canvas);
-                    tex.magFilter = THREE.NearestFilter;
-                    tex.repeat.set(mw / 64, mh / 32);
-                    tex.offset.set(ox / 64, 1 - (oy + mh) / 32);
-                    mat.map = tex;
-                    mat.needsUpdate = true;
-                }
-                return mat;
-            };
-            return [getM(u + d + w, v + d, d, h), getM(u, v + d, d, h), getM(u + d, v, w, d), getM(u + d + w, v, w, d), getM(u + d, v + d, w, h), getM(u + d + w + d, v + d, w, h)];
-        };
         // Chicken Body
-        const body = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.4, 0.6), buildChickenBox(0, 9, 6, 6, 8));
+        const body = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.4, 0.6), buildAnimalBox('chicken', 0, 9, 6, 6, 8));
         body.position.set(0, 0.4, 0); group.add(body);
         // Chicken Head
-        const head = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.3, 0.2), buildChickenBox(0, 0, 4, 6, 3));
+        const head = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.3, 0.2), buildAnimalBox('chicken', 0, 0, 4, 6, 3));
         head.position.set(0, 0.7, 0.3); group.add(head);
+        // Beak (14, 0, 4x2x2)
+        const beakMat = buildAnimalBox('chicken', 14, 0, 4, 2, 2);
+        const beak = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.1, 0.1), beakMat);
+        beak.position.set(0, 0.65, 0.45); group.add(beak);
     } else {
-        // Body (28, 8, 10x16x8 mapped horizontally in some versions, but let's approximate)
+        // Body
         const bodyMat = buildAnimalBox(type, 28, 8, 10, 16, 8);
         const bodyGeo = new THREE.BoxGeometry(0.8, 0.6, 1.2);
         const body = new THREE.Mesh(bodyGeo, bodyMat);
         body.position.set(0, 0.6, 0);
         group.add(body);
 
-        // Head (0, 0, 8x8x8)
+        // Head
         const headMat = buildAnimalBox(type, 0, 0, 8, 8, 8);
         const headGeo = new THREE.BoxGeometry(0.5, 0.5, 0.5);
         const head = new THREE.Mesh(headGeo, headMat);
         head.position.set(0, 0.9, 0.7);
         group.add(head);
 
+        // Snout
+        if (type === 'pig') {
+            const snoutMat = buildAnimalBox('pig', 16, 16, 4, 3, 1);
+            const snout = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.15, 0.1), snoutMat);
+            snout.position.set(0, 0.85, 0.95); group.add(snout);
+        } else if (type === 'cow') {
+            const snoutMat = buildAnimalBox('cow', 0, 0, 8, 8, 8); // simplified
+            const snout = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.2, 0.1), snoutMat);
+            snout.position.set(0, 0.8, 0.95); group.add(snout);
+        }
+
         // Legs
-        const legMat = buildAnimalBox(type, 0, 16, 4, 12, 4); // Standard animal leg texture position
+        const legMat = buildAnimalBox(type, 0, 16, 4, 12, 4);
         const legGeo = new THREE.BoxGeometry(0.25, 0.4, 0.25);
         [[0.25, 0.4], [-0.25, 0.4], [0.25, -0.4], [-0.25, -0.4]].forEach(p => {
             const l = new THREE.Mesh(legGeo, legMat);
@@ -273,7 +269,7 @@ function buildSkinBox(texUrl: string, u: number, v: number, w: number, h: number
 
 let playerParts: any = {};
 const fpHand = new THREE.Group();
-fpHand.position.set(0.4, -0.3, -0.6);
+fpHand.position.set(0.6, -0.5, -0.8);
 camera.add(fpHand);
 const tpHand = new THREE.Group();
 tpHand.position.set(0, -0.6, -0.4);

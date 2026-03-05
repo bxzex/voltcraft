@@ -232,10 +232,14 @@ export default class Bag {
         item.appendChild(createBlockIcon(block.type, block.src))
 
         item.onclick = () => {
+          control.audio.playSound(BlockType.stone); // Play click sound
           control.holdingBlock = block.type
           const selectedItem = this.items[control.hotbarIndex]
           selectedItem.innerHTML = ''
           selectedItem.appendChild(createBlockIcon(block.type, block.src))
+
+          // Update the internal state of the hotbar item if necessary
+          // (The current implementation seems to just use innerHTML)
 
           // Close inventory after selection
           const inv = document.getElementById('inventory-menu')
