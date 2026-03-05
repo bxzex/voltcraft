@@ -373,12 +373,12 @@ let currentHeldBlock = -1;
 
             // Sounds
             if (m.type === 'pig' || m.type === 'cow') {
-                if (Math.random() < 0.01) { // say sounds
+                if (Math.random() < 0.001) { // say sounds (reduced)
                     control.audio.playMobSound(m.type, 'say');
                 }
                 if (m.mesh.position.y < 29.5) { // splash in water
-                    if (Math.random() < 0.05) control.audio.playSplash();
-                } else if (Math.random() < 0.05) { // step sounds
+                    if (Math.random() < 0.005) control.audio.playSplash(); // reduced
+                } else if (Math.random() < 0.002) { // step sounds (reduced)
                     control.audio.playMobSound(m.type, 'step');
                 }
             }
@@ -405,13 +405,19 @@ let currentHeldBlock = -1;
     if (isSneaking) {
         playerGroup.position.y -= 0.15; // Lower overall group
         if (playerParts.body) playerParts.body.rotation.x = 0.3; // Tilt body forward
-        if (playerParts.head) playerParts.head.position.y = 0.35; // Lower head
+        if (playerParts.head) {
+            playerParts.head.position.y = 1.25; // Adjusted (was 0.35)
+            playerParts.head.position.z = 0.1;  // Forward lean
+        }
         // Bend legs slightly for sneaking
         if (playerParts.leftLegGroup) playerParts.leftLegGroup.rotation.x = -0.3;
         if (playerParts.rightLegGroup) playerParts.rightLegGroup.rotation.x = -0.3;
     } else {
         if (playerParts.body) playerParts.body.rotation.x = 0;
-        if (playerParts.head) playerParts.head.position.y = 0.55; // Default head Y
+        if (playerParts.head) {
+            playerParts.head.position.y = 1.4; // Adjusted (was 0.55)
+            playerParts.head.position.z = 0;
+        }
     }
 
     if (control.velocity.x !== 0 || control.velocity.z !== 0) {
