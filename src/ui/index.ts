@@ -157,6 +157,7 @@ export default class UI {
       if (e.key === 'e' && document.pointerLockElement) {
         const inv = document.getElementById('inventory-menu');
         if (inv) {
+          inv.style.display = 'flex';
           inv.classList.remove('hidden');
           !isMobile && control.control.unlock();
         }
@@ -191,13 +192,21 @@ export default class UI {
     document.addEventListener('pointerlockchange', () => {
       const inv = document.getElementById('inventory-menu');
       if (document.pointerLockElement) {
-        this.onPlay()
+        if (!document.querySelector('.menu')?.classList.contains('start')) {
+            this.onPlay()
+            if (inv && inv.style.display === 'flex') {
+                inv.style.display = 'none';
+                inv.classList.add('hidden');
+            }
+        }
       } else {
-        if (inv && !inv.classList.contains('hidden')) {
-          // Inventory is open, do not pause
-          this.crossHair.classList.add('hidden')
-        } else {
-          this.onPause()
+        if (!document.querySelector('.menu')?.classList.contains('start')) {
+            if (inv && inv.style.display === 'flex') {
+              // Inventory is open, do not pause
+              this.crossHair.classList.add('hidden')
+            } else {
+              this.onPause()
+            }
         }
       }
     })
