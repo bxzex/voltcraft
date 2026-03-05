@@ -9,13 +9,12 @@ import { isMobile } from '../../utils'
 import Control from '../../control'
 import { BlockType } from '../../terrain'
 
-const ASSET_URL = '/textures/block/';
-const dirt = ASSET_URL + 'dirt.png';
-const cobblestone = ASSET_URL + 'cobblestone.png';
-const bedrock = ASSET_URL + 'bedrock.png';
-const sand = ASSET_URL + 'sand.png';
-const leaf = ASSET_URL + 'oak_leaves.png';
-const coal = ASSET_URL + 'coal_ore.png';
+import dirt from '../../static/textures/block/dirt.png'
+import cobblestone from '../../static/textures/block/cobblestone.png'
+import bedrock from '../../static/textures/block/bedrock.png'
+import sand from '../../static/textures/block/sand.png'
+import leaf from '../../static/textures/block/oak_leaves.png'
+import coal from '../../static/textures/block/coal_ore.png'
 
 const allBlocks = [
   { type: BlockType.grass, src: grass },
@@ -33,45 +32,14 @@ const allBlocks = [
 ];
 
 const createBlockIcon = (src: string) => {
-  if (src.includes('block-icon')) {
-    const img = document.createElement('img');
-    img.src = src; img.style.width = '48px'; img.style.height = '48px';
-    img.crossOrigin = 'anonymous';
-    img.style.imageRendering = 'pixelated';
-    return img;
-  }
-
-  const wrapper = document.createElement('div');
-  wrapper.style.width = '48px'; wrapper.style.height = '48px';
-  wrapper.style.display = 'flex'; wrapper.style.justifyContent = 'center'; wrapper.style.alignItems = 'center';
-
-  const cube = document.createElement('div');
-  cube.style.width = '24px'; cube.style.height = '24px';
-  cube.style.position = 'relative';
-  cube.style.transformStyle = 'preserve-3d';
-  cube.style.transform = 'rotateX(-30deg) rotateY(45deg)';
-
-  const addFace = (transform: string, brightness: number) => {
-    const face = document.createElement('div');
-    face.style.position = 'absolute';
-    face.style.width = '100%'; face.style.height = '100%';
-    face.style.backgroundImage = `url(${src})`;
-    face.style.backgroundSize = 'cover';
-    face.style.imageRendering = 'pixelated';
-    face.style.transform = transform;
-    face.style.filter = `brightness(${brightness})`;
-    if (src.includes('glass') || src.includes('water')) {
-      face.style.opacity = '0.7';
-    }
-    cube.appendChild(face);
-  };
-
-  addFace('rotateX(90deg) translateZ(12px)', 1.2); // top
-  addFace('rotateY(-90deg) translateZ(12px)', 0.8); // left
-  addFace('translateZ(12px)', 0.6); // front
-
-  wrapper.appendChild(cube);
-  return wrapper;
+  const img = document.createElement('img');
+  img.src = src;
+  img.style.width = '48px';
+  img.style.height = '48px';
+  img.crossOrigin = 'anonymous';
+  img.style.imageRendering = 'pixelated';
+  img.style.objectFit = 'contain';
+  return img;
 };
 
 export default class Bag {

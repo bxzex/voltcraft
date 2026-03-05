@@ -146,11 +146,11 @@ if (myWorldId && copyIdBtn) {
 // Parrots
 function spawnParrot(x: number, y: number, z: number) {
     const group = new THREE.Group();
-    const tex = texLoader.load(ASSET_URL + 'textures/entity/parrot/parrot_red_blue.png');
-    tex.magFilter = THREE.NearestFilter;
+    const parrotTexUrl = ASSET_URL + 'textures/entity/parrot/parrot_red_blue.png';
     const buildParrotBox = (u: number, v: number, w: number, h: number, d: number) => {
         const getM = (ox: number, oy: number, mw: number, mh: number) => {
-            const t = tex.clone(); t.needsUpdate = true;
+            const t = texLoader.load(parrotTexUrl);
+            t.magFilter = THREE.NearestFilter;
             t.repeat.set(mw / 32, mh / 32); t.offset.set(ox / 32, 1 - (oy + mh) / 32);
             return new THREE.MeshLambertMaterial({ map: t, transparent: true, alphaTest: 0.5 });
         };
