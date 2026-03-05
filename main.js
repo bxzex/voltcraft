@@ -674,6 +674,7 @@ function toggleCamera() {
     document.getElementById('crosshair').style.display = state.firstPerson ? 'flex' : 'none';
     camera.position.set(0, 0, state.firstPerson ? 0 : 5);
     pModel.g.visible = !state.firstPerson;
+    fpItem.visible = state.firstPerson;
 }
 
 document.addEventListener('pointerlockchange', () => {
@@ -916,21 +917,44 @@ function animate() {
         }
 
         entities.forEach(e => {
+            if(e.velocity_y === undefined) e.velocity_y = 0;
             e.timer -= delta; if (e.timer <= 0) { e.dir.set(Math.random()-0.5, 0, Math.random()-0.5).normalize(); e.timer = 2 + Math.random()*3; if(Math.random()<0.4) e.dir.set(0,0,0); }
+            
+            // Gravity
+            e.velocity_y -= CONFIG.gravity * delta;
+            
+            const ar = e.isQuad ? 0.4 : 0.2;
+            const canEntMove = (anx, anz, ay) => {
+                const pts = [[ar,ar],[-ar,ar],[ar,-ar],[-ar,-ar]];
+                for(let p of pts) {
+                    const k1 = getBlockKey(anx + p[0], ay + 0.1, anz + p[1]);
+                    const k2 = getBlockKey(anx + p[0], ay + 1.1, anz + p[1]);
+                    if (world.has(k1) && solidTypes.includes(world.get(k1).type)) return false;
+                    if (world.has(k2) && solidTypes.includes(world.get(k2).type)) return false;
+                }
+                return true;
+            };
+
+            let onGround = false;
+            const floorK = getBlockKey(e.g.position.x, e.g.position.y - 0.1, e.g.position.z);
+            if (world.has(floorK) && solidTypes.includes(world.get(floorK).type) && e.velocity_y <= 0) {
+                e.velocity_y = 0; 
+                e.g.position.y = Math.floor(e.g.position.y - 0.1 + 0.5) + (e.isQuad?0.5:0.8);
+                onGround = true;
+            } else {
+                e.g.position.y += e.velocity_y * delta;
+            }
+            if (e.g.position.y < -20) { e.g.position.y = 20; e.g.position.x = player.position.x; e.g.position.z = player.position.z; }
+
             if (e.dir.lengthSq() > 0.1) {
                 const nX = e.g.position.x + e.dir.x * delta * e.speed; const nZ = e.g.position.z + e.dir.z * delta * e.speed;
-                const ar = e.isQuad ? 0.4 : 0.2;
-                const canEntMove = (anx, anz) => {
-                    const pts = [[ar,ar],[-ar,ar],[ar,-ar],[-ar,-ar]];
-                    for(let p of pts) {
-                        const k1 = getBlockKey(anx + p[0], e.g.position.y + 0.1, anz + p[1]);
-                        const k2 = getBlockKey(anx + p[0], e.g.position.y + 1.1, anz + p[1]);
-                        if (world.has(k1) && solidTypes.includes(world.get(k1).type)) return false;
-                        if (world.has(k2) && solidTypes.includes(world.get(k2).type)) return false;
-                    }
-                    return true;
-                };
-                if (canEntMove(nX, nZ)) { e.g.position.x = nX; e.g.position.z = nZ; } else { e.dir.set(0,0,0); }
+                if (canEntMove(nX, nZ, e.g.position.y)) { 
+                    e.g.position.x = nX; e.g.position.z = nZ; 
+                } else {
+                    // Try jumping if blocked and on ground
+                    if(onGround) e.velocity_y = CONFIG.jumpForce * 0.8;
+                    else e.dir.set(0,0,0); 
+                }
                 e.g.lookAt(e.g.position.x + e.dir.x, e.g.position.y, e.g.position.z + e.dir.z);
                 const sLeg = Math.sin(time * 0.01 * e.speed) * 0.5;
                 if(e.isQuad) { e.legs[0].rotation.x=sLeg; e.legs[1].rotation.x=-sLeg; e.legs[2].rotation.x=-sLeg; e.legs[3].rotation.x=sLeg; }
@@ -939,9 +963,6 @@ function animate() {
                 e.legs.forEach(l => l.rotation.x = 0);
                 if(e.arms) e.arms.forEach(a => a.rotation.x = 0);
             }
-            const floorK = getBlockKey(e.g.position.x, e.g.position.y - 0.1, e.g.position.z);
-            if (!world.has(floorK) || !solidTypes.includes(world.get(floorK).type)) { e.g.position.y -= 10 * delta; if (e.g.position.y < -20) { e.g.position.y = 20; e.g.position.x = player.position.x; e.g.position.z = player.position.z; } } 
-            else { e.g.position.y = Math.floor(e.g.position.y - 0.1 + 0.5) + (e.isQuad?0.5:0.8); }
         });
     }
     renderer.render(scene, camera);
