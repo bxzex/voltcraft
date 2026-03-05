@@ -288,7 +288,12 @@ export default class Materials {
       mat(treeTex), mat(treeTex)
     ],
     leaf: mat(leafTex, { color: new THREE.Color(0, 1, 0), transparent: true }),
-    water: mat(waterTex, { transparent: true, opacity: 0.7 }),
+    water: mat(waterTex, { 
+      transparent: true, 
+      opacity: 0.8, 
+      color: 0x3366ff,
+      side: THREE.DoubleSide
+    }),
     stone: mat(stoneTex),
     coal: mat(coalTex),
     wood: mat(woodTex),
