@@ -31,6 +31,11 @@ import leaf1 from './blocks/leaf1.ogg'
 import leaf2 from './blocks/leaf2.ogg'
 import leaf3 from './blocks/leaf3.ogg'
 import leaf4 from './blocks/leaf4.ogg'
+
+import splash1 from '../static/sounds/liquid/splash.ogg'
+import splash2 from '../static/sounds/liquid/splash2.ogg'
+import splash3 from '../static/sounds/liquid/heavy_splash.ogg'
+
 import { isMobile } from '../utils'
 
 export default class Audio {
@@ -93,7 +98,7 @@ export default class Audio {
     [stone1, stone2, stone3, stone4],       // 9  quartz
     [stone1, stone2, stone3, stone4],       // 10 glass
     [stone1, stone2, stone3, stone4],       // 11 bedrock
-    [grass1, grass2, grass3, grass4],       // 12 water
+    [splash1, splash2, splash3, splash1],   // 12 water
     // New blocks
     [stone1, stone2, stone3, stone4],       // 13 cobblestone
     [stone1, stone2, stone3, stone4],       // 14 bricks
@@ -121,6 +126,37 @@ export default class Audio {
     [tree1, tree2, tree3, tree4],           // 36 pumpkin
     [tree1, tree2, tree3, tree4],           // 37 melon
     [grass1, grass2, grass3, grass4],       // 38 sponge
+    [stone1, stone2, stone3, stone4],       // 39 amethyst
+    [stone1, stone2, stone3, stone4],       // 40 ancientDebris
+    [stone1, stone2, stone3, stone4],       // 41 andesite
+    [stone1, stone2, stone3, stone4],       // 42 polishedAndesite
+    [stone1, stone2, stone3, stone4],       // 43 diorite
+    [stone1, stone2, stone3, stone4],       // 44 polishedDiorite
+    [stone1, stone2, stone3, stone4],       // 45 granite
+    [stone1, stone2, stone3, stone4],       // 46 polishedGranite
+    [stone1, stone2, stone3, stone4],       // 47 deepslate
+    [stone1, stone2, stone3, stone4],       // 48 deepslateBricks
+    [stone1, stone2, stone3, stone4],       // 49 deepslateTiles
+    [stone1, stone2, stone3, stone4],       // 50 basalt
+    [stone1, stone2, stone3, stone4],       // 51 polishedBasalt
+    [stone1, stone2, stone3, stone4],       // 52 blackstone
+    [stone1, stone2, stone3, stone4],       // 53 gildedBlackstone
+    [stone1, stone2, stone3, stone4],       // 54 chiseledBlackstone
+    [stone1, stone2, stone3, stone4],       // 55 endStone
+    [stone1, stone2, stone3, stone4],       // 56 endStoneBricks
+    [stone1, stone2, stone3, stone4],       // 57 purpur
+    [stone1, stone2, stone3, stone4],       // 58 purpurPillar
+    [stone1, stone2, stone3, stone4],       // 59 redSandstone
+    [stone1, stone2, stone3, stone4],       // 60 chiseledRedSandstone
+    [stone1, stone2, stone3, stone4],       // 61 cutRedSandstone
+    [stone1, stone2, stone3, stone4],       // 62 magma
+    [sand1, sand2, sand3, sand4],           // 63 soulSand
+    [dirt1, dirt2, dirt3, dirt4],           // 64 soulSoil
+    [stone1, stone2, stone3, stone4],       // 65 boneBlock
+    [stone1, stone2, stone3, stone4],       // 66 copperBlock
+    [stone1, stone2, stone3, stone4],       // 67 rawIron
+    [stone1, stone2, stone3, stone4],       // 68 rawGold
+    [stone1, stone2, stone3, stone4],       // 69 rawCopper
   ]
 
   soundSet: THREE.Audio[][] = []
