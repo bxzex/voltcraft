@@ -225,6 +225,23 @@
     
     <div id="pause-menu">
         <h1>Game Paused</h1>
+        <div style="background: rgba(0,0,0,0.7); padding: 20px; border: 2px solid #555; text-align: center; margin-bottom: 20px;">
+            <p style="font-size: 20px; color: #aaa; margin: 5px;">World ID:</p>
+            <div style="display: flex; gap: 10px; align-items: center; justify-content: center;">
+                <span id="pause-world-id" style="font-size: 24px; color: #fff; background: #333; padding: 5px 10px; user-select: text;">Not Hosting</span>
+                <button class="mc-btn" id="copy-id-btn" style="font-size: 16px; padding: 5px 10px; margin: 0;">Copy</button>
+            </div>
+            <p style="font-size: 18px; color: #aaa; margin-top: 15px;">Generated Blocks: <span id="pause-block-count" style="color: #fff;">0</span></p>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+            <button class="mc-btn" id="time-day-btn" style="font-size: 20px; padding: 10px;">Set Day</button>
+            <button class="mc-btn" id="time-night-btn" style="font-size: 20px; padding: 10px;">Set Night</button>
+            <button class="mc-btn" id="weather-clear-btn" style="font-size: 20px; padding: 10px;">Sunny</button>
+            <button class="mc-btn" id="weather-rain-btn" style="font-size: 20px; padding: 10px;">Rain</button>
+            <button class="mc-btn" id="weather-thunder-btn" style="font-size: 20px; padding: 10px; grid-column: span 2;">Thunder</button>
+        </div>
+
         <button class="mc-btn" id="resume-btn">Resume</button>
         <button class="mc-btn" id="regen-btn">Regenerate World</button>
     </div>

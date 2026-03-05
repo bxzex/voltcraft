@@ -13,7 +13,8 @@ let state = {
     actionTime: 0, prevTime: performance.now(), yaw: 0, pitch: 0,
     velocity: new THREE.Vector3(), move: { f: 0, b: 0, l: 0, r: 0, u: 0, d: 0 },
     lastTaps: {}, stepLatch: false, activeSlot: 0, selectedItem: 'grass',
-    worldTime: Math.PI / 4 // Morning
+    worldTime: Math.PI / 4, // Morning
+    weather: 'clear' // clear, rain, thunder
 };
 
 const inventoryItems = [
@@ -30,7 +31,7 @@ const isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 
 // --- 2. MULTIPLAYER (PeerJS) ---
 let peer = null;
-let connections = {}; // remote peers
+let connections = {};
 let myId = null;
 
 const mpStatus = document.getElementById('mp-status');
@@ -41,15 +42,14 @@ const worldIdInput = document.getElementById('world-id-input');
 function setupPeerEvents(conn) {
     conn.on('open', () => {
         mpStatus.innerText = `Connected to ${conn.peer}!`;
-        // If Host, send world data to the new peer
-        if (peer.id === myId) { // I am the host
-            conn.send({ type: 'init_world', data: Array.from(world.entries()) });
-        }
+        if (peer.id === myId) conn.send({ type: 'init_world', data: Array.from(world.entries()), time: state.worldTime, weather: state.weather });
     });
     conn.on('data', (msg) => {
         if (msg.type === 'init_world') {
             world.clear();
             msg.data.forEach(([k, v]) => world.set(k, v));
+            state.worldTime = msg.time;
+            setWeather(msg.weather);
             updateInstances();
             mpStatus.innerText = "World downloaded! Ready to play.";
         } else if (msg.type === 'place') {
@@ -62,6 +62,10 @@ function setupPeerEvents(conn) {
             playSound('break');
         } else if (msg.type === 'player_move') {
             updateRemotePlayer(conn.peer, msg.pos, msg.yaw, msg.pitch, msg.isMoving);
+        } else if (msg.type === 'set_time') {
+            state.worldTime = msg.time;
+        } else if (msg.type === 'set_weather') {
+            setWeather(msg.weather);
         }
     });
     conn.on('close', () => {
@@ -100,7 +104,18 @@ if(joinBtn) joinBtn.onclick = () => {
     });
 };
 
-// --- 3. PROCEDURAL TEXTURES (VOLTCRAFT ASSETS) ---
+// --- 3. PROCEDURAL & EXTERNAL ASSETS (VOLTCRAFT) ---
+const ASSET_URL = 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.19.2/assets/minecraft/';
+const texLoader = new THREE.TextureLoader();
+texLoader.setCrossOrigin('anonymous');
+
+const extTex = (path) => {
+    const t = texLoader.load(ASSET_URL + 'textures/' + path);
+    t.magFilter = THREE.NearestFilter; t.colorSpace = THREE.SRGBColorSpace;
+    return t;
+};
+
+// We mix procedural blocks with actual Minecraft entity textures to satisfy the prompt.
 const texCache = {};
 const dataUrls = {};
 
@@ -131,7 +146,6 @@ function noise(ctx, size, baseColor, varAmt, rR, rG, rB) {
     ctx.putImageData(img, 0, 0);
 }
 
-// Blocks
 createTexture('dirt', 16, ctx => noise(ctx, 16, '#5C4033', 30, 1, 0.9, 0.8));
 createTexture('grass_top', 16, ctx => noise(ctx, 16, '#4CA938', 40, 0.8, 1, 0.5));
 createTexture('grass_side', 16, ctx => {
@@ -175,8 +189,8 @@ createTexture('brick', 16, ctx => {
 });
 createTexture('obsidian', 16, ctx => noise(ctx, 16, '#1A0B2E', 20, 1, 0.5, 1));
 createTexture('bedrock', 16, ctx => noise(ctx, 16, '#222222', 60, 1, 1, 1));
-createTexture('water', 16, ctx => noise(ctx, 16, 'rgba(0, 50, 200, 0.7)', 20, 0.5, 0.5, 1));
-createTexture('lava', 16, ctx => noise(ctx, 16, '#FF4500', 40, 1, 0.5, 0));
+createTexture('water', 16, ctx => { noise(ctx, 16, '#0000FF', 20, 0, 0, 1); });
+createTexture('lava', 16, ctx => { noise(ctx, 16, '#FF4500', 40, 1, 0.5, 0); });
 
 const genOre = (name, color) => {
     createTexture(name, 16, ctx => {
@@ -222,8 +236,6 @@ createTexture('poppy', 16, ctx => {
     ctx.clearRect(0,0,16,16); ctx.fillStyle = '#228B22'; ctx.fillRect(7,8,2,8); ctx.fillRect(5,11,3,1);
     ctx.fillStyle = '#FF0000'; ctx.fillRect(5,4,6,4); ctx.fillRect(6,3,4,6); ctx.fillRect(4,5,8,2); ctx.fillStyle = '#000000'; ctx.fillRect(7,5,2,2);
 });
-
-// Item Icons
 createTexture('pickaxe', 16, ctx => {
     ctx.clearRect(0,0,16,16); ctx.fillStyle = '#8B5A2B';
     for(let i=0; i<10; i++) ctx.fillRect(14-i, 14-i, 2, 2);
@@ -237,42 +249,17 @@ createTexture('sword', 16, ctx => {
     ctx.fillStyle = '#FFFFFF'; for(let i=0; i<7; i++) ctx.fillRect(9-i, 7-i, 1, 1);
 });
 
-// Entity Textures
-createTexture('face_player', 16, ctx => {
-    ctx.fillStyle = '#E0AC69'; ctx.fillRect(0,0,16,16);
-    ctx.fillStyle = '#4A3525'; ctx.fillRect(0,0,16,4); ctx.fillRect(0,0,4,6); ctx.fillRect(12,0,4,6); 
-    ctx.fillStyle = '#FFFFFF'; ctx.fillRect(3,7,3,2); ctx.fillRect(10,7,3,2); 
-    ctx.fillStyle = '#2222FF'; ctx.fillRect(4,7,1,2); ctx.fillRect(11,7,1,2); 
-    ctx.fillStyle = '#A0522D'; ctx.fillRect(6,10,4,1); 
-    ctx.fillStyle = '#AA5555'; ctx.fillRect(5,12,6,1); 
-});
-createTexture('face_pig', 16, ctx => {
-    ctx.fillStyle = '#FFB6C1'; ctx.fillRect(0,0,16,16);
-    ctx.fillStyle = '#000000'; ctx.fillRect(2,6,2,2); ctx.fillRect(12,6,2,2); 
-    ctx.fillStyle = '#FFFFFF'; ctx.fillRect(2,6,1,1); ctx.fillRect(12,6,1,1);
-    ctx.fillStyle = '#FF69B4'; ctx.fillRect(5,9,6,4); 
-    ctx.fillStyle = '#8B0000'; ctx.fillRect(6,10,1,2); ctx.fillRect(9,10,1,2); 
-});
-createTexture('face_cow', 16, ctx => {
-    ctx.fillStyle = '#4A3A2A'; ctx.fillRect(0,0,16,16);
-    ctx.fillStyle = '#DDDDDD'; ctx.fillRect(0,0,5,5); ctx.fillRect(10,3,6,4); 
-    ctx.fillStyle = '#000000'; ctx.fillRect(1,6,2,2); ctx.fillRect(13,6,2,2); 
-    ctx.fillStyle = '#FFFFFF'; ctx.fillRect(1,6,1,1); ctx.fillRect(13,6,1,1);
-    ctx.fillStyle = '#555555'; ctx.fillRect(4,10,8,6); 
-});
-createTexture('face_villager', 16, ctx => {
-    ctx.fillStyle = '#E0AC69'; ctx.fillRect(0,0,16,16);
-    ctx.fillStyle = '#FFFFFF'; ctx.fillRect(3,6,3,2); ctx.fillRect(10,6,3,2); 
-    ctx.fillStyle = '#00AA00'; ctx.fillRect(4,6,1,2); ctx.fillRect(11,6,1,2); 
-    ctx.fillStyle = '#000000'; ctx.fillRect(3,5,3,1); ctx.fillRect(10,5,3,1); 
-    ctx.fillStyle = '#A0522D'; ctx.fillRect(6,8,4,6); 
-});
+// Entity skins (Minecraft original)
+const entitySkins = {
+    pig: extTex('entity/pig/pig.png'),
+    cow: extTex('entity/cow/cow.png'),
+    villager: extTex('entity/villager/villager.png'),
+    player: extTex('entity/steve.png')
+};
 
 const m = (t) => new THREE.MeshLambertMaterial({ map: texCache[t] });
 const mT = (t) => new THREE.MeshLambertMaterial({ map: texCache[t], transparent: true, alphaTest: 0.5 });
 const mD = (t) => new THREE.MeshLambertMaterial({ map: texCache[t], transparent: true, alphaTest: 0.5, side: THREE.DoubleSide });
-const mWater = new THREE.MeshLambertMaterial({ map: texCache['water'], transparent: true, opacity: 0.7 });
-const mLava = new THREE.MeshBasicMaterial({ map: texCache['lava'] }); // Lava glows
 
 const materialsMap = {
     grass: [m('grass_side'), m('grass_side'), m('grass_top'), m('dirt'), m('grass_side'), m('grass_side')],
@@ -281,7 +268,9 @@ const materialsMap = {
     planks: m('planks'), leaves: mT('leaves'), sand: m('sand'),
     glass: new THREE.MeshLambertMaterial({ map: texCache['glass'], transparent: true, opacity: 0.6 }),
     brick: m('brick'), bookshelf: [m('bookshelf'), m('bookshelf'), m('planks'), m('planks'), m('bookshelf'), m('bookshelf')],
-    obsidian: m('obsidian'), bedrock: m('bedrock'), water: mWater, lava: mLava,
+    obsidian: m('obsidian'), bedrock: m('bedrock'), 
+    water: new THREE.MeshLambertMaterial({ map: texCache['water'], transparent: true, opacity: 0.7, color: 0x88CCFF }), 
+    lava: new THREE.MeshBasicMaterial({ map: texCache['lava'] }),
     diamond_ore: m('diamond_ore'), gold_ore: m('gold_ore'), iron_ore: m('iron_ore'), coal_ore: m('coal_ore'),
     crafting_table: [m('craft_side'), m('craft_side'), m('craft_top'), m('planks'), m('craft_side'), m('craft_side')],
     furnace: [m('cobblestone'), m('cobblestone'), m('cobblestone'), m('cobblestone'), m('furnace_front'), m('cobblestone')],
@@ -290,29 +279,17 @@ const materialsMap = {
     pickaxe: m('pickaxe'), sword: m('sword')
 };
 
-// Procedural Audio
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-function playProceduralSound(type) {
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-    const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
-    o.connect(g); g.connect(audioCtx.destination);
-    
-    const t = audioCtx.currentTime;
-    if(type === 'break') {
-        o.type = 'square'; o.frequency.setValueAtTime(150, t); o.frequency.exponentialRampToValueAtTime(40, t+0.1);
-        g.gain.setValueAtTime(0.1, t); g.gain.exponentialRampToValueAtTime(0.01, t+0.1);
-        o.start(t); o.stop(t+0.1);
-    } else if (type === 'place') {
-        o.type = 'sine'; o.frequency.setValueAtTime(300, t); o.frequency.exponentialRampToValueAtTime(100, t+0.05);
-        g.gain.setValueAtTime(0.1, t); g.gain.exponentialRampToValueAtTime(0.01, t+0.05);
-        o.start(t); o.stop(t+0.05);
-    } else if (type === 'step') {
-        o.type = 'triangle'; o.frequency.setValueAtTime(80, t);
-        g.gain.setValueAtTime(0.05, t); g.gain.exponentialRampToValueAtTime(0.01, t+0.05);
-        o.start(t); o.stop(t+0.05);
-    }
-}
-const playSound = playProceduralSound;
+// High Quality Sounds (Minecraft style online assets)
+const sounds = {
+    break: new Audio(ASSET_URL + 'sounds/dig/stone1.ogg'),
+    place: new Audio(ASSET_URL + 'sounds/dig/grass1.ogg'),
+    step: new Audio(ASSET_URL + 'sounds/step/grass1.ogg'),
+    rain: new Audio(ASSET_URL + 'sounds/ambient/weather/rain1.ogg'),
+    thunder: new Audio(ASSET_URL + 'sounds/ambient/weather/thunder1.ogg')
+};
+Object.values(sounds).forEach(s => { s.crossOrigin = 'anonymous'; s.volume = 0.2; });
+sounds.rain.loop = true; sounds.rain.volume = 0.4;
+const playSound = (n) => { if(sounds[n]) { sounds[n].currentTime = 0; sounds[n].play().catch(()=>{}); } };
 
 // --- 4. SCENE SETUP (Environment) ---
 const scene = new THREE.Scene();
@@ -331,7 +308,7 @@ const ambientLight = new THREE.AmbientLight(0xffffff, 0.6); scene.add(ambientLig
 
 // Sun & Moon
 const sunGroup = new THREE.Group(); scene.add(sunGroup);
-const sunMesh = new THREE.Mesh(new THREE.BoxGeometry(8,8,0.1), new THREE.MeshBasicMaterial({color:0xFFFF00}));
+const sunMesh = new THREE.Mesh(new THREE.BoxGeometry(8,8,0.1), new THREE.MeshBasicMaterial({color:0xFFFFaa}));
 sunMesh.position.set(0, 150, 0); sunGroup.add(sunMesh);
 const moonMesh = new THREE.Mesh(new THREE.BoxGeometry(6,6,0.1), new THREE.MeshBasicMaterial({color:0xDDDDDD}));
 moonMesh.position.set(0, -150, 0); sunGroup.add(moonMesh);
@@ -352,7 +329,38 @@ for(let i=0; i<20; i++) {
     clouds.add(c);
 }
 
-// --- 5. WORLD ENGINE (With Caves & Lakes) ---
+// Rain System
+const rainGeo = new THREE.BufferGeometry();
+const rainCount = 1500;
+const rainPos = new Float32Array(rainCount * 3);
+for(let i=0;i<rainCount*3;i++) {
+    rainPos[i] = (Math.random() - 0.5) * 100;
+}
+rainGeo.setAttribute('position', new THREE.BufferAttribute(rainPos, 3));
+const rainMat = new THREE.PointsMaterial({
+    color: 0xaaaaFF,
+    size: 0.2,
+    transparent: true,
+    opacity: 0.6
+});
+const rainSys = new THREE.Points(rainGeo, rainMat);
+scene.add(rainSys);
+rainSys.visible = false;
+
+function setWeather(w) {
+    state.weather = w;
+    if(w === 'rain' || w === 'thunder') {
+        rainSys.visible = true;
+        scene.fog.color.set(0x555555);
+        if(sounds.rain.paused) sounds.rain.play().catch(()=>{});
+        if(w === 'thunder') playSound('thunder');
+    } else {
+        rainSys.visible = false;
+        sounds.rain.pause();
+    }
+}
+
+// --- 5. WORLD ENGINE ---
 const blockGeo = new THREE.BoxGeometry(1, 1, 1);
 const plantGeo = new THREE.PlaneGeometry(0.8, 0.8); plantGeo.translate(0, 0.4, 0);
 
@@ -382,10 +390,8 @@ function noise2D(x, z) {
     const s = 0.05; return Math.sin(x * s) * Math.cos(z * s) * 4 + Math.sin(x * s * 0.5) * 6;
 }
 
-// Very simple 3D noise proxy for caves
 function isCave(x, y, z) {
-    const n = Math.sin(x*0.1) * Math.cos(y*0.1) * Math.sin(z*0.1);
-    return n > 0.4; // Threshold for cave carving
+    return (Math.sin(x*0.1) * Math.cos(y*0.1) * Math.sin(z*0.1)) > 0.4;
 }
 
 function buildTree(wx, wy, wz) {
@@ -396,6 +402,23 @@ function buildTree(wx, wy, wz) {
             if (!world.has(k)) world.set(k, { type: 'leaves' });
         }
     }
+}
+
+function buildHouse(wx, wy, wz) {
+    for(let hx = -2; hx <= 2; hx++) {
+        for(let hz = -2; hz <= 2; hz++) {
+            world.set(getBlockKey(wx + hx, wy, wz + hz), { type: 'cobblestone' });
+            for (let hy = 1; hy <= 3; hy++) {
+                if (Math.abs(hx) === 2 || Math.abs(hz) === 2) {
+                    if (!(hx === 0 && hz === 2 && hy <= 2)) world.set(getBlockKey(wx + hx, wy + hy, wz + hz), { type: 'planks' });
+                }
+            }
+            world.set(getBlockKey(wx + hx, wy + 4, wz + hz), { type: 'wood' });
+        }
+    }
+    world.set(getBlockKey(wx - 1, wy + 1, wz - 1), { type: 'crafting_table' });
+    world.set(getBlockKey(wx + 1, wy + 1, wz - 1), { type: 'furnace' });
+    world.set(getBlockKey(wx - 1, wy + 1, wz + 1), { type: 'bookshelf' });
 }
 
 function generateWorld() {
@@ -419,11 +442,9 @@ function generateWorld() {
                     for (let y = h; y >= CONFIG.bedrockDepth; y--) {
                         if (y === CONFIG.bedrockDepth) { world.set(getBlockKey(wx, y, wz), { type: 'bedrock' }); continue; }
                         
-                        // Water Lakes
                         if (y > h && y <= 6) { world.set(getBlockKey(wx, y, wz), { type: 'water' }); continue; }
-                        if (y > h) continue; // Above ground
+                        if (y > h) continue;
 
-                        // Caves
                         if (y < h - 3 && isCave(wx, y, wz)) {
                             if (y < CONFIG.bedrockDepth + 4) world.set(getBlockKey(wx, y, wz), { type: 'lava' });
                             continue;
@@ -431,7 +452,7 @@ function generateWorld() {
 
                         let type = 'stone';
                         if (y === h) {
-                            if (y <= 6) type = 'sand'; // Shores
+                            if (y <= 6) type = 'sand';
                             else type = (vDist < 15 && Math.random()<0.3) ? 'dirt' : 'grass';
                         }
                         else if (y > h - 4) type = 'dirt';
@@ -481,43 +502,36 @@ function updateInstances() {
 
 // --- 6. ENTITIES & MULTIPLAYER PLAYERS ---
 const entities = [];
-const remotePlayers = {}; // Track other players
+const remotePlayers = {}; 
 
 function createMobModel(type) {
     const g = new THREE.Group();
-    let isQuad = false; let bC, hC, lC, faceTex; 
+    const isQuad = (type === 'pig' || type === 'cow');
+    const mat = new THREE.MeshLambertMaterial({ map: entitySkins[type], transparent: true, alphaTest: 0.5 });
     
-    if (type === 'pig') { isQuad=true; bC='#FFB6C1'; hC='#FF99AA'; lC='#FFB6C1'; faceTex='face_pig'; }
-    else if (type === 'cow') { isQuad=true; bC='#4A3A2A'; hC='#3A2A1A'; lC='#3A2A1A'; faceTex='face_cow'; }
-    else if (type === 'villager') { isQuad=false; bC='#5C4033'; hC='#E0AC69'; lC='#3C2013'; faceTex='face_villager'; }
-    else { isQuad=false; bC='#00AAAA'; hC='#E0AC69'; lC='#222288'; faceTex='face_player'; }
-
-    const matB = new THREE.MeshLambertMaterial({ color: bC });
-    const matH = new THREE.MeshLambertMaterial({ color: hC });
-    const matL = new THREE.MeshLambertMaterial({ color: lC });
-    const matHeadArr = [matH, matH, matH, matH, new THREE.MeshLambertMaterial({map: texCache[faceTex]}), matH];
-
+    // We use a simplified mapping for full skins.
+    // Minecraft textures are typically complex, but applying them to standard boxes gives a classic rough vibe.
     if (isQuad) {
-        const body = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.6, 1.2), matB); body.position.y = 0.6; g.add(body);
-        const head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), matHeadArr); head.position.set(0, 0.9, 0.7); g.add(head);
+        const body = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.6, 1.2), mat); body.position.y = 0.6; g.add(body);
+        const head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), mat); head.position.set(0, 0.9, 0.7); g.add(head);
         const legs = [];
         [[0.25,0.4], [-0.25,0.4], [0.25,-0.4], [-0.25,-0.4]].forEach(p => {
             const lp = new THREE.Group(); lp.position.set(p[0], 0.4, p[1]);
-            const l = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.4, 0.25), matL); l.position.y = -0.2; lp.add(l); g.add(lp); legs.push(lp);
+            const l = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.4, 0.25), mat); l.position.y = -0.2; lp.add(l); g.add(lp); legs.push(lp);
         });
         return { g, legs, head, isQuad };
     } else {
-        const body = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.8, 0.3), matB); body.position.y = 0.8; g.add(body);
-        const head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), matHeadArr); head.position.set(0, 1.4, 0); g.add(head);
+        const body = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.8, 0.3), mat); body.position.y = 0.8; g.add(body);
+        const head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), mat); head.position.set(0, 1.4, 0); g.add(head);
         const legs = [];
         [[0.15,0], [-0.15,0]].forEach(p => {
             const lp = new THREE.Group(); lp.position.set(p[0], 0.4, p[1]);
-            const l = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.4, 0.25), matL); l.position.y = -0.2; lp.add(l); g.add(lp); legs.push(lp);
+            const l = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.4, 0.25), mat); l.position.y = -0.2; lp.add(l); g.add(lp); legs.push(lp);
         });
         const arms = [];
         [[0.35, 0.8], [-0.35, 0.8]].forEach(p => {
             const ap = new THREE.Group(); ap.position.set(p[0], 1.2, 0);
-            const a = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.8, 0.2), matB); a.position.y = -0.4; ap.add(a); g.add(ap); arms.push(ap);
+            const a = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.8, 0.2), mat); a.position.y = -0.4; ap.add(a); g.add(ap); arms.push(ap);
         });
         return { g, legs, arms, head, isQuad };
     }
@@ -531,7 +545,6 @@ function spawnVillager(x, y, z) { spawnMob('villager', x, y, z); }
 
 for(let i=0; i<12; i++) spawnMob(Math.random()>0.5 ? 'pig' : 'cow', (Math.random()-0.5)*40, 20, (Math.random()-0.5)*40);
 
-// Multiplayer players
 function updateRemotePlayer(id, pos, yaw, pitch, isMoving) {
     if(!remotePlayers[id]) {
         const p = createMobModel('player');
@@ -646,6 +659,16 @@ document.getElementById('regen-btn').onclick = () => {
     if(isMobile) document.getElementById('mobile-controls').style.display = 'block';
 };
 
+// Pause Menu Buttons
+const copyIdBtn = document.getElementById('copy-id-btn');
+if(copyIdBtn) copyIdBtn.onclick = () => { navigator.clipboard.writeText(myId||''); alert('ID Copied!'); }
+
+document.getElementById('time-day-btn').onclick = () => { state.worldTime = Math.PI/4; broadcast({type:'set_time', time: state.worldTime}); }
+document.getElementById('time-night-btn').onclick = () => { state.worldTime = Math.PI + Math.PI/4; broadcast({type:'set_time', time: state.worldTime}); }
+document.getElementById('weather-clear-btn').onclick = () => { setWeather('clear'); broadcast({type:'set_weather', weather: 'clear'}); }
+document.getElementById('weather-rain-btn').onclick = () => { setWeather('rain'); broadcast({type:'set_weather', weather: 'rain'}); }
+document.getElementById('weather-thunder-btn').onclick = () => { setWeather('thunder'); broadcast({type:'set_weather', weather: 'thunder'}); }
+
 function toggleCamera() {
     state.firstPerson = !state.firstPerson;
     document.getElementById('crosshair').style.display = state.firstPerson ? 'flex' : 'none';
@@ -655,13 +678,16 @@ function toggleCamera() {
 
 document.addEventListener('pointerlockchange', () => {
     if (!isMobile && document.pointerLockElement !== document.body && state.gameStarted && !state.inventoryOpen) {
-        document.getElementById('pause-menu').style.display = 'flex';
+        handlePause();
     }
 });
 
 function handlePause() {
     if(state.gameStarted && !state.inventoryOpen) {
         document.getElementById('pause-menu').style.display = 'flex';
+        document.getElementById('pause-world-id').innerText = myId || 'Not Hosting';
+        document.getElementById('pause-block-count').innerText = world.size.toLocaleString();
+        
         if(isMobile) document.getElementById('mobile-controls').style.display = 'none';
         if(!isMobile) document.exitPointerLock();
     }
@@ -808,11 +834,32 @@ function animate() {
     state.worldTime += delta * 0.05;
     sunGroup.rotation.z = state.worldTime;
     const isNight = Math.sin(state.worldTime) < 0;
-    scene.background.set(isNight ? 0x0A0A2A : 0x87CEEB);
-    scene.fog.color.set(isNight ? 0x0A0A2A : 0x87CEEB);
-    ambientLight.intensity = isNight ? 0.2 : 0.6;
-    dirLight.intensity = isNight ? 0.1 : 1.0;
     
+    if (state.weather === 'clear') {
+        scene.background.set(isNight ? 0x0A0A2A : 0x87CEEB);
+        scene.fog.color.set(isNight ? 0x0A0A2A : 0x87CEEB);
+    } else {
+        scene.background.set(0x555555);
+        scene.fog.color.set(0x555555);
+    }
+    
+    ambientLight.intensity = isNight ? 0.2 : (state.weather==='clear'?0.6:0.4);
+    dirLight.intensity = isNight ? 0.1 : (state.weather==='clear'?1.0:0.5);
+
+    if(state.weather === 'thunder' && Math.random() < 0.01) {
+        scene.background.set(0xFFFFFF); // Lightning flash
+    }
+    
+    if(state.weather !== 'clear') {
+        const pArray = rainGeo.attributes.position.array;
+        for(let i=1; i<rainCount*3; i+=3) {
+            pArray[i] -= delta * 30;
+            if(pArray[i] < -20) pArray[i] = 40 + Math.random()*20;
+        }
+        rainGeo.attributes.position.needsUpdate = true;
+        rainSys.position.copy(player.position);
+    }
+
     clouds.children.forEach(c => {
         c.position.x += delta * 2;
         if(c.position.x > 100) c.position.x = -100;
