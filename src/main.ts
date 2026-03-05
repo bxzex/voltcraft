@@ -89,7 +89,13 @@ function spawnMob(type: 'pig' | 'cow', x: number, y: number, z: number) {
     scene.add(group);
     mobs.push({ mesh: group, type, timer: Math.random() * 100 });
 }
-for (let i = 0; i < 12; i++) spawnMob(Math.random() > 0.5 ? 'pig' : 'cow', (Math.random() - 0.5) * 40 + 8, 30, (Math.random() - 0.5) * 40 + 8);
+for (let i = 0; i < 12; i++) {
+    const x = (Math.random() - 0.5) * 40 + 8;
+    const z = (Math.random() - 0.5) * 40 + 8;
+    const noise = terrain.noise;
+    const groundY = Math.floor(noise.get(x / noise.gap, z / noise.gap, noise.seed) * noise.amp) + 30;
+    spawnMob(Math.random() > 0.5 ? 'pig' : 'cow', x, groundY + 0.5, z);
+}
 
 // Weather
 let weather = 'clear';
@@ -352,10 +358,18 @@ let currentHeldBlock = -1;
             const wings = m.mesh.children.slice(2);
             wings.forEach(w => w.rotation.z = Math.sin(m.timer * 10) * 0.5);
         } else {
-            m.mesh.position.y += Math.sin(m.timer) * 0.005;
+            // Horizontal movement
             m.mesh.rotation.y += Math.cos(m.timer * 0.5) * 0.005;
             m.mesh.position.x += Math.cos(m.timer * 0.5) * 0.01;
             m.mesh.position.z += Math.sin(m.timer * 0.5) * 0.01;
+
+            // Grounding logic
+            const nx = m.mesh.position.x;
+            const nz = m.mesh.position.z;
+            const noise = terrain.noise;
+            const groundY = Math.floor(noise.get(nx / noise.gap, nz / noise.gap, noise.seed) * noise.amp) + 30;
+            // Set Y to top of block (groundY + 0.5)
+            m.mesh.position.y = groundY + 0.5 + Math.sin(m.timer) * 0.005;
 
             // Animate Legs (children 2 to 5)
             if (m.mesh.children.length >= 6) {
