@@ -12,7 +12,9 @@ enum ActionKey {
   MODE = 'mode',
   JUMP = 'jump',
   UP = 'up',
-  DOWN = 'down'
+  DOWN = 'down',
+  BREAK = 'break',
+  PLACE = 'place'
 }
 
 export default class Joystick {
@@ -49,36 +51,34 @@ export default class Joystick {
   // init joystick button
   private initButton = ({
     actionKey,
-    key
+    key,
+    mouseButton
   }: {
     actionKey: ActionKey
-    key: string
+    key?: string
+    mouseButton?: number
   }) => {
     const button = document.querySelector(
       `#action-${actionKey}`
     ) as HTMLButtonElement
+    if(!button) return;
+
     button.addEventListener('pointermove', e => {
       e.stopPropagation()
     })
     button.addEventListener('pointerdown', e => {
-      this.control.setMovementHandler(this.emitKeyboardEvent(key))
+      if(key) this.control.setMovementHandler(this.emitKeyboardEvent(key))
+      if(mouseButton !== undefined) this.control.mousedownHandler(this.emitClickEvent(mouseButton))
       e.stopPropagation()
     })
     button.addEventListener('pointerup', e => {
-      this.control.resetMovementHandler(this.emitKeyboardEvent(key))
+      if(key) this.control.resetMovementHandler(this.emitKeyboardEvent(key))
       e.stopPropagation()
     })
-    // extra config for mode switch button
-    if (actionKey === ActionKey.MODE && key === 'q') {
-      this.initButton({ actionKey: ActionKey.MODE, key: ' ' })
-      button.addEventListener('pointerdown', () => {
-        if (this.control.player.mode === Mode.flying) {
-          document.querySelector('#action-down')?.classList.remove('hidden')
-        } else {
-          document.querySelector('#action-down')?.classList.add('hidden')
-        }
-      })
-    }
+    button.addEventListener('pointerleave', e => {
+      if(key) this.control.resetMovementHandler(this.emitKeyboardEvent(key))
+      e.stopPropagation()
+    })
   }
 
   init = () => {
@@ -88,12 +88,13 @@ export default class Joystick {
     this.initButton({ actionKey: ActionKey.LEFT, key: 'a' })
     this.initButton({ actionKey: ActionKey.RIGHT, key: 'd' })
     this.initButton({ actionKey: ActionKey.BACK, key: 's' })
-    this.initButton({ actionKey: ActionKey.MODE, key: 'q' })
-    this.initButton({ actionKey: ActionKey.UP, key: ' ' })
-    this.initButton({ actionKey: ActionKey.DOWN, key: 'Shift' })
+    this.initButton({ actionKey: ActionKey.JUMP, key: ' ' })
+    this.initButton({ actionKey: ActionKey.BREAK, mouseButton: 0 })
+    this.initButton({ actionKey: ActionKey.PLACE, mouseButton: 2 })
 
     // camera control
     document.addEventListener('pointermove', e => {
+      if ((e.target as HTMLElement).closest('.joystick')) return;
       if (this.pageX !== 0 || this.pageY !== 0) {
         this.euler.setFromQuaternion(this.control.camera.quaternion)
         this.euler.y -= 0.01 * (e.pageX - this.pageX)
@@ -111,6 +112,7 @@ export default class Joystick {
 
     // click control
     document.addEventListener('pointerdown', e => {
+      if ((e.target as HTMLElement).closest('.joystick')) return;
       this.clickX = e.pageX
       this.clickY = e.pageY
 
@@ -130,7 +132,9 @@ export default class Joystick {
       this.clickInterval && clearInterval(this.clickInterval)
 
       if (!this.hold && e.pageX === this.clickX && e.pageY === this.clickY) {
-        this.control.mousedownHandler(this.emitClickEvent(2))
+        if (!(e.target as HTMLElement).closest('.joystick')) {
+          this.control.mousedownHandler(this.emitClickEvent(2))
+        }
       }
       this.hold = false
       this.pageX = 0
