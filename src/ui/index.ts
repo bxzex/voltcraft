@@ -192,6 +192,7 @@ export default class UI {
       // menu
       const inv = document.getElementById('inventory-menu');
       if (e.key === 'e' || e.code === 'Escape') {
+        if (e.code === 'Escape') e.preventDefault(); // Prevent exit fullscreen default
         if (inv && inv.style.display === 'flex' && !document.pointerLockElement) {
           // Close inventory
           inv.style.display = 'none';
