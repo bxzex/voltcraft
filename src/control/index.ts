@@ -89,9 +89,9 @@ export default class Control {
     BlockType.diamond,
     BlockType.quartz,
     BlockType.glass,
-    BlockType.grass,
-    BlockType.grass,
-    BlockType.grass
+    BlockType.dirt,
+    BlockType.stone,
+    BlockType.bedrock
   ]
   holdingIndex = 0
   wheelGap = false

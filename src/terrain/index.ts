@@ -149,6 +149,7 @@ export default class Terrain {
   }
 
   generate = () => {
+    console.log('terrain.generate called! blocks.length:', this.blocks.length);
     this.blocksCount = new Array(this.blocks.length).fill(0)
     // post work to generate worker
     this.generateWorker.postMessage({
@@ -279,6 +280,8 @@ export default class Terrain {
   }
 
   update = () => {
+    if (this.blocks.length === 0) return
+
     this.chunk.set(
       Math.floor(this.camera.position.x / this.chunkSize),
       Math.floor(this.camera.position.z / this.chunkSize)
