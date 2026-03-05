@@ -136,6 +136,15 @@ export default class UI {
       }
     })
 
+    // fps toggle
+    this.fpsInput?.addEventListener('input', (e: Event) => {
+      if (this.fpsToggle && e.target instanceof HTMLInputElement) {
+        const visible = e.target.value === '1'
+        this.fps.toggle(visible)
+        this.fpsToggle.innerHTML = `FPS Counter: ${visible ? 'On' : 'Off'}`
+      }
+    })
+
     // apply settings
     this.settingBack?.addEventListener('click', () => {
       if (this.distanceInput instanceof HTMLInputElement) {
@@ -285,6 +294,9 @@ export default class UI {
   music = document.querySelector('#music')
   musicInput = document.querySelector('#music-input')
 
+  fpsToggle = document.querySelector('#fps-toggle')
+  fpsInput = document.querySelector('#fps-input')
+
   settingBack = document.querySelector('#setting-back')
 
   onPlay = () => {
@@ -294,7 +306,6 @@ export default class UI {
     this.joinMenuContent?.classList.add('hidden')
     this.play && (this.play.innerHTML = 'Resume')
     this.crossHair.classList.remove('hidden')
-    document.getElementById('watermark')?.classList.remove('hidden')
     this.github && this.github.classList.add('hidden')
     this.donate && this.donate.classList.add('hidden')
     this.feature?.classList.add('hidden')
@@ -303,7 +314,6 @@ export default class UI {
   onPause = () => {
     this.menu?.classList.remove('hidden')
     this.crossHair.classList.add('hidden')
-    document.getElementById('watermark')?.classList.add('hidden')
     this.save && (this.save.innerHTML = 'Save and Exit')
     this.github && this.github.classList.remove('hidden')
     this.donate && this.donate.classList.remove('hidden')
@@ -318,7 +328,6 @@ export default class UI {
     this.play && (this.play.innerHTML = 'Singleplayer')
     this.save && (this.save.innerHTML = 'Load Game')
     this.feature?.classList.remove('hidden')
-    document.getElementById('watermark')?.classList.add('hidden')
     if (this.mpButtons) (this.mpButtons as HTMLElement).style.display = 'flex'
     if (this.mpStatus) (this.mpStatus as HTMLElement).style.display = 'block'
     const username = document.getElementById('username');

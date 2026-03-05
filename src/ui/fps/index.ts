@@ -15,6 +15,10 @@ export default class FPS {
   fps = document.createElement('div')
   count = 0
 
+  toggle = (visible: boolean) => {
+    this.fps.style.display = visible ? 'block' : 'none'
+  }
+
   update = () => {
     this.p1 = performance.now()
     this.count++

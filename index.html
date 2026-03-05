@@ -13,9 +13,6 @@
 </head>
 
 <body>
-  <div id="watermark" class="hidden"
-    style="position: absolute; top: 10px; left: 10px; font-family: Minecraft; color: rgba(255,255,255,0.5); pointer-events: none; z-index: 10; font-size: 1.2rem; text-shadow: 1px 1px 0px #000;">
-    Voltcraft Beta</div>
   <script type="module" src="./src/main.ts"></script>
   <a href="https://buy.stripe.com/9B6eVfd9E6OC3sr7cEaAw03" target="_blank" rel="noopener" class="donate-btn">
     Support Us! ☕
@@ -118,6 +115,9 @@
 
     <p id="music">Music: On</p>
     <input type="range" id="music-input" min="0" max="1" value="1" step="1" />
+
+    <p id="fps-toggle">FPS Counter: On</p>
+    <input type="range" id="fps-input" min="0" max="1" value="1" step="1" />
 
     <p>Weather:</p>
     <div style="display: flex; gap: 5px;">
