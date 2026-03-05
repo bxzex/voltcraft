@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 
+// --- 1. CORE CONFIG & STATE ---
 const CONFIG = {
     worldSize: 6, chunkSize: 16, maxInstances: 300000,
     mouseSensitivity: 0.002, playerSpeed: 6, jumpForce: 10,
@@ -12,7 +13,7 @@ let state = {
     actionTime: 0, prevTime: performance.now(), yaw: 0, pitch: 0,
     velocity: new THREE.Vector3(), move: { f: 0, b: 0, l: 0, r: 0, u: 0, d: 0 },
     lastTaps: {}, stepLatch: false, activeSlot: 0, selectedItem: 'grass',
-    worldTime: Math.PI / 4
+    worldTime: Math.PI / 4 // Morning
 };
 
 const inventoryItems = [
@@ -26,81 +27,265 @@ state.selectedItem = hotbarSlots[state.activeSlot];
 
 const isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 
-const ASSET_URL = 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.19.2/assets/minecraft/';
-const texLoader = new THREE.TextureLoader();
-texLoader.setCrossOrigin('anonymous');
+// --- 2. PROCEDURAL TEXTURES (VOLTCRAFT ASSETS) ---
+const texCache = {};
+const dataUrls = {};
 
-const loadTex = (path) => {
-    const t = texLoader.load(ASSET_URL + 'textures/' + path);
-    t.magFilter = THREE.NearestFilter; t.colorSpace = THREE.SRGBColorSpace;
-    return t;
+function createTexture(name, size=16, drawFn) {
+    const canvas = document.createElement('canvas');
+    canvas.width = size; canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = false;
+    drawFn(ctx, size);
+    
+    dataUrls[name] = canvas.toDataURL();
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.magFilter = THREE.NearestFilter;
+    tex.colorSpace = THREE.SRGBColorSpace;
+    texCache[name] = tex;
+    return tex;
+}
+
+function noise(ctx, size, baseColor, varAmt, rR, rG, rB) {
+    ctx.fillStyle = baseColor; ctx.fillRect(0,0,size,size);
+    const img = ctx.getImageData(0,0,size,size);
+    for(let i=0; i<img.data.length; i+=4) {
+        let n = (Math.random()-0.5)*varAmt;
+        img.data[i] = Math.max(0, Math.min(255, img.data[i]+n*rR));
+        img.data[i+1] = Math.max(0, Math.min(255, img.data[i+1]+n*rG));
+        img.data[i+2] = Math.max(0, Math.min(255, img.data[i+2]+n*rB));
+    }
+    ctx.putImageData(img, 0, 0);
+}
+
+// Generate Blocks
+createTexture('dirt', 16, ctx => noise(ctx, 16, '#5C4033', 30, 1, 0.9, 0.8));
+createTexture('grass_top', 16, ctx => noise(ctx, 16, '#4CA938', 40, 0.8, 1, 0.5));
+createTexture('grass_side', 16, ctx => {
+    noise(ctx, 16, '#5C4033', 30, 1, 0.9, 0.8);
+    ctx.fillStyle = '#4CA938';
+    for(let x=0; x<16; x++) {
+        let h = 4 + Math.random()*3;
+        ctx.fillRect(x, 0, 1, h);
+    }
+});
+createTexture('stone', 16, ctx => noise(ctx, 16, '#7D7D7D', 40, 1, 1, 1));
+createTexture('cobblestone', 16, ctx => {
+    noise(ctx, 16, '#666666', 20, 1, 1, 1);
+    ctx.fillStyle = '#444444';
+    ctx.fillRect(0,0,16,1); ctx.fillRect(0,8,16,1);
+    ctx.fillRect(8,0,1,8); ctx.fillRect(4,8,1,8); ctx.fillRect(12,8,1,8);
+});
+createTexture('wood', 16, ctx => {
+    noise(ctx, 16, '#4A3525', 10, 1, 0.8, 0.5);
+    ctx.fillStyle = '#332211';
+    for(let x=0; x<16; x+=3) ctx.fillRect(x, 0, 1, 16);
+});
+createTexture('wood_top', 16, ctx => {
+    noise(ctx, 16, '#8B5A2B', 15, 1, 0.9, 0.6);
+    ctx.strokeStyle = '#4A3525'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(8, 8, 4, 0, Math.PI*2); ctx.stroke();
+});
+createTexture('planks', 16, ctx => {
+    noise(ctx, 16, '#C19A6B', 15, 1, 0.9, 0.6);
+    ctx.fillStyle = '#8B5A2B';
+    ctx.fillRect(0, 3, 16, 1); ctx.fillRect(0, 7, 16, 1); ctx.fillRect(0, 11, 16, 1); ctx.fillRect(0, 15, 16, 1);
+});
+createTexture('leaves', 16, ctx => {
+    ctx.clearRect(0,0,16,16);
+    ctx.fillStyle = '#228B22';
+    for(let i=0; i<60; i++) ctx.fillRect(Math.random()*16, Math.random()*16, 2, 2);
+    ctx.fillStyle = '#006400';
+    for(let i=0; i<60; i++) ctx.fillRect(Math.random()*16, Math.random()*16, 2, 2);
+});
+createTexture('sand', 16, ctx => noise(ctx, 16, '#EEDD82', 15, 1, 1, 0.8));
+createTexture('glass', 16, ctx => {
+    ctx.fillStyle = 'rgba(173, 216, 230, 0.3)'; ctx.fillRect(0,0,16,16);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+    ctx.fillRect(0,0,16,2); ctx.fillRect(0,0,2,16);
+    ctx.fillRect(14,0,2,16); ctx.fillRect(0,14,16,2);
+    ctx.fillRect(4,4,4,2);
+});
+createTexture('brick', 16, ctx => {
+    ctx.fillStyle = '#B22222'; ctx.fillRect(0,0,16,16);
+    ctx.fillStyle = '#DDDDDD';
+    ctx.fillRect(0,3,16,1); ctx.fillRect(0,7,16,1); ctx.fillRect(0,11,16,1); ctx.fillRect(0,15,16,1);
+    for(let y=0; y<16; y+=4) {
+        let off = (y%8===0)?4:8;
+        ctx.fillRect(off, y, 1, 4); ctx.fillRect(off+8, y, 1, 4);
+    }
+});
+createTexture('obsidian', 16, ctx => noise(ctx, 16, '#1A0B2E', 20, 1, 0.5, 1));
+createTexture('bedrock', 16, ctx => noise(ctx, 16, '#222222', 60, 1, 1, 1));
+
+const genOre = (name, color) => {
+    createTexture(name, 16, ctx => {
+        ctx.drawImage(texCache['stone'].image, 0, 0);
+        ctx.fillStyle = color;
+        for(let i=0; i<8; i++) { ctx.fillRect(2+Math.random()*10, 2+Math.random()*10, 2+Math.random()*2, 2+Math.random()*2); }
+    });
 };
+genOre('diamond_ore', '#00FFFF'); genOre('gold_ore', '#FFD700');
+genOre('iron_ore', '#F5F5DC'); genOre('coal_ore', '#111111');
 
-const tData = {
-    grass_top: loadTex('block/grass_block_top.png'),
-    grass_side: loadTex('block/grass_block_side.png'),
-    dirt: loadTex('block/dirt.png'),
-    stone: loadTex('block/stone.png'),
-    cobblestone: loadTex('block/cobblestone.png'),
-    wood: loadTex('block/oak_log.png'),
-    wood_top: loadTex('block/oak_log_top.png'),
-    planks: loadTex('block/oak_planks.png'),
-    leaves: loadTex('block/oak_leaves.png'),
-    sand: loadTex('block/sand.png'),
-    glass: loadTex('block/glass.png'),
-    brick: loadTex('block/bricks.png'),
-    bookshelf: loadTex('block/bookshelf.png'),
-    obsidian: loadTex('block/obsidian.png'),
-    diamond_ore: loadTex('block/diamond_ore.png'),
-    gold_ore: loadTex('block/gold_ore.png'),
-    iron_ore: loadTex('block/iron_ore.png'),
-    coal_ore: loadTex('block/coal_ore.png'),
-    craft_top: loadTex('block/crafting_table_top.png'),
-    craft_side: loadTex('block/crafting_table_front.png'),
-    furnace_front: loadTex('block/furnace_front.png'),
-    furnace_top: loadTex('block/furnace_top.png'),
-    furnace_side: loadTex('block/furnace_side.png'),
-    tnt_side: loadTex('block/tnt_side.png'),
-    tnt_top: loadTex('block/tnt_top.png'),
-    tnt_bottom: loadTex('block/tnt_bottom.png'),
-    dandelion: loadTex('block/dandelion.png'),
-    poppy: loadTex('block/poppy.png')
-};
+createTexture('craft_top', 16, ctx => {
+    ctx.fillStyle = '#C19A6B'; ctx.fillRect(0,0,16,16);
+    ctx.fillStyle = '#8B5A2B';
+    ctx.fillRect(2,2,12,12);
+    ctx.fillStyle = '#C19A6B';
+    ctx.fillRect(4,4,3,3); ctx.fillRect(8,4,3,3); ctx.fillRect(4,8,3,3); ctx.fillRect(8,8,3,3);
+});
+createTexture('craft_side', 16, ctx => {
+    ctx.drawImage(texCache['wood'].image, 0, 0);
+    ctx.fillStyle = '#A0522D'; ctx.fillRect(2,2,12,4);
+    ctx.fillStyle = '#8B4513'; ctx.fillRect(4,3,2,2); ctx.fillRect(10,3,2,2);
+});
 
-const m = (tex) => new THREE.MeshLambertMaterial({ map: tex });
-const mT = (tex) => new THREE.MeshLambertMaterial({ map: tex, transparent: true, alphaTest: 0.5 });
-const mD = (tex) => new THREE.MeshLambertMaterial({ map: tex, transparent: true, alphaTest: 0.5, side: THREE.DoubleSide });
+createTexture('furnace_front', 16, ctx => {
+    ctx.drawImage(texCache['cobblestone'].image, 0, 0);
+    ctx.fillStyle = '#222222'; ctx.fillRect(4,8,8,6);
+    ctx.fillStyle = '#FF4500'; ctx.fillRect(5,10,6,3);
+    ctx.fillStyle = '#111111'; ctx.fillRect(4,2,8,4);
+});
+createTexture('bookshelf', 16, ctx => {
+    ctx.drawImage(texCache['planks'].image, 0, 0);
+    ctx.fillStyle = '#332211'; ctx.fillRect(2,2,12,5); ctx.fillRect(2,9,12,5);
+    const cols = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF'];
+    for(let i=0; i<6; i++) {
+        ctx.fillStyle = cols[Math.floor(Math.random()*cols.length)];
+        ctx.fillRect(3+i*2, 2, 1, 4+Math.random());
+        ctx.fillStyle = cols[Math.floor(Math.random()*cols.length)];
+        ctx.fillRect(3+i*2, 9, 1, 4+Math.random());
+    }
+});
+
+createTexture('tnt_side', 16, ctx => {
+    ctx.fillStyle = '#FF3333'; ctx.fillRect(0,0,16,16);
+    ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0,6,16,4);
+    ctx.fillStyle = '#000000'; ctx.font = '5px monospace'; ctx.fillText('TNT', 1, 9);
+    ctx.fillStyle = '#AA0000'; ctx.fillRect(3,0,1,16); ctx.fillRect(8,0,1,16); ctx.fillRect(13,0,1,16);
+});
+createTexture('tnt_top', 16, ctx => {
+    ctx.fillStyle = '#CC2222'; ctx.fillRect(0,0,16,16);
+    ctx.fillStyle = '#555555'; ctx.fillRect(6,6,4,4);
+    ctx.fillStyle = '#DDDDDD'; ctx.fillRect(7,7,2,2);
+});
+
+createTexture('dandelion', 16, ctx => {
+    ctx.clearRect(0,0,16,16);
+    ctx.fillStyle = '#228B22'; ctx.fillRect(7,8,2,8); ctx.fillRect(5,10,3,1); ctx.fillRect(8,12,3,1);
+    ctx.fillStyle = '#FFFF00'; ctx.fillRect(6,4,4,4); ctx.fillRect(7,3,2,6); ctx.fillRect(5,5,6,2);
+});
+createTexture('poppy', 16, ctx => {
+    ctx.clearRect(0,0,16,16);
+    ctx.fillStyle = '#228B22'; ctx.fillRect(7,8,2,8); ctx.fillRect(5,11,3,1);
+    ctx.fillStyle = '#FF0000'; ctx.fillRect(5,4,6,4); ctx.fillRect(6,3,4,6); ctx.fillRect(4,5,8,2);
+    ctx.fillStyle = '#000000'; ctx.fillRect(7,5,2,2);
+});
+
+// Item Icons
+createTexture('pickaxe', 16, ctx => {
+    ctx.clearRect(0,0,16,16);
+    ctx.fillStyle = '#8B5A2B';
+    for(let i=0; i<10; i++) ctx.fillRect(14-i, 14-i, 2, 2);
+    ctx.fillStyle = '#DDDDDD'; ctx.fillRect(2,4,4,2); ctx.fillRect(4,2,2,4); ctx.fillRect(1,5,2,2); ctx.fillRect(5,1,2,2);
+    ctx.fillStyle = '#888888'; ctx.fillRect(3,3,2,2);
+});
+createTexture('sword', 16, ctx => {
+    ctx.clearRect(0,0,16,16);
+    ctx.fillStyle = '#8B5A2B'; ctx.fillRect(12,12,2,2); ctx.fillRect(10,14,2,2);
+    ctx.fillStyle = '#555555'; ctx.fillRect(10,10,2,2); ctx.fillRect(12,8,2,2); ctx.fillRect(8,12,2,2);
+    ctx.fillStyle = '#DDDDDD';
+    for(let i=0; i<8; i++) ctx.fillRect(8-i, 8-i, 2, 2);
+    ctx.fillStyle = '#FFFFFF';
+    for(let i=0; i<7; i++) ctx.fillRect(9-i, 7-i, 1, 1);
+});
+
+// Entity Textures
+createTexture('face_player', 16, ctx => {
+    ctx.fillStyle = '#E0AC69'; ctx.fillRect(0,0,16,16);
+    ctx.fillStyle = '#4A3525'; ctx.fillRect(0,0,16,4); ctx.fillRect(0,0,4,6); ctx.fillRect(12,0,4,6); // Hair
+    ctx.fillStyle = '#FFFFFF'; ctx.fillRect(3,7,3,2); ctx.fillRect(10,7,3,2); // Eyes
+    ctx.fillStyle = '#2222FF'; ctx.fillRect(4,7,1,2); ctx.fillRect(11,7,1,2); // Pupils
+    ctx.fillStyle = '#A0522D'; ctx.fillRect(6,10,4,1); // Nose
+    ctx.fillStyle = '#AA5555'; ctx.fillRect(5,12,6,1); // Mouth
+});
+createTexture('face_pig', 16, ctx => {
+    ctx.fillStyle = '#FFB6C1'; ctx.fillRect(0,0,16,16);
+    ctx.fillStyle = '#000000'; ctx.fillRect(2,6,2,2); ctx.fillRect(12,6,2,2); // Eyes
+    ctx.fillStyle = '#FFFFFF'; ctx.fillRect(2,6,1,1); ctx.fillRect(12,6,1,1);
+    ctx.fillStyle = '#FF69B4'; ctx.fillRect(5,9,6,4); // Snout
+    ctx.fillStyle = '#8B0000'; ctx.fillRect(6,10,1,2); ctx.fillRect(9,10,1,2); // Nostrils
+});
+createTexture('face_cow', 16, ctx => {
+    ctx.fillStyle = '#4A3A2A'; ctx.fillRect(0,0,16,16);
+    ctx.fillStyle = '#DDDDDD'; ctx.fillRect(0,0,5,5); ctx.fillRect(10,3,6,4); // Spots
+    ctx.fillStyle = '#000000'; ctx.fillRect(1,6,2,2); ctx.fillRect(13,6,2,2); // Eyes
+    ctx.fillStyle = '#FFFFFF'; ctx.fillRect(1,6,1,1); ctx.fillRect(13,6,1,1);
+    ctx.fillStyle = '#555555'; ctx.fillRect(4,10,8,6); // Snout
+});
+createTexture('face_villager', 16, ctx => {
+    ctx.fillStyle = '#E0AC69'; ctx.fillRect(0,0,16,16);
+    ctx.fillStyle = '#FFFFFF'; ctx.fillRect(3,6,3,2); ctx.fillRect(10,6,3,2); // Eyes
+    ctx.fillStyle = '#00AA00'; ctx.fillRect(4,6,1,2); ctx.fillRect(11,6,1,2); // Pupils
+    ctx.fillStyle = '#000000'; ctx.fillRect(3,5,3,1); ctx.fillRect(10,5,3,1); // Brows
+    ctx.fillStyle = '#A0522D'; ctx.fillRect(6,8,4,6); // Big Nose
+});
+
+// Materials Helper
+const m = (t) => new THREE.MeshLambertMaterial({ map: texCache[t] });
+const mT = (t) => new THREE.MeshLambertMaterial({ map: texCache[t], transparent: true, alphaTest: 0.5 });
+const mD = (t) => new THREE.MeshLambertMaterial({ map: texCache[t], transparent: true, alphaTest: 0.5, side: THREE.DoubleSide });
 
 const materialsMap = {
-    dirt: m(tData.dirt), stone: m(tData.stone), cobblestone: m(tData.cobblestone),
-    planks: m(tData.planks), sand: m(tData.sand), brick: m(tData.brick),
-    obsidian: m(tData.obsidian), diamond_ore: m(tData.diamond_ore),
-    gold_ore: m(tData.gold_ore), iron_ore: m(tData.iron_ore), coal_ore: m(tData.coal_ore),
-    glass: new THREE.MeshLambertMaterial({ map: tData.glass, transparent: true, opacity: 0.6 }),
-    leaves: mT(tData.leaves), dandelion: mD(tData.dandelion), poppy: mD(tData.poppy),
-    grass: [m(tData.grass_side), m(tData.grass_side), m(tData.grass_top), m(tData.dirt), m(tData.grass_side), m(tData.grass_side)],
-    wood: [m(tData.wood), m(tData.wood), m(tData.wood_top), m(tData.wood_top), m(tData.wood), m(tData.wood)],
-    crafting_table: [m(tData.craft_side), m(tData.craft_side), m(tData.craft_top), m(tData.planks), m(tData.craft_side), m(tData.craft_side)],
-    furnace: [m(tData.furnace_side), m(tData.furnace_side), m(tData.furnace_top), m(tData.furnace_top), m(tData.furnace_front), m(tData.furnace_side)],
-    bookshelf: [m(tData.bookshelf), m(tData.bookshelf), m(tData.planks), m(tData.planks), m(tData.bookshelf), m(tData.bookshelf)],
-    tnt: [m(tData.tnt_side), m(tData.tnt_side), m(tData.tnt_top), m(tData.tnt_bottom), m(tData.tnt_side), m(tData.tnt_side)]
+    grass: [m('grass_side'), m('grass_side'), m('grass_top'), m('dirt'), m('grass_side'), m('grass_side')],
+    dirt: m('dirt'), stone: m('stone'), cobblestone: m('cobblestone'),
+    wood: [m('wood'), m('wood'), m('wood_top'), m('wood_top'), m('wood'), m('wood')],
+    planks: m('planks'), leaves: mT('leaves'), sand: m('sand'),
+    glass: new THREE.MeshLambertMaterial({ map: texCache['glass'], transparent: true, opacity: 0.6 }),
+    brick: m('brick'), bookshelf: [m('bookshelf'), m('bookshelf'), m('planks'), m('planks'), m('bookshelf'), m('bookshelf')],
+    obsidian: m('obsidian'), bedrock: m('bedrock'),
+    diamond_ore: m('diamond_ore'), gold_ore: m('gold_ore'), iron_ore: m('iron_ore'), coal_ore: m('coal_ore'),
+    crafting_table: [m('craft_side'), m('craft_side'), m('craft_top'), m('planks'), m('craft_side'), m('craft_side')],
+    furnace: [m('cobblestone'), m('cobblestone'), m('cobblestone'), m('cobblestone'), m('furnace_front'), m('cobblestone')],
+    tnt: [m('tnt_side'), m('tnt_side'), m('tnt_top'), m('tnt_top'), m('tnt_side'), m('tnt_side')], // fixed bottom for simplicity
+    dandelion: mD('dandelion'), poppy: mD('poppy'),
+    pickaxe: m('pickaxe'), sword: m('sword')
 };
 
-const sounds = {
-    break: new Audio(ASSET_URL + 'sounds/dig/stone1.ogg'),
-    place: new Audio(ASSET_URL + 'sounds/dig/grass1.ogg'),
-    step: new Audio(ASSET_URL + 'sounds/step/grass1.ogg')
-};
-Object.values(sounds).forEach(s => { s.crossOrigin = 'anonymous'; s.volume = 0.2; });
-const playSound = (n) => { if(sounds[n]) { sounds[n].currentTime = 0; sounds[n].play().catch(()=>{}); } };
+// Procedural Audio
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playProceduralSound(type) {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+    o.connect(g); g.connect(audioCtx.destination);
+    
+    const t = audioCtx.currentTime;
+    if(type === 'break') {
+        o.type = 'square'; o.frequency.setValueAtTime(150, t); o.frequency.exponentialRampToValueAtTime(40, t+0.1);
+        g.gain.setValueAtTime(0.1, t); g.gain.exponentialRampToValueAtTime(0.01, t+0.1);
+        o.start(t); o.stop(t+0.1);
+    } else if (type === 'place') {
+        o.type = 'sine'; o.frequency.setValueAtTime(300, t); o.frequency.exponentialRampToValueAtTime(100, t+0.05);
+        g.gain.setValueAtTime(0.1, t); g.gain.exponentialRampToValueAtTime(0.01, t+0.05);
+        o.start(t); o.stop(t+0.05);
+    } else if (type === 'step') {
+        o.type = 'triangle'; o.frequency.setValueAtTime(80, t);
+        g.gain.setValueAtTime(0.05, t); g.gain.exponentialRampToValueAtTime(0.01, t+0.05);
+        o.start(t); o.stop(t+0.05);
+    }
+}
+const playSound = playProceduralSound;
 
+// --- 3. SCENE SETUP ---
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x87CEEB);
 scene.fog = new THREE.Fog(0x87CEEB, 20, 100);
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-const renderer = new THREE.WebGLRenderer({ antialias: true });
+const renderer = new THREE.WebGLRenderer({ antialias: false }); // Disable antialias for performance & pixel look
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Limit pixel ratio for mobile perf
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 document.body.appendChild(renderer.domElement);
@@ -110,21 +295,24 @@ const dirLight = new THREE.DirectionalLight(0xffffff, 1.0);
 dirLight.position.set(50, 100, 50); dirLight.castShadow = true;
 dirLight.shadow.camera.left = -60; dirLight.shadow.camera.right = 60;
 dirLight.shadow.camera.top = 60; dirLight.shadow.camera.bottom = -60;
-dirLight.shadow.mapSize.set(2048, 2048);
+dirLight.shadow.mapSize.set(1024, 1024); // Lower for perf
 scene.add(dirLight);
 
+// --- 4. WORLD ENGINE ---
 const blockGeo = new THREE.BoxGeometry(1, 1, 1);
 const plantGeo = new THREE.PlaneGeometry(0.8, 0.8); plantGeo.translate(0, 0.4, 0);
 
 const world = new Map();
 const blockMeshes = {};
-const allTypes = Array.from(new Set([...inventoryItems, 'bedrock', 'leaves']));
-const solidTypes = allTypes.filter(t => t !== 'dandelion' && t !== 'poppy');
+// allTypes must include every placable block
+const allTypes = Array.from(new Set([...inventoryItems, 'bedrock']));
+const solidTypes = allTypes.filter(t => t !== 'dandelion' && t !== 'poppy' && t !== 'pickaxe' && t !== 'sword');
 
 function setupInstancedMeshes() {
     allTypes.forEach(t => {
         if (blockMeshes[t]) scene.remove(blockMeshes[t]);
         const mat = materialsMap[t] || materialsMap.stone;
+        if(t === 'pickaxe' || t === 'sword') return; // Don't instance items
         const isPlant = t === 'dandelion' || t === 'poppy';
         const geo = isPlant ? plantGeo : blockGeo;
         blockMeshes[t] = new THREE.InstancedMesh(geo, mat, CONFIG.maxInstances);
@@ -220,6 +408,7 @@ const dummyPlant1 = new THREE.Object3D(); const dummyPlant2 = new THREE.Object3D
 function updateInstances() {
     const counts = {}; allTypes.forEach(t => counts[t] = 0);
     for (const [key, data] of world.entries()) {
+        if(data.type === 'pickaxe' || data.type === 'sword') continue;
         const [x, y, z] = key.split(',').map(Number);
         if (data.type === 'dandelion' || data.type === 'poppy') {
             dummyPlant1.position.set(x, y - 0.5, z); dummyPlant1.rotation.y = Math.PI / 4; dummyPlant1.updateMatrix();
@@ -234,25 +423,29 @@ function updateInstances() {
     allTypes.forEach(t => { if(blockMeshes[t]){ blockMeshes[t].count = counts[t]; blockMeshes[t].instanceMatrix.needsUpdate = true; } });
 }
 
+// --- 5. ENTITIES ---
 const entities = [];
 
 function createMobModel(type) {
     const g = new THREE.Group();
     let isQuad = false;
-    let bC, hC, lC; 
+    let bC, hC, lC, faceTex; 
     
-    if (type === 'pig') { isQuad=true; bC=0xffb6c1; hC=0xff99aa; lC=0xffb6c1; }
-    else if (type === 'cow') { isQuad=true; bC=0x4a3a2a; hC=0x3a2a1a; lC=0x3a2a1a; }
-    else if (type === 'villager') { isQuad=false; bC=0x5c4033; hC=0xe0ac69; lC=0x3c2013; }
-    else { isQuad=false; bC=0x00aaaa; hC=0xe0ac69; lC=0x222288; }
+    if (type === 'pig') { isQuad=true; bC='#FFB6C1'; hC='#FF99AA'; lC='#FFB6C1'; faceTex='face_pig'; }
+    else if (type === 'cow') { isQuad=true; bC='#4A3A2A'; hC='#3A2A1A'; lC='#3A2A1A'; faceTex='face_cow'; }
+    else if (type === 'villager') { isQuad=false; bC='#5C4033'; hC='#E0AC69'; lC='#3C2013'; faceTex='face_villager'; }
+    else { isQuad=false; bC='#00AAAA'; hC='#E0AC69'; lC='#222288'; faceTex='face_player'; }
 
     const matB = new THREE.MeshLambertMaterial({ color: bC });
     const matH = new THREE.MeshLambertMaterial({ color: hC });
     const matL = new THREE.MeshLambertMaterial({ color: lC });
+    
+    // Create multi-material for head so face is only on front
+    const matHeadArr = [matH, matH, matH, matH, new THREE.MeshLambertMaterial({map: texCache[faceTex]}), matH];
 
     if (isQuad) {
         const body = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.6, 1.2), matB); body.position.y = 0.6; g.add(body);
-        const head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), matH); head.position.set(0, 0.9, 0.7); g.add(head);
+        const head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), matHeadArr); head.position.set(0, 0.9, 0.7); g.add(head);
         const legs = [];
         [[0.25,0.4], [-0.25,0.4], [0.25,-0.4], [-0.25,-0.4]].forEach(p => {
             const lp = new THREE.Group(); lp.position.set(p[0], 0.4, p[1]);
@@ -261,7 +454,7 @@ function createMobModel(type) {
         return { g, legs, head, isQuad };
     } else {
         const body = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.8, 0.3), matB); body.position.y = 0.8; g.add(body);
-        const head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), matH); head.position.set(0, 1.4, 0); g.add(head);
+        const head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), matHeadArr); head.position.set(0, 1.4, 0); g.add(head);
         const legs = [];
         [[0.15,0], [-0.15,0]].forEach(p => {
             const lp = new THREE.Group(); lp.position.set(p[0], 0.4, p[1]);
@@ -297,8 +490,13 @@ const fpItem = new THREE.Group(); fpItem.position.set(0.4, -0.3, -0.5); camera.a
 
 function createTool(type) {
     const g = new THREE.Group();
-    if (materialsMap[type]) {
-        const m = Array.isArray(materialsMap[type]) ? materialsMap[type][0] : materialsMap[type];
+    if(type === 'pickaxe' || type === 'sword') {
+        const mat = new THREE.MeshLambertMaterial({map: texCache[type], transparent: true, alphaTest: 0.5});
+        const mesh = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.5), mat);
+        mesh.rotation.y = -Math.PI/4;
+        mesh.castShadow = true; g.add(mesh);
+    } else if (materialsMap[type]) {
+        const m = Array.isArray(materialsMap[type]) ? materialsMap[type] : materialsMap[type];
         const mesh = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.3, 0.3), m);
         mesh.castShadow = true; g.add(mesh);
     } else {
@@ -308,18 +506,18 @@ function createTool(type) {
     return g;
 }
 
+// --- 6. UI LOGIC ---
 const hotbarEl = document.getElementById('hotbar-container');
 const invGrid = document.getElementById('inventory-grid');
 const invMenu = document.getElementById('inventory-menu');
 
 function getIconUrl(t) {
-    if(t === 'wood') return 'oak_log';
-    if(t === 'planks') return 'oak_planks';
-    if(t === 'grass') return 'grass_block_side';
-    if(t === 'crafting_table') return 'crafting_table_front';
-    if(t === 'furnace') return 'furnace_front';
-    if(t === 'tnt') return 'tnt_side';
-    return t;
+    if(t === 'wood') return dataUrls['wood_top'];
+    if(t === 'grass') return dataUrls['grass_side'];
+    if(t === 'crafting_table') return dataUrls['craft_top'];
+    if(t === 'furnace') return dataUrls['furnace_front'];
+    if(t === 'tnt') return dataUrls['tnt_side'];
+    return dataUrls[t];
 }
 
 function renderUI() {
@@ -327,11 +525,7 @@ function renderUI() {
         hotbarEl.innerHTML = '';
         hotbarSlots.forEach((t, i) => {
             const s = document.createElement('div'); s.className = 'slot' + (i === state.activeSlot ? ' active' : '');
-            if(t !== '' && t !== 'sword' && t !== 'pickaxe') {
-                s.style.backgroundImage = `url(${ASSET_URL}textures/block/${getIconUrl(t)}.png)`;
-            } else if (t === 'sword' || t === 'pickaxe') {
-                s.style.backgroundImage = `url(${ASSET_URL}textures/item/${t === 'sword' ? 'iron_sword' : 'iron_pickaxe'}.png)`;
-            }
+            if(t) s.style.backgroundImage = `url(${getIconUrl(t)})`;
             s.innerText = i+1;
             s.onclick = () => { state.activeSlot = i; state.selectedItem = t; renderUI(); };
             hotbarEl.appendChild(s);
@@ -345,8 +539,7 @@ if (invGrid) {
     inventoryItems.forEach(t => {
         const s = document.createElement('div'); s.className = 'inv-slot';
         s.setAttribute('data-item', t);
-        if(t !== 'sword' && t !== 'pickaxe') s.style.backgroundImage = `url(${ASSET_URL}textures/block/${getIconUrl(t)}.png)`;
-        else s.style.backgroundImage = `url(${ASSET_URL}textures/item/${t === 'sword' ? 'iron_sword' : 'iron_pickaxe'}.png)`;
+        s.style.backgroundImage = `url(${getIconUrl(t)})`;
         s.onclick = () => { hotbarSlots[state.activeSlot] = t; state.selectedItem = t; renderUI(); };
         invGrid.appendChild(s);
     });
@@ -401,6 +594,7 @@ function handlePause() {
     }
 }
 
+// --- 7. INTERACTION & CONTROLS ---
 function getTarget() {
     const dir = new THREE.Vector3(); camera.getWorldDirection(dir);
     const start = new THREE.Vector3(); camera.getWorldPosition(start);
@@ -426,7 +620,7 @@ function handleBlockAction(type) {
     if (type === 'break') {
         if (t && world.get(t.k).type !== 'bedrock') { world.delete(t.k); updateInstances(); playSound('break'); }
     } else if (type === 'place') {
-        if (t) {
+        if (t && state.selectedItem !== 'pickaxe' && state.selectedItem !== 'sword') {
             const pk = getBlockKey(t.pos.x + t.normal.x, t.pos.y + t.normal.y, t.pos.z + t.normal.z);
             if (!world.has(pk)) {
                 const checkInside = (ox, oz) => {
@@ -443,6 +637,7 @@ function handleBlockAction(type) {
     }
 }
 
+// Desktop Mouse
 document.addEventListener('mousedown', (e) => {
     if (isMobile || document.pointerLockElement !== document.body) return;
     if (e.button === 0) handleBlockAction('break');
@@ -457,6 +652,7 @@ document.addEventListener('mousemove', (e) => {
     player.rotation.y = state.yaw; pitchPivot.rotation.x = state.pitch;
 });
 
+// Desktop Keyboard
 document.addEventListener('keydown', (e) => {
     if(e.code === 'Escape') { handlePause(); return; }
     if (e.code === 'KeyE') { toggleInventory(); return; }
@@ -477,6 +673,7 @@ document.addEventListener('keyup', (e) => {
     if (e.code === 'Space') state.move.u = 0; if (e.code === 'ShiftLeft') state.move.d = 0;
 });
 
+// Mobile Controls
 let touchStartX = 0, touchStartY = 0;
 document.addEventListener('touchstart', (e) => {
     if (!isMobile || !state.gameStarted || state.inventoryOpen) return;
@@ -487,7 +684,7 @@ document.addEventListener('touchstart', (e) => {
 document.addEventListener('touchmove', (e) => {
     if (!isMobile || !state.gameStarted || state.inventoryOpen) return;
     if(e.target.closest('#mobile-controls') || e.target.closest('#hotbar-container')) return;
-    e.preventDefault();
+    e.preventDefault(); 
     const moveX = e.touches[0].clientX - touchStartX;
     const moveY = e.touches[0].clientY - touchStartY;
     touchStartX = e.touches[0].clientX; touchStartY = e.touches[0].clientY;
@@ -526,6 +723,7 @@ document.getElementById('btn-inv').addEventListener('touchstart', (e) => { e.pre
 document.getElementById('btn-cam').addEventListener('touchstart', (e) => { e.preventDefault(); toggleCamera(); });
 document.getElementById('btn-pause').addEventListener('touchstart', (e) => { e.preventDefault(); handlePause(); });
 
+// --- 8. ANIMATION LOOP ---
 function animate() {
     requestAnimationFrame(animate);
     const time = performance.now(); const delta = Math.min((time - state.prevTime)/1000, 0.1); state.prevTime = time;
@@ -607,5 +805,6 @@ function animate() {
     renderer.render(scene, camera);
 }
 
+// --- 9. STARTUP ---
 generateWorld(); renderUI(); animate();
 window.onresize = () => { camera.aspect = window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); };
