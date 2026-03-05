@@ -137,11 +137,12 @@ export default class UI {
     })
 
     // fps toggle
-    this.fpsInput?.addEventListener('input', (e: Event) => {
-      if (this.fpsToggle && e.target instanceof HTMLInputElement) {
-        const visible = e.target.value === '1'
-        this.fps.toggle(visible)
-        this.fpsToggle.innerHTML = `FPS Counter: ${visible ? 'On' : 'Off'}`
+    this.fpsBtn?.addEventListener('click', () => {
+      if (this.fpsToggle) {
+        const isVisible = this.fps.fps.style.display !== 'none'
+        const nextVisible = !isVisible
+        this.fps.toggle(nextVisible)
+        this.fpsToggle.innerHTML = `FPS Counter: ${nextVisible ? 'On' : 'Off'}`
       }
     })
 
@@ -295,7 +296,7 @@ export default class UI {
   musicInput = document.querySelector('#music-input')
 
   fpsToggle = document.querySelector('#fps-toggle')
-  fpsInput = document.querySelector('#fps-input')
+  fpsBtn = document.querySelector('#fps-btn')
 
   settingBack = document.querySelector('#setting-back')
 

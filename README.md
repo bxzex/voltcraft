@@ -44,10 +44,10 @@ npm run build
 - **F:** Full screen
 - **E / ESC:** Open pause menu
 
+## Disclaimer
+
+This is an independent project and is not affiliated with Mojang or Microsoft.
+
 ## License
 
-MIT
-
----
-
-**Disclaimer:** This is an independent project and is not affiliated with Mojang or Microsoft. License. Copyright (c) 2026 bxzex.
+MIT License. Copyright (c) 2026 bxzex.

@@ -188,8 +188,11 @@ const createBlockIcon = (type: BlockType, src: string) => {
   };
 
   cube.appendChild(createFace('front', frontSrc));
-  cube.appendChild(createFace('top', topSrc));
+  cube.appendChild(createFace('back', frontSrc));
+  cube.appendChild(createFace('left', frontSrc));
   cube.appendChild(createFace('right', rightSrc));
+  cube.appendChild(createFace('top', topSrc));
+  cube.appendChild(createFace('bottom', frontSrc));
 
   container.appendChild(cube);
   return container;

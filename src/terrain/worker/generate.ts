@@ -183,7 +183,7 @@ onmessage = (
           )
         }
       } else {
-        if (yOffset < -3) {
+        if (yOffset < -1) {
           // sand
           idMap.set(`${x}_${y + yOffset}_${z}`, blocksCount[BlockType.sand])
           blocks[BlockType.sand].setMatrixAt(
@@ -191,8 +191,8 @@ onmessage = (
             matrix
           )
 
-          // Generate water above sand up to sea level (-3)
-          for (let wy = yOffset + 1; wy <= -3; wy++) {
+          // Generate water above sand up to sea level (-1)
+          for (let wy = yOffset + 1; wy <= -1; wy++) {
             matrix.setPosition(x, y + wy, z)
             idMap.set(`${x}_${y + wy}_${z}`, blocksCount[BlockType.water])
             blocks[BlockType.water].setMatrixAt(

@@ -162,23 +162,35 @@ body {
   transform: rotateY(0deg) translateZ(15px);
 }
 
-.face.top {
-  transform: rotateX(90deg) translateZ(15px);
+.face.back {
+  transform: rotateY(180deg) translateZ(15px);
 }
 
-.face.top::after {
-  background-color: rgba(255, 255, 255, 0.15); /* Brightest top */
+.face.left {
+  transform: rotateY(-90deg) translateZ(15px);
 }
 
 .face.right {
   transform: rotateY(90deg) translateZ(15px);
 }
 
-.face.right::after {
+.face.top {
+  transform: rotateX(90deg) translateZ(15px);
+}
+
+.face.bottom {
+  transform: rotateX(-90deg) translateZ(15px);
+}
+
+.face.top::after {
+  background-color: rgba(255, 255, 255, 0.15); /* Brightest top */
+}
+
+.face.right::after, .face.left::after {
   background-color: rgba(0, 0, 0, 0.1); /* Medium side */
 }
 
-.face.front::after {
+.face.front::after, .face.back::after, .face.bottom::after {
   background-color: rgba(0, 0, 0, 0.3); /* Darkest side for depth */
 }
 

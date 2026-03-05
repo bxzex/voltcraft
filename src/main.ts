@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import Core from './core'
 import Control from './control'
-import Player from './player'
+import Player, { Mode } from './player'
 import Terrain from './terrain'
 import UI from './ui'
 import Audio from './audio'
@@ -376,7 +376,7 @@ let currentHeldBlock = -1;
                 if (Math.random() < 0.01) { // say sounds
                     control.audio.playMobSound(m.type, 'say');
                 }
-                if (m.mesh.position.y < 27.5) { // splash in water
+                if (m.mesh.position.y < 29.5) { // splash in water
                     if (Math.random() < 0.05) control.audio.playSplash();
                 } else if (Math.random() < 0.05) { // step sounds
                     control.audio.playMobSound(m.type, 'step');
@@ -397,7 +397,7 @@ let currentHeldBlock = -1;
     // Player Mesh Update
     playerGroup.position.copy(camera.position);
     playerGroup.position.y -= 1.5;
-    playerGroup.rotation.y = camera.rotation.y + Math.PI; // Face same direction as camera
+    playerGroup.rotation.y = camera.rotation.y; // Face same direction as camera
     if (playerParts.head) playerParts.head.rotation.x = -camera.rotation.x; // Head follows pitch
 
     // Sneaking animation
@@ -406,6 +406,9 @@ let currentHeldBlock = -1;
         playerGroup.position.y -= 0.15; // Lower overall group
         if (playerParts.body) playerParts.body.rotation.x = 0.3; // Tilt body forward
         if (playerParts.head) playerParts.head.position.y = 0.35; // Lower head
+        // Bend legs slightly for sneaking
+        if (playerParts.leftLegGroup) playerParts.leftLegGroup.rotation.x = -0.3;
+        if (playerParts.rightLegGroup) playerParts.rightLegGroup.rotation.x = -0.3;
     } else {
         if (playerParts.body) playerParts.body.rotation.x = 0;
         if (playerParts.head) playerParts.head.position.y = 0.55; // Default head Y
@@ -413,11 +416,18 @@ let currentHeldBlock = -1;
 
     if (control.velocity.x !== 0 || control.velocity.z !== 0) {
         const sCycle = Math.sin(performance.now() * 0.015) * 0.8;
-        if (playerParts.leftLegGroup) playerParts.leftLegGroup.rotation.x = sCycle;
-        if (playerParts.rightLegGroup) playerParts.rightLegGroup.rotation.x = -sCycle;
+        if (!isSneaking) {
+            if (playerParts.leftLegGroup) playerParts.leftLegGroup.rotation.x = sCycle;
+            if (playerParts.rightLegGroup) playerParts.rightLegGroup.rotation.x = -sCycle;
+        } else {
+            // Slower, smaller leg movement when sneaking
+            const sneakCycle = Math.sin(performance.now() * 0.01) * 0.3;
+            if (playerParts.leftLegGroup) playerParts.leftLegGroup.rotation.x = -0.3 + sneakCycle;
+            if (playerParts.rightLegGroup) playerParts.rightLegGroup.rotation.x = -0.3 - sneakCycle;
+        }
         if (playerParts.leftArmGroup) playerParts.leftArmGroup.rotation.x = -sCycle;
         if (playerParts.rightArmGroup) playerParts.rightArmGroup.rotation.x = sCycle;
-    } else {
+    } else if (!isSneaking) {
         if (playerParts.leftLegGroup) playerParts.leftLegGroup.rotation.x = 0;
         if (playerParts.rightLegGroup) playerParts.rightLegGroup.rotation.x = 0;
         if (playerParts.leftArmGroup) playerParts.leftArmGroup.rotation.x = 0;

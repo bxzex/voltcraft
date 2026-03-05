@@ -290,8 +290,8 @@ export default class Materials {
     leaf: mat(leafTex, { color: new THREE.Color(0, 1, 0), transparent: true }),
     water: mat(waterTex, { 
       transparent: true, 
-      opacity: 0.8, 
-      color: 0x3366ff,
+      opacity: 0.9, 
+      color: 0x0044ff,
       side: THREE.DoubleSide
     }),
     stone: mat(stoneTex),
