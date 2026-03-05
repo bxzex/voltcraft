@@ -19,7 +19,34 @@ export enum BlockType {
   quartz = 9,
   glass = 10,
   bedrock = 11,
-  water = 12
+  water = 12,
+  // New blocks
+  cobblestone = 13,
+  bricks = 14,
+  stoneBricks = 15,
+  obsidian = 16,
+  iron = 17,
+  ironBlock = 18,
+  goldBlock = 19,
+  emeraldBlock = 20,
+  lapisBlock = 21,
+  redstoneOre = 22,
+  tnt = 23,
+  bookshelf = 24,
+  mossyCobblestone = 25,
+  netherrack = 26,
+  glowstone = 27,
+  gravel = 28,
+  clay = 29,
+  snow = 30,
+  craftingTable = 31,
+  furnace = 32,
+  birchPlanks = 33,
+  sprucePlanks = 34,
+  netherBricks = 35,
+  pumpkin = 36,
+  melon = 37,
+  sponge = 38
 }
 export default class Terrain {
   constructor(scene: THREE.Scene, camera: THREE.PerspectiveCamera) {
@@ -81,13 +108,44 @@ export default class Terrain {
     MaterialType.quartz,
     MaterialType.glass,
     MaterialType.bedrock,
-    MaterialType.water
+    MaterialType.water,
+    // New blocks
+    MaterialType.cobblestone,
+    MaterialType.bricks,
+    MaterialType.stoneBricks,
+    MaterialType.obsidian,
+    MaterialType.iron,
+    MaterialType.ironBlock,
+    MaterialType.goldBlock,
+    MaterialType.emeraldBlock,
+    MaterialType.lapisBlock,
+    MaterialType.redstoneOre,
+    MaterialType.tnt,
+    MaterialType.bookshelf,
+    MaterialType.mossyCobblestone,
+    MaterialType.netherrack,
+    MaterialType.glowstone,
+    MaterialType.gravel,
+    MaterialType.clay,
+    MaterialType.snow,
+    MaterialType.craftingTable,
+    MaterialType.furnace,
+    MaterialType.birchPlanks,
+    MaterialType.sprucePlanks,
+    MaterialType.netherBricks,
+    MaterialType.pumpkin,
+    MaterialType.melon,
+    MaterialType.sponge
   ]
 
   // other properties
   blocks: THREE.InstancedMesh[] = []
   blocksCount: number[] = []
-  blocksFactor = [1, 0.2, 0.1, 0.7, 0.1, 0.2, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.3]
+  blocksFactor = [
+    1, 0.2, 0.1, 0.7, 0.1, 0.2, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.3,
+    // New blocks (all player-placeable, small factor)
+    0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1
+  ]
 
   customBlocks: Block[] = []
   highlight: Highlight
@@ -182,8 +240,8 @@ export default class Terrain {
           -this.chunkSize * this.distance * 3 + this.chunkSize * this.chunk.x;
         x <
         this.chunkSize * this.distance * 3 +
-          this.chunkSize +
-          this.chunkSize * this.chunk.x;
+        this.chunkSize +
+        this.chunkSize * this.chunk.x;
         x += 20
       ) {
         for (
@@ -191,8 +249,8 @@ export default class Terrain {
             -this.chunkSize * this.distance * 3 + this.chunkSize * this.chunk.y;
           z <
           this.chunkSize * this.distance * 3 +
-            this.chunkSize +
-            this.chunkSize * this.chunk.y;
+          this.chunkSize +
+          this.chunkSize * this.chunk.y;
           z += 20
         ) {
           const matrix = new THREE.Matrix4()
@@ -250,7 +308,7 @@ export default class Terrain {
     // check if it's natural terrain
     const yOffset = Math.floor(
       noise.get(position.x / noise.gap, position.z / noise.gap, noise.seed) *
-        noise.amp
+      noise.amp
     )
     if (position.y >= 30 + yOffset || position.y < 0) {
       return

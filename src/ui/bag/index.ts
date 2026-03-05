@@ -9,25 +9,77 @@ import { isMobile } from '../../utils'
 import Control from '../../control'
 import { BlockType } from '../../terrain'
 
+// Block textures for inventory
 import dirt from '../../static/textures/block/dirt.png'
 import cobblestone from '../../static/textures/block/cobblestone.png'
 import bedrock from '../../static/textures/block/bedrock.png'
 import sand from '../../static/textures/block/sand.png'
 import leaf from '../../static/textures/block/oak_leaves.png'
 import coal from '../../static/textures/block/coal_ore.png'
+import bricks from '../../static/textures/block/bricks.png'
+import stoneBricks from '../../static/textures/block/stone_bricks.png'
+import obsidian from '../../static/textures/block/obsidian.png'
+import ironOre from '../../static/textures/block/iron_ore.png'
+import ironBlock from '../../static/textures/block/iron_block.png'
+import goldBlock from '../../static/textures/block/gold_block.png'
+import emeraldBlock from '../../static/textures/block/emerald_block.png'
+import lapisBlock from '../../static/textures/block/lapis_block.png'
+import redstoneOre from '../../static/textures/block/redstone_ore.png'
+import tnt from '../../static/textures/block/tnt_side.png'
+import bookshelf from '../../static/textures/block/bookshelf.png'
+import mossyCobblestone from '../../static/textures/block/mossy_cobblestone.png'
+import netherrack from '../../static/textures/block/netherrack.png'
+import glowstone from '../../static/textures/block/glowstone.png'
+import gravel from '../../static/textures/block/gravel.png'
+import clay from '../../static/textures/block/clay.png'
+import snow from '../../static/textures/block/snow.png'
+import craftingTable from '../../static/textures/block/crafting_table_front.png'
+import furnace from '../../static/textures/block/furnace_front.png'
+import birchPlanks from '../../static/textures/block/birch_planks.png'
+import sprucePlanks from '../../static/textures/block/spruce_planks.png'
+import netherBricks from '../../static/textures/block/nether_bricks.png'
+import pumpkin from '../../static/textures/block/pumpkin_side.png'
+import melon from '../../static/textures/block/melon_side.png'
+import sponge from '../../static/textures/block/sponge.png'
 
 const allBlocks = [
   { type: BlockType.grass, src: grass },
+  { type: BlockType.dirt, src: dirt },
   { type: BlockType.sand, src: sand },
+  { type: BlockType.stone, src: stone },
+  { type: BlockType.cobblestone, src: cobblestone },
+  { type: BlockType.coal, src: coal },
+  { type: BlockType.iron, src: ironOre },
+  { type: BlockType.redstoneOre, src: redstoneOre },
+  { type: BlockType.diamond, src: diamond },
+  { type: BlockType.emeraldBlock, src: emeraldBlock },
+  { type: BlockType.goldBlock, src: goldBlock },
+  { type: BlockType.ironBlock, src: ironBlock },
+  { type: BlockType.lapisBlock, src: lapisBlock },
+  { type: BlockType.wood, src: wood },
+  { type: BlockType.birchPlanks, src: birchPlanks },
+  { type: BlockType.sprucePlanks, src: sprucePlanks },
   { type: BlockType.tree, src: tree },
   { type: BlockType.leaf, src: leaf },
-  { type: BlockType.dirt, src: dirt },
-  { type: BlockType.stone, src: stone },
-  { type: BlockType.coal, src: coal },
-  { type: BlockType.wood, src: wood },
-  { type: BlockType.diamond, src: diamond },
-  { type: BlockType.quartz, src: quartz },
   { type: BlockType.glass, src: glass },
+  { type: BlockType.bricks, src: bricks },
+  { type: BlockType.stoneBricks, src: stoneBricks },
+  { type: BlockType.mossyCobblestone, src: mossyCobblestone },
+  { type: BlockType.obsidian, src: obsidian },
+  { type: BlockType.quartz, src: quartz },
+  { type: BlockType.gravel, src: gravel },
+  { type: BlockType.clay, src: clay },
+  { type: BlockType.snow, src: snow },
+  { type: BlockType.craftingTable, src: craftingTable },
+  { type: BlockType.furnace, src: furnace },
+  { type: BlockType.bookshelf, src: bookshelf },
+  { type: BlockType.tnt, src: tnt },
+  { type: BlockType.glowstone, src: glowstone },
+  { type: BlockType.netherrack, src: netherrack },
+  { type: BlockType.netherBricks, src: netherBricks },
+  { type: BlockType.pumpkin, src: pumpkin },
+  { type: BlockType.melon, src: melon },
+  { type: BlockType.sponge, src: sponge },
   { type: BlockType.bedrock, src: bedrock }
 ];
 

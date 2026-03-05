@@ -81,17 +81,46 @@ export default class Audio {
   disabled = false
 
   sourceSet = [
-    [grass1, grass2, grass3, grass4],
-    [sand1, sand2, sand3, sand4],
-    [tree1, tree2, tree3, tree4],
-    [leaf1, leaf2, leaf3, leaf4],
-    [dirt1, dirt2, dirt3, dirt4],
-    [stone1, stone2, stone3, stone4],
-    [stone1, stone2, stone3, stone4],
-    [tree1, tree2, tree3, tree4],
-    [stone1, stone2, stone3, stone4],
-    [stone1, stone2, stone3, stone4],
-    [stone1, stone2, stone3, stone4]
+    [grass1, grass2, grass3, grass4],       // 0  grass
+    [sand1, sand2, sand3, sand4],           // 1  sand
+    [tree1, tree2, tree3, tree4],           // 2  tree
+    [leaf1, leaf2, leaf3, leaf4],           // 3  leaf
+    [dirt1, dirt2, dirt3, dirt4],            // 4  dirt
+    [stone1, stone2, stone3, stone4],       // 5  stone
+    [stone1, stone2, stone3, stone4],       // 6  coal
+    [tree1, tree2, tree3, tree4],           // 7  wood
+    [stone1, stone2, stone3, stone4],       // 8  diamond
+    [stone1, stone2, stone3, stone4],       // 9  quartz
+    [stone1, stone2, stone3, stone4],       // 10 glass
+    [stone1, stone2, stone3, stone4],       // 11 bedrock
+    [grass1, grass2, grass3, grass4],       // 12 water
+    // New blocks
+    [stone1, stone2, stone3, stone4],       // 13 cobblestone
+    [stone1, stone2, stone3, stone4],       // 14 bricks
+    [stone1, stone2, stone3, stone4],       // 15 stoneBricks
+    [stone1, stone2, stone3, stone4],       // 16 obsidian
+    [stone1, stone2, stone3, stone4],       // 17 iron (ore)
+    [stone1, stone2, stone3, stone4],       // 18 ironBlock
+    [stone1, stone2, stone3, stone4],       // 19 goldBlock
+    [stone1, stone2, stone3, stone4],       // 20 emeraldBlock
+    [stone1, stone2, stone3, stone4],       // 21 lapisBlock
+    [stone1, stone2, stone3, stone4],       // 22 redstoneOre
+    [grass1, grass2, grass3, grass4],       // 23 tnt
+    [tree1, tree2, tree3, tree4],           // 24 bookshelf
+    [stone1, stone2, stone3, stone4],       // 25 mossyCobblestone
+    [stone1, stone2, stone3, stone4],       // 26 netherrack
+    [stone1, stone2, stone3, stone4],       // 27 glowstone
+    [dirt1, dirt2, dirt3, dirt4],            // 28 gravel
+    [dirt1, dirt2, dirt3, dirt4],            // 29 clay
+    [grass1, grass2, grass3, grass4],       // 30 snow
+    [tree1, tree2, tree3, tree4],           // 31 craftingTable
+    [stone1, stone2, stone3, stone4],       // 32 furnace
+    [tree1, tree2, tree3, tree4],           // 33 birchPlanks
+    [tree1, tree2, tree3, tree4],           // 34 sprucePlanks
+    [stone1, stone2, stone3, stone4],       // 35 netherBricks
+    [tree1, tree2, tree3, tree4],           // 36 pumpkin
+    [tree1, tree2, tree3, tree4],           // 37 melon
+    [grass1, grass2, grass3, grass4],       // 38 sponge
   ]
 
   soundSet: THREE.Audio[][] = []

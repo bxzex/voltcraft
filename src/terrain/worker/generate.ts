@@ -15,7 +15,34 @@ enum BlockType {
   quartz = 9,
   glass = 10,
   bedrock = 11,
-  water = 12
+  water = 12,
+  // New blocks
+  cobblestone = 13,
+  bricks = 14,
+  stoneBricks = 15,
+  obsidian = 16,
+  iron = 17,
+  ironBlock = 18,
+  goldBlock = 19,
+  emeraldBlock = 20,
+  lapisBlock = 21,
+  redstoneOre = 22,
+  tnt = 23,
+  bookshelf = 24,
+  mossyCobblestone = 25,
+  netherrack = 26,
+  glowstone = 27,
+  gravel = 28,
+  clay = 29,
+  snow = 30,
+  craftingTable = 31,
+  furnace = 32,
+  birchPlanks = 33,
+  sprucePlanks = 34,
+  netherBricks = 35,
+  pumpkin = 36,
+  melon = 37,
+  sponge = 38
 }
 
 const matrix = new THREE.Matrix4()
@@ -132,7 +159,7 @@ onmessage = (
             blocksCount[BlockType.sand]++,
             matrix
           )
-          
+
           // Generate water above sand up to sea level (-3)
           for (let wy = yOffset + 1; wy <= -3; wy++) {
             matrix.setPosition(x, y + wy, z)
