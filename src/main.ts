@@ -332,8 +332,10 @@ let currentHeldBlock = -1;
             const mat = terrain.materials.get(typeStr);
             if (mat) {
                 const meshFP = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.3, 0.3), mat);
+                meshFP.rotation.set(0.3, 0.4, 0.1);
                 fpHand.add(meshFP);
                 const meshTP = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.3, 0.3), mat);
+                meshTP.rotation.set(0.3, 0.4, 0.1);
                 tpHand.add(meshTP);
             }
         }

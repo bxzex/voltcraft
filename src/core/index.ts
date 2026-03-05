@@ -37,15 +37,16 @@ export default class Core {
     this.scene.fog = new THREE.Fog(backgroundColor, 1, 96)
     this.scene.background = new THREE.Color(backgroundColor)
 
-    const sunLight = new THREE.PointLight(0xffffff, 0.5)
-    sunLight.position.set(500, 500, 500)
+    const sunLight = new THREE.DirectionalLight(0xffffff, 1.0)
+    sunLight.position.set(100, 100, 100)
+    sunLight.castShadow = false // Optimization
     this.scene.add(sunLight)
 
-    const sunLight2 = new THREE.PointLight(0xffffff, 0.2)
-    sunLight2.position.set(-500, 500, -500)
-    this.scene.add(sunLight2)
+    const fillLight = new THREE.DirectionalLight(0xffffff, 0.4)
+    fillLight.position.set(-100, 50, -100)
+    this.scene.add(fillLight)
 
-    const reflectionLight = new THREE.AmbientLight(0x404040)
+    const reflectionLight = new THREE.AmbientLight(0x606060)
     this.scene.add(reflectionLight)
   }
 

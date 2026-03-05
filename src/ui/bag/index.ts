@@ -150,6 +150,7 @@ const allBlocks = [
 const createBlockIcon = (src: string) => {
   const img = document.createElement('img');
   img.src = src;
+  img.className = 'icon';
   img.style.width = '48px';
   img.style.height = '48px';
   img.crossOrigin = 'anonymous';
