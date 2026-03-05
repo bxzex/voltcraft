@@ -225,6 +225,45 @@ document.getElementById('weather-thunder')?.addEventListener('click', () => setW
 
 // Time
 let timeMode = 'day';
+const celestialGroup = new THREE.Group();
+scene.add(celestialGroup);
+
+// Sun
+const sunTex = texLoader.load('/textures/environment/sun.png');
+sunTex.magFilter = THREE.NearestFilter;
+const sunMat = new THREE.MeshBasicMaterial({ map: sunTex, transparent: true, side: THREE.DoubleSide });
+const sunMesh = new THREE.Mesh(new THREE.PlaneGeometry(20, 20), sunMat);
+sunMesh.position.set(0, 200, 0); // Far away
+sunMesh.rotation.x = Math.PI / 2;
+celestialGroup.add(sunMesh);
+
+// Moon
+const moonTex = texLoader.load('/textures/environment/moon_phases.png');
+moonTex.magFilter = THREE.NearestFilter;
+moonTex.repeat.set(1/4, 1/2); // Just show one phase for now
+const moonMat = new THREE.MeshBasicMaterial({ map: moonTex, transparent: true, side: THREE.DoubleSide });
+const moonMesh = new THREE.Mesh(new THREE.PlaneGeometry(20, 20), moonMat);
+moonMesh.position.set(0, -200, 0); // Opposite of sun
+moonMesh.rotation.x = -Math.PI / 2;
+celestialGroup.add(moonMesh);
+
+// Stars
+const starsGeo = new THREE.BufferGeometry();
+const starsCount = 2000;
+const starsPos = new Float32Array(starsCount * 3);
+for (let i = 0; i < starsCount; i++) {
+    const r = 400;
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos(2 * Math.random() - 1);
+    starsPos[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+    starsPos[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+    starsPos[i * 3 + 2] = r * Math.cos(phi);
+}
+starsGeo.setAttribute('position', new THREE.BufferAttribute(starsPos, 3));
+const starsMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.8, transparent: true, opacity: 0 });
+const starsSys = new THREE.Points(starsGeo, starsMat);
+scene.add(starsSys);
+
 function setTime(t: string) {
     timeMode = t;
 }
@@ -335,7 +374,7 @@ function buildSkinBox(texUrl: string, u: number, v: number, w: number, h: number
 
 let playerParts: any = {};
 const fpHand = new THREE.Group();
-fpHand.position.set(0.3, -0.3, -0.5); // Move into view (right, down, forward)
+fpHand.position.set(0.4, -0.4, -0.6); 
 camera.add(fpHand);
 const tpHand = new THREE.Group();
 tpHand.position.set(0, -0.6, -0.4);
@@ -445,11 +484,11 @@ let currentHeldBlock = -1;
             const tex = texLoader.load(itemTextures[currentHeldBlock]);
             tex.magFilter = THREE.NearestFilter;
             const mat = new THREE.MeshLambertMaterial({ map: tex, transparent: true, alphaTest: 0.5, side: THREE.DoubleSide });
-            const geo = new THREE.PlaneGeometry(0.4, 0.4);
+            const geo = new THREE.PlaneGeometry(0.8, 0.8);
             
             const meshFP = new THREE.Mesh(geo, mat);
             meshFP.rotation.set(0, -Math.PI / 2, Math.PI / 4);
-            meshFP.position.set(0.1, 0.1, 0);
+            meshFP.position.set(0.1, 0.2, 0);
             fpHand.add(meshFP);
 
             const meshTP = new THREE.Mesh(geo, mat);
@@ -462,7 +501,7 @@ let currentHeldBlock = -1;
             if (typeStr !== undefined) {
                 const mat = terrain.materials.get(typeStr);
                 if (mat) {
-                    const meshFP = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, 0.2), mat);
+                    const meshFP = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.4, 0.4), mat);
                     meshFP.rotation.set(0.3, 0.4, 0.1);
                     meshFP.position.set(0.1, 0, 0);
                     fpHand.add(meshFP);
@@ -618,6 +657,28 @@ let currentHeldBlock = -1;
         rainGeo.attributes.position.needsUpdate = true;
         rainSys.position.copy(camera.position);
     }
+
+    // Celestial Animation
+    celestialGroup.position.copy(camera.position);
+    starsSys.position.copy(camera.position);
+
+    let targetRotation = 0; // Day
+    let targetStarOpacity = 0;
+    if (timeMode === 'night') {
+        targetRotation = Math.PI; // Night
+        targetStarOpacity = 1.0;
+    }
+
+    // Rotate celestial group smoothly
+    let currentRot = celestialGroup.rotation.x;
+    celestialGroup.rotation.x += (targetRotation - currentRot) * 0.02;
+    
+    // Smoothly fade stars
+    starsMat.opacity += (targetStarOpacity - starsMat.opacity) * 0.02;
+
+    // Look at player logic for sun/moon to keep them facing camera correctly
+    sunMesh.lookAt(camera.position);
+    moonMesh.lookAt(camera.position);
 
     // Target colors and intensities
     let targetBg = new THREE.Color(0x87ceeb);
