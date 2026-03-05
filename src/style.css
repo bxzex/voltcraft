@@ -388,6 +388,64 @@ body {
   cursor: pointer;
 }
 
+@media (max-width: 768px) {
+  .menu.start {
+    background-size: cover;
+    background-position: center;
+  }
+
+  .voltcraft-logo h1 {
+    font-size: 3.5rem ! from 5rem;
+  }
+
+  .settings, .features {
+    width: 85vw;
+    padding: 15px 20px;
+  }
+
+  .button {
+    width: 260px;
+    font-size: 1rem;
+  }
+
+  #mp-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #mp-buttons .button {
+    width: 260px !important;
+  }
+
+  #inventory-grid {
+    grid-template-columns: repeat(4, 50px) !important;
+    gap: 8px !important;
+    padding: 10px !important;
+  }
+
+  .cube-container {
+    width: 40px;
+    height: 40px;
+  }
+
+  .cube {
+    width: 24px;
+    height: 24px;
+  }
+
+  .face {
+    width: 24px;
+    height: 24px;
+  }
+
+  .face.front { transform: rotateY(0deg) translateZ(12px); }
+  .face.back { transform: rotateY(180deg) translateZ(12px); }
+  .face.left { transform: rotateY(-90deg) translateZ(12px); }
+  .face.right { transform: rotateY(90deg) translateZ(12px); }
+  .face.top { transform: rotateX(90deg) translateZ(12px); }
+  .face.bottom { transform: rotateX(-90deg) translateZ(12px); }
+}
+
 * {
   -webkit-touch-callout: none;
   -moz-touch-callout: none;
