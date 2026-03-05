@@ -20,7 +20,7 @@ export default class UI {
 
     // play
     this.play?.addEventListener('click', () => {
-      if (this.play?.innerHTML === 'Play') {
+      if (this.play?.innerHTML === 'Singleplayer' || this.play?.innerHTML === 'Play') {
         this.onPlay()
 
         // reset game
@@ -249,7 +249,7 @@ export default class UI {
 
   onExit = () => {
     this.menu?.classList.add('start')
-    this.play && (this.play.innerHTML = 'Play')
+    this.play && (this.play.innerHTML = 'Singleplayer')
     this.save && (this.save.innerHTML = 'Load Game')
     this.feature?.classList.remove('hidden')
   }

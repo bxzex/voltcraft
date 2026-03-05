@@ -36,15 +36,48 @@ const entitySkins = {
     pig: extTex('entity/pig/pig.png'),
     cow: extTex('entity/cow/cow.png')
 };
-const mobs: { mesh: THREE.Mesh, type: string, timer: number }[] = [];
+const mobs: { mesh: THREE.Group, type: string, timer: number }[] = [];
+
+function buildAnimalBox(tex: THREE.Texture, u: number, v: number, w: number, h: number, d: number) {
+    const getM = (ox: number, oy: number, mw: number, mh: number) => {
+        const t = tex.clone();
+        t.needsUpdate = true;
+        // Assume standard 64x32 for older Minecraft skins (like Pig/Cow)
+        t.repeat.set(mw / 64, mh / 32);
+        t.offset.set(ox / 64, 1 - (oy + mh) / 32);
+        return new THREE.MeshLambertMaterial({ map: t, transparent: true, alphaTest: 0.5 });
+    };
+    return [
+        getM(u + d + w, v + d, d, h), // left
+        getM(u, v + d, d, h),         // right
+        getM(u + d, v, w, d),         // top
+        getM(u + d + w, v, w, d),     // bottom
+        getM(u + d, v + d, w, h),     // front
+        getM(u + d + w + d, v + d, w, h) // back
+    ];
+}
+
 function spawnMob(type: 'pig' | 'cow', x: number, y: number, z: number) {
-    const isQuad = (type === 'pig' || type === 'cow');
-    const mat = new THREE.MeshLambertMaterial({ map: entitySkins[type], transparent: true, alphaTest: 0.5 });
-    const geo = new THREE.BoxGeometry(isQuad?1:0.6, isQuad?0.8:1.8, isQuad?1.5:0.6);
-    const m = new THREE.Mesh(geo, mat);
-    m.position.set(x, y, z);
-    scene.add(m);
-    mobs.push({ mesh: m, type, timer: Math.random()*100 });
+    const group = new THREE.Group();
+    const tex = entitySkins[type];
+
+    // Head (0, 0, 8x8x8)
+    const headMat = buildAnimalBox(tex, 0, 0, 8, 8, 8);
+    const headGeo = new THREE.BoxGeometry(0.8, 0.8, 0.8);
+    const head = new THREE.Mesh(headGeo, headMat);
+    head.position.set(0, 0.4, 0.6);
+    group.add(head);
+
+    // Body (28, 8, 10x16x8 mapped horizontally in some versions, but let's approximate)
+    const bodyMat = buildAnimalBox(tex, 28, 8, 10, 16, 8);
+    const bodyGeo = new THREE.BoxGeometry(1.0, 0.8, 1.6);
+    const body = new THREE.Mesh(bodyGeo, bodyMat);
+    body.position.set(0, 0, -0.2);
+    group.add(body);
+
+    group.position.set(x, y, z);
+    scene.add(group);
+    mobs.push({ mesh: group, type, timer: Math.random()*100 });
 }
 for(let i=0; i<12; i++) spawnMob(Math.random()>0.5 ? 'pig' : 'cow', (Math.random()-0.5)*40 + 8, 30, (Math.random()-0.5)*40 + 8);
 
