@@ -50,11 +50,16 @@
             outline: 2px solid #000; z-index: 2;
         }
         
-        
+        /* Menus */
         #pause-menu, #instructions, #inventory-menu {
             position: absolute; width: 100%; height: 100%;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            background: rgba(0,0,0,0.6); color: white; z-index: 10;
+            background-color: hsla(0, 0%, 11%, 0.9); color: white; z-index: 10;
+        }
+
+        #instructions {
+            background-image: url('https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.19.2/assets/minecraft/textures/gui/options_background.png');
+            background-repeat: repeat; background-size: 64px 64px;
         }
         #pause-menu, #inventory-menu { display: none; }
         
@@ -91,13 +96,22 @@
         }
         
         .mc-btn {
-            background: #c6c6c6; border: 3px solid #000; border-top-color: #fff; border-left-color: #fff;
-            border-bottom-color: #555; border-right-color: #555;
-            padding: 10px 40px; font-family: 'VT323', monospace; font-size: 32px; color: #000;
-            cursor: pointer; margin: 10px; text-transform: uppercase; text-shadow: 1px 1px 0px #fff;
+            width: 300px; margin-bottom: 15px; padding: 10px;
+            font-family: 'VT323', monospace; font-size: 32px; color: white;
+            background-color: #727272; cursor: pointer; text-align: center;
+            border-left: 2px solid #a4a4a4; border-top: 2px solid #a4a4a4;
+            border-bottom: 2px solid #545655; border-right: 2px solid #545655;
+            box-shadow: 0 0 0 2px black; text-transform: uppercase;
         }
-        .mc-btn:hover { background: #5e81ce; color: #fff; border-top-color: #7d9eeb; border-left-color: #7d9eeb; border-bottom-color: #384d7a; border-right-color: #384d7a; text-shadow: 2px 2px 0px #3f3f3f; }
-        .mc-btn:active { border-top-color: #555; border-left-color: #555; border-bottom-color: #fff; border-right-color: #fff; }
+        .mc-btn:hover {
+            background-color: #218306;
+            border-left: 2px solid #17cd07; border-top: 2px solid #17cd07;
+            border-bottom: 2px solid #004e00; border-right: 2px solid #004e00;
+            box-shadow: 0 0 0 2px white;
+        }
+        .mc-btn:active {
+            border-top: 2px solid #555; border-left: 2px solid #555; border-bottom: 2px solid #fff; border-right: 2px solid #fff;
+        }
         
         .controls-list { font-size: 24px; text-align: left; margin-bottom: 30px; }
         .controls-list p { margin: 10px 0; }
@@ -308,6 +322,14 @@
             <div class="abtn" id="btn-break">Break</div>
             <div class="abtn" id="btn-place">Place</div>
             <div class="abtn" id="btn-jump">Jump</div>
+        </div>
+    </div>
+
+    <!-- Loading Screen -->
+    <div id="loading-screen" style="display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background-image: url('https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.19.2/assets/minecraft/textures/gui/options_background.png'); background-repeat: repeat; background-size: 64px 64px; z-index: 9999; flex-direction: column; justify-content: center; align-items: center; color: white;">
+        <h1 id="loading-text" style="font-size: 48px; text-shadow: 4px 4px 0px #000;">Loading World...</h1>
+        <div style="width: 300px; height: 10px; border: 2px solid #555; background: #000; margin-top: 20px;">
+            <div id="loading-bar" style="width: 0%; height: 100%; background: #17cd07; transition: width 0.3s;"></div>
         </div>
     </div>
 

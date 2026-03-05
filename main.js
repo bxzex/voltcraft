@@ -49,10 +49,29 @@ function appendChat(msg) {
     if(box.children.length > 5) box.removeChild(box.children[0]);
 }
 
+const loadingScreen = document.getElementById('loading-screen');
+const loadingText = document.getElementById('loading-text');
+const loadingBar = document.getElementById('loading-bar');
+
+function showLoading(text) {
+    document.getElementById('instructions').style.display = 'none';
+    loadingScreen.style.display = 'flex';
+    loadingText.innerText = text;
+    loadingBar.style.width = '10%';
+}
+
+function hideLoading() {
+    loadingScreen.style.display = 'none';
+}
+
 function setupPeerEvents(conn) {
     conn.on('open', () => {
         mpStatus.innerText = `Connected to ${conn.peer}!`;
         if (peer.id === myId) conn.send({ type: 'init_world', data: Array.from(world.entries()), time: state.worldTime, weather: state.weather });
+        else {
+            loadingBar.style.width = '50%';
+            loadingText.innerText = "Downloading World Data...";
+        }
     });
     conn.on('data', (msg) => {
         if (msg.type === 'init_world') {
@@ -61,9 +80,12 @@ function setupPeerEvents(conn) {
             state.worldTime = msg.time;
             setWeather(msg.weather);
             updateInstances();
-            mpStatus.innerText = "World downloaded! Ready to play.";
-            startSetup(); // Pop right into game
-            appendChat(`[Server] Joined world ${conn.peer}`);
+            loadingBar.style.width = '100%';
+            setTimeout(() => {
+                hideLoading();
+                startSetup(); // Pop right into game
+                appendChat(`[Server] Joined world ${conn.peer}`);
+            }, 500);
         } else if (msg.type === 'chat') {
             appendChat(msg.text);
         } else if (msg.type === 'place') {
@@ -83,7 +105,7 @@ function setupPeerEvents(conn) {
         }
     });
     conn.on('close', () => {
-        mpStatus.innerText = `Player ${conn.peer} left.`;
+        appendChat(`[Server] Player ${conn.peer} left.`);
         removeRemotePlayer(conn.peer);
         delete connections[conn.peer];
     });
@@ -113,7 +135,7 @@ if(joinBtn) joinBtn.onclick = () => {
     myUsername = usernameInput.value.trim() || 'Player';
     const targetId = worldIdInput.value.trim();
     if(!targetId) return alert("Enter a World ID");
-    mpStatus.innerText = "Connecting... (Please wait to jump in)";
+    showLoading("Connecting to Host...");
     peer = new window.Peer();
     peer.on('open', (id) => {
         const conn = peer.connect(targetId);
