@@ -154,12 +154,23 @@ export default class UI {
     // menu and fullscreen
     document.body.addEventListener('keydown', (e: KeyboardEvent) => {
       // menu
-      if (e.key === 'e' && document.pointerLockElement) {
-        const inv = document.getElementById('inventory-menu');
-        if (inv) {
-          inv.style.display = 'flex';
-          inv.classList.remove('hidden');
-          !isMobile && control.control.unlock();
+      const inv = document.getElementById('inventory-menu');
+      if (e.key === 'e' || e.code === 'Escape') {
+        if (inv && inv.style.display === 'flex' && !document.pointerLockElement) {
+          // Close inventory
+          inv.style.display = 'none';
+          inv.classList.add('hidden');
+          !isMobile && control.control.lock();
+          // Prevent ESC from triggering pause menu logic
+          e.stopPropagation();
+          return;
+        } else if (e.key === 'e' && document.pointerLockElement) {
+          // Open inventory
+          if (inv) {
+            inv.style.display = 'flex';
+            inv.classList.remove('hidden');
+            !isMobile && control.control.unlock();
+          }
         }
       }
 
@@ -227,7 +238,7 @@ export default class UI {
   bag: Bag
   joystick: Joystick
 
-  menu = document.querySelector('.menu')
+  menu = document.querySelector('#main-menu-container')
   crossHair = document.createElement('div')
 
   // buttons
@@ -241,8 +252,8 @@ export default class UI {
 
   // MP buttons
   mpButtons = document.querySelector('#mp-buttons')
-  mainMenuContent = document.querySelector('#main-menu-content')
-  joinMenuContent = document.querySelector('#join-menu-content')
+  mainMenuContent = document.querySelector('#main-menu-container')
+  joinMenuContent = document.querySelector('#join-menu-container')
   joinMenuBtn = document.querySelector('#join-menu-btn')
   joinBackBtn = document.querySelector('#join-back-btn')
 
@@ -270,6 +281,7 @@ export default class UI {
     isMobile && this.joystick.init()
     this.menu?.classList.add('hidden')
     this.menu?.classList.remove('start')
+    this.joinMenuContent?.classList.add('hidden')
     this.play && (this.play.innerHTML = 'Resume')
     this.crossHair.classList.remove('hidden')
     this.github && this.github.classList.add('hidden')

@@ -55,8 +55,9 @@ export default class Multiplayer {
       this.myUsername = usernameInput?.value.trim() || 'Player';
       const targetId = joinIdInput?.value.trim();
       if (!targetId) { alert("Enter a World ID"); return; }
-      
-      if(mpStatus) mpStatus.innerText = "Connecting...";
+
+      const joinStatus = document.getElementById('mp-join-status');
+      if(joinStatus) joinStatus.innerText = "Connecting...";
       this.peer = new Peer();
       this.peer.on('open', () => {
         const conn = this.peer!.connect(targetId);
@@ -64,7 +65,6 @@ export default class Multiplayer {
         this.setupConnection(conn);
       });
     };
-
     // Chat
     const chatInputWrapper = document.getElementById('chat-input-wrapper');
     const chatInput = document.getElementById('chat-input') as HTMLInputElement;

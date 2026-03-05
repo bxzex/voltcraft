@@ -41,9 +41,8 @@
         ></path>
       </svg>
     </a>
-    <div class="menu start">
-      
-      <div id="main-menu-content" style="display: flex; flex-direction: column; align-items: center;">
+    <div class="menu start" id="main-menu-container">
+      <div id="main-menu-content" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
         <input type="text" id="username" placeholder="Username" value="Player" class="button" style="text-align: center; background-color: #fff; color: #000;" />
         <button id="play" class="button">Singleplayer</button>
         
@@ -64,14 +63,17 @@
           <a href="https://www.linkedin.com/in/bxzex/" target="_blank" title="LinkedIn"><img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png" alt="LinkedIn" width="32" height="32"></a>
         </div>
       </div>
+    </div>
 
-      <div id="join-menu-content" class="hidden" style="display: flex; flex-direction: column; align-items: center;">
+    <!-- Join Menu Overlay -->
+    <div id="join-menu-container" class="menu start hidden" style="z-index: 2;">
+      <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
         <h2 style="font-family: Minecraft; font-size: 2rem; color: white; margin-bottom: 20px; text-shadow: 2px 2px 0px #000;">Join World</h2>
-        <input type="text" id="join-id" placeholder="Enter World ID" class="button" style="text-align: center; background-color: #fff; color: #000; margin-bottom: 10px;" />
+        <input type="text" id="join-id" placeholder="Paste World ID Here" class="button" style="text-align: center; background-color: #fff; color: #000; margin-bottom: 10px;" />
         <button id="join" class="button">Join</button>
         <button id="join-back-btn" class="button">Back</button>
+        <div id="mp-join-status" style="color: #ffff00; font-family: Minecraft; font-size: 1.2rem; text-shadow: 2px 2px 0px #000; margin-top: 10px;"></div>
       </div>
-
     </div>
 
     <!-- Chat Overlay -->
