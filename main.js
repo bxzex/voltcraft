@@ -266,7 +266,8 @@ const entitySkins = {
     pig: extTex('entity/pig/pig.png'),
     cow: extTex('entity/cow/cow.png'),
     villager: extTex('entity/villager/villager.png'),
-    player: extTex('entity/steve.png')
+    player: extTex('entity/steve.png'),
+    bird: extTex('entity/parrot/parrot_red_blue.png')
 };
 
 const m = (t) => new THREE.MeshLambertMaterial({ map: texCache[t] });
@@ -609,9 +610,28 @@ function createMobModel(type) {
         mBody = getBoxMats(tex, 16, 20, 8, 12, 6);
         mLeg = getBoxMats(tex, 0, 22, 4, 12, 4);
         mArm = getBoxMats(tex, 44, 22, 4, 8, 4); 
+    } else if (type === 'bird') {
+        mHead = getBoxMats(tex, 2, 2, 2, 3, 2, 32, 32);
+        mBody = getBoxMats(tex, 2, 8, 3, 4, 3, 32, 32);
+        mArm = getBoxMats(tex, 19, 8, 1, 4, 3, 32, 32); // Wings
+        mLeg = getBoxMats(tex, 14, 18, 1, 2, 1, 32, 32);
     }
 
-    if (isQuad) {
+    if (type === 'bird') {
+        const body = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.4, 0.3), mBody); body.position.y = 0.4; g.add(body);
+        const head = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.3, 0.2), mHead); head.position.set(0, 0.75, 0.1); g.add(head);
+        const legs = [];
+        [[0.1,0.2], [-0.1,0.2]].forEach(p => {
+            const lp = new THREE.Group(); lp.position.set(p[0], 0.2, p[1]);
+            const l = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.2, 0.1), mLeg); l.position.y = -0.1; lp.add(l); g.add(lp); legs.push(lp);
+        });
+        const arms = []; // Wings
+        [[0.2, 0.4], [-0.2, 0.4]].forEach(p => {
+            const ap = new THREE.Group(); ap.position.set(p[0], 0.5, 0);
+            const a = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.4, 0.3), mArm); a.position.y = -0.2; ap.add(a); g.add(ap); arms.push(ap);
+        });
+        return { g, legs, arms, head, isQuad: false, isBird: true };
+    } else if (isQuad) {
         // Body is usually horizontal for animals
         const body = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.6, 1.2), mBody); body.position.y = 0.6; g.add(body);
         const head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), mHead); head.position.set(0, 0.9, 0.7); g.add(head);
@@ -645,6 +665,7 @@ function spawnMob(type, x, y, z) {
 function spawnVillager(x, y, z) { spawnMob('villager', x, y, z); }
 
 for(let i=0; i<12; i++) spawnMob(Math.random()>0.5 ? 'pig' : 'cow', (Math.random()-0.5)*40, 20, (Math.random()-0.5)*40);
+for(let i=0; i<8; i++) spawnMob('bird', (Math.random()-0.5)*40, 20, (Math.random()-0.5)*40);
 
 function updateRemotePlayer(id, pos, yaw, pitch, isMoving) {
     if(!remotePlayers[id]) {
@@ -1040,11 +1061,17 @@ function animate() {
 
         entities.forEach(e => {
             if(e.velocity_y === undefined) e.velocity_y = 0;
-            e.timer -= delta; if (e.timer <= 0) { e.dir.set(Math.random()-0.5, 0, Math.random()-0.5).normalize(); e.timer = 2 + Math.random()*3; if(Math.random()<0.4) e.dir.set(0,0,0); }
+            e.timer -= delta; if (e.timer <= 0) { 
+                e.dir.set(Math.random()-0.5, e.isBird ? (Math.random()-0.5) : 0, Math.random()-0.5).normalize(); 
+                e.timer = 2 + Math.random()*3; 
+                if(Math.random()<0.4) e.dir.set(0,0,0); 
+            }
             
-            // Gravity
-            e.velocity_y -= CONFIG.gravity * delta;
-            
+            // Gravity (Birds fly, others fall)
+            if(!e.isBird) e.velocity_y -= CONFIG.gravity * delta;
+            else if(e.dir.lengthSq() < 0.1) e.velocity_y -= (CONFIG.gravity * 0.2) * delta; // Glide down if resting
+            else e.velocity_y = e.dir.y * e.speed;
+
             const ar = e.isQuad ? 0.4 : 0.2;
             const canEntMove = (anx, anz, ay) => {
                 const pts = [[ar,ar],[-ar,ar],[ar,-ar],[-ar,-ar]];
@@ -1074,16 +1101,25 @@ function animate() {
                     e.g.position.x = nX; e.g.position.z = nZ; 
                 } else {
                     // Try jumping if blocked and on ground
-                    if(onGround) e.velocity_y = CONFIG.jumpForce * 0.8;
+                    if(onGround && !e.isBird) e.velocity_y = CONFIG.jumpForce * 0.8;
                     else e.dir.set(0,0,0); 
                 }
-                e.g.lookAt(e.g.position.x + e.dir.x, e.g.position.y, e.g.position.z + e.dir.z);
+                e.g.lookAt(e.g.position.x + e.dir.x, e.g.position.y + (e.isBird?e.dir.y:0), e.g.position.z + e.dir.z);
                 const sLeg = Math.sin(time * 0.01 * e.speed) * 0.5;
                 if(e.isQuad) { e.legs[0].rotation.x=sLeg; e.legs[1].rotation.x=-sLeg; e.legs[2].rotation.x=-sLeg; e.legs[3].rotation.x=sLeg; }
-                else { e.legs[0].rotation.x=sLeg; e.legs[1].rotation.x=-sLeg; if(e.arms){ e.arms[0].rotation.x=-sLeg; e.arms[1].rotation.x=sLeg; } }
+                else { 
+                    e.legs[0].rotation.x=sLeg; e.legs[1].rotation.x=-sLeg; 
+                    if(e.arms){ 
+                        if(e.isBird) { e.arms[0].rotation.z = Math.abs(Math.sin(time*0.02)); e.arms[1].rotation.z = -Math.abs(Math.sin(time*0.02)); }
+                        else { e.arms[0].rotation.x=-sLeg; e.arms[1].rotation.x=sLeg; }
+                    } 
+                }
             } else { 
                 e.legs.forEach(l => l.rotation.x = 0);
-                if(e.arms) e.arms.forEach(a => a.rotation.x = 0);
+                if(e.arms) {
+                    if(e.isBird) e.arms.forEach(a => a.rotation.z = 0);
+                    else e.arms.forEach(a => a.rotation.x = 0);
+                }
             }
         });
     }
