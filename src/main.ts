@@ -47,7 +47,6 @@ function buildMobBox(type: string, u: number, v: number, w: number, h: number, d
             ctx.drawImage(img, 0, 0);
             const tex = new THREE.CanvasTexture(canvas);
             tex.magFilter = THREE.NearestFilter;
-            tex.flipY = false;
             tex.repeat.set(mw / 64, mh / 64);
             tex.offset.set(ox / 64, 1 - (oy + mh) / 64);
             mat.map = tex;
@@ -56,8 +55,8 @@ function buildMobBox(type: string, u: number, v: number, w: number, h: number, d
         return mat;
     };
     return [
-        getM(u, v + d, d, h),         // right (+x)
-        getM(u + d + w, v + d, d, h), // left (-x)
+        getM(u + d + w, v + d, d, h), // right (+x)
+        getM(u, v + d, d, h),         // left (-x)
         getM(u + d, v, w, d),         // top (+y)
         getM(u + d + w, v, w, d),     // bottom (-y)
         getM(u + d, v + d, w, h),     // front (+z)
@@ -294,13 +293,12 @@ function spawnParrot(x: number, y: number, z: number) {
         const getM = (ox: number, oy: number, mw: number, mh: number) => {
             const t = texLoader.load(parrotTexUrl);
             t.magFilter = THREE.NearestFilter;
-            t.flipY = false;
             t.repeat.set(mw / 32, mh / 32); t.offset.set(ox / 32, 1 - (oy + mh) / 32);
             return new THREE.MeshLambertMaterial({ map: t, transparent: true, alphaTest: 0.5 });
         };
         return [
-            getM(u, v + d, d, h),         // right (+x)
-            getM(u + d + w, v + d, d, h), // left (-x)
+            getM(u + d + w, v + d, d, h), // right (+x)
+            getM(u, v + d, d, h),         // left (-x)
             getM(u + d, v, w, d),         // top (+y)
             getM(u + d + w, v, w, d),     // bottom (-y)
             getM(u + d, v + d, w, h),     // front (+z)
@@ -363,7 +361,6 @@ function buildSkinBox(texUrl: string, u: number, v: number, w: number, h: number
 
             const tex = new THREE.CanvasTexture(canvas);
             tex.magFilter = THREE.NearestFilter;
-            tex.flipY = false;
             tex.repeat.set(mw / 64, mh / 64);
             tex.offset.set(ox / 64, 1 - (oy + mh) / 64);
             mat.map = tex;
@@ -373,8 +370,8 @@ function buildSkinBox(texUrl: string, u: number, v: number, w: number, h: number
         return mat;
     };
     return [
-        getM(u, v + d, d, h),         // right (+x)
-        getM(u + d + w, v + d, d, h), // left (-x)
+        getM(u + d + w, v + d, d, h), // right (+x)
+        getM(u, v + d, d, h),         // left (-x)
         getM(u + d, v, w, d),         // top (+y)
         getM(u + d + w, v, w, d),     // bottom (-y)
         getM(u + d, v + d, w, h),     // front (+z)
