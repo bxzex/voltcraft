@@ -25,7 +25,7 @@ const multiplayer = new Multiplayer(scene, terrain, player, control)
     ; (window as any).multiplayer = multiplayer;
 
 // Animals
-const ASSET_URL = '/';
+const ASSET_URL = './';
 const texLoader = new THREE.TextureLoader();
 const mobs: { mesh: THREE.Group, type: string, timer: number }[] = [];
 
@@ -229,7 +229,7 @@ const celestialGroup = new THREE.Group();
 scene.add(celestialGroup);
 
 // Sun
-const sunTex = texLoader.load('/textures/environment/sun.png');
+const sunTex = texLoader.load('./textures/environment/sun.png');
 sunTex.magFilter = THREE.NearestFilter;
 const sunMat = new THREE.MeshBasicMaterial({ map: sunTex, transparent: true, side: THREE.DoubleSide });
 const sunMesh = new THREE.Mesh(new THREE.PlaneGeometry(20, 20), sunMat);
@@ -238,7 +238,7 @@ sunMesh.rotation.x = Math.PI / 2;
 celestialGroup.add(sunMesh);
 
 // Moon
-const moonTex = texLoader.load('/textures/environment/moon_phases.png');
+const moonTex = texLoader.load('./textures/environment/moon_phases.png');
 moonTex.magFilter = THREE.NearestFilter;
 moonTex.repeat.set(1/4, 1/2); // Just show one phase for now
 const moonMat = new THREE.MeshBasicMaterial({ map: moonTex, transparent: true, side: THREE.DoubleSide });
@@ -388,7 +388,7 @@ tpHand.position.set(0, -0.6, -0.4);
 
 function createPlayerMesh(skinName: string) {
     playerGroup.clear();
-    const texUrl = `/skins/${skinName}.png`;
+    const texUrl = `./skins/${skinName}.png`;
 
     const headMat = buildSkinBox(texUrl, 0, 0, 8, 8, 8);
     playerParts.head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), headMat);
