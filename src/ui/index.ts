@@ -177,6 +177,16 @@ export default class UI {
       this.onExit()
     })
 
+    // MP menu flow
+    this.joinMenuBtn?.addEventListener('click', () => {
+      this.mainMenuContent?.classList.add('hidden');
+      this.joinMenuContent?.classList.remove('hidden');
+    });
+    this.joinBackBtn?.addEventListener('click', () => {
+      this.joinMenuContent?.classList.add('hidden');
+      this.mainMenuContent?.classList.remove('hidden');
+    });
+
     // play / pause handler
     document.addEventListener('pointerlockchange', () => {
       const inv = document.getElementById('inventory-menu');
@@ -220,6 +230,13 @@ export default class UI {
   exit = document.querySelector('#exit')
   save = document.querySelector('#save')
 
+  // MP buttons
+  mpButtons = document.querySelector('#mp-buttons')
+  mainMenuContent = document.querySelector('#main-menu-content')
+  joinMenuContent = document.querySelector('#join-menu-content')
+  joinMenuBtn = document.querySelector('#join-menu-btn')
+  joinBackBtn = document.querySelector('#join-back-btn')
+
   // modals
   saveModal = document.querySelector('.save-modal')
   loadModal = document.querySelector('.load-modal')
@@ -255,6 +272,7 @@ export default class UI {
     this.crossHair.classList.add('hidden')
     this.save && (this.save.innerHTML = 'Save and Exit')
     this.github && this.github.classList.remove('hidden')
+    this.mpButtons?.classList.add('hidden')
   }
 
   onExit = () => {
@@ -262,6 +280,9 @@ export default class UI {
     this.play && (this.play.innerHTML = 'Singleplayer')
     this.save && (this.save.innerHTML = 'Load Game')
     this.feature?.classList.remove('hidden')
+    this.mpButtons?.classList.remove('hidden')
+    this.joinMenuContent?.classList.add('hidden')
+    this.mainMenuContent?.classList.remove('hidden')
   }
 
   onSave = () => {

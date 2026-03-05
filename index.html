@@ -2,11 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" href="/src/static/mc.ico" />
-    <meta
-      name="viewport"
-      content="width=device-width,initial-scale=1,maximum-scale=1"
-    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="apple-touch-icon" href="/src/static/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" href="/src/static/favicon.png" />
     <meta
       name="description"
       content="Voltcraft - an open source voxel game built with Three.js and TypeScript by bxzex"
@@ -35,25 +34,36 @@
       </svg>
     </a>
     <div class="menu start">
+      
+      <div id="main-menu-content" style="display: flex; flex-direction: column; align-items: center;">
+        <input type="text" id="username" placeholder="Username" value="Player" class="button" style="text-align: center; background-color: #fff; color: #000;" />
+        <button id="play" class="button">Singleplayer</button>
+        
+        <div id="mp-buttons" style="display: flex; gap: 10px;">
+          <button id="host" class="button" style="width: 145px;">Host World</button>
+          <button id="join-menu-btn" class="button" style="width: 145px;">Join World</button>
+        </div>
+        <div id="mp-status" style="color: #ffff00; font-family: Minecraft; font-size: 1.2rem; text-shadow: 2px 2px 0px #000; margin-bottom: 10px;"></div>
 
-    <input type="text" id="username" placeholder="Username" value="Player" class="button" style="text-align: center; background-color: #fff; color: #000;" />      
-      <button id="play" class="button">Singleplayer</button>
-      <div style="display: flex; gap: 10px;">
-        <button id="host" class="button" style="width: 145px;">Host World</button>
-        <button id="join" class="button" style="width: 145px;">Join World</button>
+        <button id="save" class="button">Load Game</button>
+        <button id="setting" class="button">Setting</button>
+        <button id="feature" class="button">Guide</button>
+        <button id="exit" class="button">Exit</button>
+        
+        <div class="social-links" style="display: flex; gap: 10px; margin-top: 20px; justify-content: center;">
+          <a href="https://github.com/bxzex" target="_blank" title="GitHub"><img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" alt="GitHub" width="32" height="32" style="filter: invert(1);"></a>
+          <a href="https://www.instagram.com/bxzex/" target="_blank" title="Instagram"><img src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg" alt="Instagram" width="32" height="32"></a>
+          <a href="https://www.linkedin.com/in/bxzex/" target="_blank" title="LinkedIn"><img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png" alt="LinkedIn" width="32" height="32"></a>
+        </div>
       </div>
-      <input type="text" id="join-id" placeholder="Enter World ID" class="button" style="text-align: center; background-color: #fff; color: #000;" />
-      <div id="mp-status" style="color: #ffff00; font-family: Minecraft; font-size: 1.2rem; text-shadow: 2px 2px 0px #000; margin-bottom: 10px;"></div>
 
-      <button id="save" class="button">Load Game</button>
-      <button id="setting" class="button">Setting</button>
-      <button id="feature" class="button">Guide</button>
-      <button id="exit" class="button">Exit</button>
-      <div class="social-links" style="display: flex; gap: 10px; margin-top: 20px; justify-content: center;">
-        <a href="https://github.com/bxzex" target="_blank" title="GitHub"><img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" alt="GitHub" width="32" height="32" style="filter: invert(1);"></a>
-        <a href="https://www.instagram.com/bxzex/" target="_blank" title="Instagram"><img src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg" alt="Instagram" width="32" height="32"></a>
-        <a href="https://www.linkedin.com/in/bxzex/" target="_blank" title="LinkedIn"><img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png" alt="LinkedIn" width="32" height="32"></a>
+      <div id="join-menu-content" class="hidden" style="display: flex; flex-direction: column; align-items: center;">
+        <h2 style="font-family: Minecraft; font-size: 2rem; color: white; margin-bottom: 20px; text-shadow: 2px 2px 0px #000;">Join World</h2>
+        <input type="text" id="join-id" placeholder="Enter World ID" class="button" style="text-align: center; background-color: #fff; color: #000; margin-bottom: 10px;" />
+        <button id="join" class="button">Join</button>
+        <button id="join-back-btn" class="button">Back</button>
       </div>
+
     </div>
 
     <!-- Chat Overlay -->

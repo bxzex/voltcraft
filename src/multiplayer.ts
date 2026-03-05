@@ -47,6 +47,8 @@ export default class Multiplayer {
         this.setupConnection(conn);
         this.appendChat(`[Server] A player joined!`);
       });
+      const playBtn = document.getElementById('play');
+      if (playBtn) playBtn.click();
     };
 
     if (joinBtn) joinBtn.onclick = () => {
