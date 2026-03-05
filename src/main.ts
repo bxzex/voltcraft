@@ -328,7 +328,6 @@ function createPlayerMesh(skinName: string) {
     playerGroup.add(playerParts.rightLegGroup);
 
     playerGroup.position.y = -1.5;
-    playerGroup.rotation.y = Math.PI;
 }
 createPlayerMesh(currentSkin);
 scene.add(playerGroup);

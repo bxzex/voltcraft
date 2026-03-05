@@ -109,9 +109,16 @@ export default class UI {
     // setting
     this.setting?.addEventListener('click', () => {
       this.settings?.classList.remove('hidden')
+      this.mainMenuContent?.querySelector('#main-menu-content')?.classList.add('hidden')
+      document.querySelector('.bag')?.classList.add('hidden')
     })
     this.settingBack?.addEventListener('click', () => {
       this.settings?.classList.add('hidden')
+      this.mainMenuContent?.querySelector('#main-menu-content')?.classList.remove('hidden')
+      // Only show bag if we are actually in-game (not at start screen)
+      if (!this.menu?.classList.contains('start')) {
+        document.querySelector('.bag')?.classList.remove('hidden')
+      }
     })
 
     // render distance
