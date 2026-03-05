@@ -232,9 +232,8 @@ scene.add(celestialGroup);
 const sunTex = texLoader.load('./textures/environment/sun.png');
 sunTex.magFilter = THREE.NearestFilter;
 const sunMat = new THREE.MeshBasicMaterial({ map: sunTex, transparent: true, side: THREE.DoubleSide });
-const sunMesh = new THREE.Mesh(new THREE.PlaneGeometry(20, 20), sunMat);
-sunMesh.position.set(0, 200, 0); // Far away
-sunMesh.rotation.x = Math.PI / 2;
+const sunMesh = new THREE.Mesh(new THREE.PlaneGeometry(50, 50), sunMat);
+sunMesh.position.set(0, 0, -200); // Start on North horizon
 celestialGroup.add(sunMesh);
 
 // Moon
@@ -242,9 +241,8 @@ const moonTex = texLoader.load('./textures/environment/moon_phases.png');
 moonTex.magFilter = THREE.NearestFilter;
 moonTex.repeat.set(1/4, 1/2); // Just show one phase for now
 const moonMat = new THREE.MeshBasicMaterial({ map: moonTex, transparent: true, side: THREE.DoubleSide });
-const moonMesh = new THREE.Mesh(new THREE.PlaneGeometry(20, 20), moonMat);
-moonMesh.position.set(0, -200, 0); // Opposite of sun
-moonMesh.rotation.x = -Math.PI / 2;
+const moonMesh = new THREE.Mesh(new THREE.PlaneGeometry(50, 50), moonMat);
+moonMesh.position.set(0, 0, 200); // Start on South horizon
 celestialGroup.add(moonMesh);
 
 // Stars
@@ -669,16 +667,15 @@ let currentHeldBlock = -1;
     celestialGroup.position.copy(camera.position);
     starsSys.position.copy(camera.position);
 
-    let targetRotation = 0; // Day
+    let targetRotation = Math.PI / 2; // Day (Sun overhead)
     let targetStarOpacity = 0;
     if (timeMode === 'night') {
-        targetRotation = Math.PI; // Night
+        targetRotation = -Math.PI / 2; // Night (Moon overhead)
         targetStarOpacity = 1.0;
     }
 
     // Rotate celestial group smoothly
-    let currentRot = celestialGroup.rotation.x;
-    celestialGroup.rotation.x += (targetRotation - currentRot) * 0.02;
+    celestialGroup.rotation.x += (targetRotation - celestialGroup.rotation.x) * 0.02;
     
     // Smoothly fade stars
     starsMat.opacity += (targetStarOpacity - starsMat.opacity) * 0.02;
