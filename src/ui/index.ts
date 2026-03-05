@@ -299,6 +299,7 @@ export default class UI {
     this.donate && this.donate.classList.remove('hidden')
     this.mpButtons?.classList.add('hidden')
     this.mpStatus?.classList.add('hidden')
+    document.getElementById('username')?.classList.add('hidden')
   }
 
   onExit = () => {
@@ -308,6 +309,7 @@ export default class UI {
     this.feature?.classList.remove('hidden')
     this.mpButtons?.classList.remove('hidden')
     this.mpStatus?.classList.remove('hidden')
+    document.getElementById('username')?.classList.remove('hidden')
     this.joinMenuContent?.classList.add('hidden')
     this.mainMenuContent?.classList.remove('hidden')
   }
