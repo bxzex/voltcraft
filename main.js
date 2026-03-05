@@ -540,34 +540,60 @@ function updateInstances() {
 const entities = [];
 const remotePlayers = {}; 
 
+function getSkinMat(tex, u, v, w, h, tW=64, tH=64) {
+    const t = tex.clone();
+    t.needsUpdate = true;
+    t.repeat.set(w/tW, h/tH);
+    t.offset.set(u/tW, 1 - (v+h)/tH);
+    return new THREE.MeshLambertMaterial({ map: t, transparent: true, alphaTest: 0.5 });
+}
+
 function createMobModel(type) {
     const g = new THREE.Group();
     const isQuad = (type === 'pig' || type === 'cow');
-    const mat = new THREE.MeshLambertMaterial({ map: entitySkins[type], transparent: true, alphaTest: 0.5 });
+    const tex = entitySkins[type];
     
-    // We use a simplified mapping for full skins.
-    // Minecraft textures are typically complex, but applying them to standard boxes gives a classic rough vibe.
+    let mBody, mHead, mLeg, mArm;
+    if (type === 'player') {
+        mHead = getSkinMat(tex, 8, 8, 8, 8);
+        mBody = getSkinMat(tex, 20, 20, 8, 12);
+        mArm = getSkinMat(tex, 44, 20, 4, 12);
+        mLeg = getSkinMat(tex, 4, 20, 4, 12);
+    } else if (type === 'pig') {
+        mHead = getSkinMat(tex, 8, 8, 8, 8, 64, 32);
+        mBody = getSkinMat(tex, 28, 16, 16, 8, 64, 32);
+        mLeg = getSkinMat(tex, 0, 16, 4, 4, 64, 32);
+    } else if (type === 'cow') {
+        mHead = getSkinMat(tex, 0, 0, 8, 8, 64, 32);
+        mBody = getSkinMat(tex, 18, 14, 18, 10, 64, 32);
+        mLeg = getSkinMat(tex, 0, 16, 4, 4, 64, 32);
+    } else if (type === 'villager') {
+        mHead = getSkinMat(tex, 0, 0, 8, 10);
+        mBody = getSkinMat(tex, 18, 20, 12, 18);
+        mLeg = getSkinMat(tex, 0, 22, 4, 12);
+    }
+
     if (isQuad) {
-        const body = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.6, 1.2), mat); body.position.y = 0.6; g.add(body);
-        const head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), mat); head.position.set(0, 0.9, 0.7); g.add(head);
+        const body = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.6, 1.2), mBody); body.position.y = 0.6; g.add(body);
+        const head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), mHead); head.position.set(0, 0.9, 0.7); g.add(head);
         const legs = [];
         [[0.25,0.4], [-0.25,0.4], [0.25,-0.4], [-0.25,-0.4]].forEach(p => {
             const lp = new THREE.Group(); lp.position.set(p[0], 0.4, p[1]);
-            const l = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.4, 0.25), mat); l.position.y = -0.2; lp.add(l); g.add(lp); legs.push(lp);
+            const l = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.4, 0.25), mLeg); l.position.y = -0.2; lp.add(l); g.add(lp); legs.push(lp);
         });
         return { g, legs, head, isQuad };
     } else {
-        const body = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.8, 0.3), mat); body.position.y = 0.8; g.add(body);
-        const head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), mat); head.position.set(0, 1.4, 0); g.add(head);
+        const body = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.8, 0.3), mBody); body.position.y = 0.8; g.add(body);
+        const head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), mHead); head.position.set(0, 1.4, 0); g.add(head);
         const legs = [];
         [[0.15,0], [-0.15,0]].forEach(p => {
             const lp = new THREE.Group(); lp.position.set(p[0], 0.4, p[1]);
-            const l = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.4, 0.25), mat); l.position.y = -0.2; lp.add(l); g.add(lp); legs.push(lp);
+            const l = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.4, 0.25), mLeg); l.position.y = -0.2; lp.add(l); g.add(lp); legs.push(lp);
         });
         const arms = [];
         [[0.35, 0.8], [-0.35, 0.8]].forEach(p => {
             const ap = new THREE.Group(); ap.position.set(p[0], 1.2, 0);
-            const a = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.8, 0.2), mat); a.position.y = -0.4; ap.add(a); g.add(ap); arms.push(ap);
+            const a = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.8, 0.2), mArm || mLeg); a.position.y = -0.4; ap.add(a); g.add(ap); arms.push(ap);
         });
         return { g, legs, arms, head, isQuad };
     }
