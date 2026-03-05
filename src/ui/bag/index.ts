@@ -31,6 +31,7 @@ import furnace from '../../static/textures/block/furnace_front.png'
 import bookshelf from '../../static/textures/block/bookshelf.png'
 import tnt from '../../static/textures/block/tnt_side.png'
 import glowstone from '../../static/textures/block/glowstone.png'
+import torch from '../../static/textures/block/torch.png'
 import netherrack from '../../static/textures/block/netherrack.png'
 import netherBricks from '../../static/textures/block/nether_bricks.png'
 import pumpkin from '../../static/textures/block/pumpkin_side.png'
@@ -146,7 +147,7 @@ const allBlocks = [
   { type: BlockType.rawIron, src: rawIron },
   { type: BlockType.rawGold, src: rawGold },
   { type: BlockType.rawCopper, src: rawCopper },
-  { type: BlockType.torch, src: glowstone },
+  { type: BlockType.torch, src: torch },
   { type: BlockType.bedrock, src: bedrock },
   { type: 100, src: diamond_pickaxe },
   { type: 101, src: diamond_shovel },
@@ -162,7 +163,8 @@ const blockTextures: Record<number, string[]> = {
   [BlockType.grass]: [grass, grass, grass_top, dirt_img, grass, grass],
   [BlockType.tree]: [tree, tree, oak_log_top, oak_log_top, tree, tree],
   [BlockType.dirt]: [dirt, dirt, dirt, dirt, dirt, dirt],
-  [BlockType.stone]: [stone, stone, stone, stone, stone, stone]
+  [BlockType.stone]: [stone, stone, stone, stone, stone, stone],
+  [BlockType.torch]: [torch, torch, torch, torch, torch, torch]
 }
 
 const createBlockIcon = (type: number, src: string) => {

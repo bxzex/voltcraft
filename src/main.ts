@@ -223,6 +223,15 @@ document.getElementById('weather-clear')?.addEventListener('click', () => setWea
 document.getElementById('weather-rain')?.addEventListener('click', () => setWeather('rain'));
 document.getElementById('weather-thunder')?.addEventListener('click', () => setWeather('thunder'));
 
+// Time
+let timeMode = 'day';
+function setTime(t: string) {
+    timeMode = t;
+}
+(window as any).setTime = setTime;
+document.getElementById('time-day')?.addEventListener('click', () => setTime('day'));
+document.getElementById('time-night')?.addEventListener('click', () => setTime('night'));
+
 // Multiplayer ID Copy
 const myWorldId = document.getElementById('my-world-id') as HTMLInputElement;
 const copyIdBtn = document.getElementById('copy-id');
@@ -599,7 +608,7 @@ let currentHeldBlock = -1;
 
     playerGroup.visible = thirdPerson;
 
-    // Animate Weather
+    // Animate Weather & Time
     if (weather !== 'clear') {
         const pArray = rainGeo.attributes.position.array as Float32Array;
         for (let i = 1; i < rainCount * 3; i += 3) {
@@ -610,6 +619,39 @@ let currentHeldBlock = -1;
         rainSys.position.copy(camera.position);
     }
 
+    // Target colors and intensities
+    let targetBg = new THREE.Color(0x87ceeb);
+    let targetSun = 1.0;
+    let targetFill = 0.4;
+    let targetReflect = 0.4;
+
+    if (timeMode === 'night') {
+        targetBg = new THREE.Color(0x050510);
+        targetSun = 0.05;
+        targetFill = 0.1;
+        targetReflect = 0.1;
+    }
+
+    if (weather === 'rain') {
+        targetBg.lerp(new THREE.Color(0x333333), 0.5);
+        targetSun *= 0.5;
+        targetFill *= 0.8;
+    } else if (weather === 'thunder') {
+        targetBg.lerp(new THREE.Color(0x222222), 0.7);
+        targetSun *= 0.3;
+        targetFill *= 0.6;
+    }
+
+    // Smoothly transition colors
+    const currentBg = (scene.background as THREE.Color);
+    currentBg.lerp(targetBg, 0.02);
+    (scene.fog as THREE.Fog).color.copy(currentBg);
+    
+    // Smoothly transition light intensities
+    core.sunLight.intensity += (targetSun - core.sunLight.intensity) * 0.02;
+    core.fillLight.intensity += (targetFill - core.fillLight.intensity) * 0.02;
+    core.reflectionLight.intensity += (targetReflect - core.reflectionLight.intensity) * 0.02;
+
     if (weather === 'thunder' && Math.random() < 0.002) {
         scene.background = new THREE.Color(0xffffff);
         scene.fog = new THREE.Fog(0xffffff, 1, 96);
@@ -619,15 +661,9 @@ let currentHeldBlock = -1;
         thunderAudio.play().catch(()=>{});
 
         setTimeout(() => {
-            scene.background = new THREE.Color(0x333333);
-            scene.fog = new THREE.Fog(0x333333, 1, 96);
+            scene.background = currentBg;
+            scene.fog = new THREE.Fog(currentBg, 1, 96);
         }, 100);
-    } else if (weather !== 'clear') {
-        scene.background = new THREE.Color(0x333333);
-        scene.fog = new THREE.Fog(0x333333, 1, 96);
-    } else {
-        scene.background = new THREE.Color(0x87ceeb);
-        scene.fog = new THREE.Fog(0x87ceeb, 1, 96);
     }
 
     if (thirdPerson) {

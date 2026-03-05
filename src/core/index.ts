@@ -12,7 +12,10 @@ export default class Core {
 
   camera: THREE.PerspectiveCamera
   scene: THREE.Scene
-  renderer: THREE.Renderer
+  renderer: THREE.WebGLRenderer
+  sunLight!: THREE.DirectionalLight
+  fillLight!: THREE.DirectionalLight
+  reflectionLight!: THREE.AmbientLight
 
   initCamera = () => {
     this.camera.fov = 50
@@ -37,17 +40,17 @@ export default class Core {
     this.scene.fog = new THREE.Fog(backgroundColor, 1, 96)
     this.scene.background = new THREE.Color(backgroundColor)
 
-    const sunLight = new THREE.DirectionalLight(0xffffff, 1.0)
-    sunLight.position.set(100, 100, 100)
-    sunLight.castShadow = false // Optimization
-    this.scene.add(sunLight)
+    this.sunLight = new THREE.DirectionalLight(0xffffff, 1.0)
+    this.sunLight.position.set(100, 100, 100)
+    this.sunLight.castShadow = false // Optimization
+    this.scene.add(this.sunLight)
 
-    const fillLight = new THREE.DirectionalLight(0xffffff, 0.4)
-    fillLight.position.set(-100, 50, -100)
-    this.scene.add(fillLight)
+    this.fillLight = new THREE.DirectionalLight(0xffffff, 0.4)
+    this.fillLight.position.set(-100, 50, -100)
+    this.scene.add(this.fillLight)
 
-    const reflectionLight = new THREE.AmbientLight(0x606060)
-    this.scene.add(reflectionLight)
+    this.reflectionLight = new THREE.AmbientLight(0x606060)
+    this.scene.add(this.reflectionLight)
   }
 
   initRenderer = () => {
