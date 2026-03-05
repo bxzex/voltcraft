@@ -252,6 +252,7 @@ export default class UI {
 
   // MP buttons
   mpButtons = document.querySelector('#mp-buttons')
+  mpStatus = document.querySelector('#mp-status')
   mainMenuContent = document.querySelector('#main-menu-container')
   joinMenuContent = document.querySelector('#join-menu-container')
   joinMenuBtn = document.querySelector('#join-menu-btn')
@@ -297,6 +298,7 @@ export default class UI {
     this.github && this.github.classList.remove('hidden')
     this.donate && this.donate.classList.remove('hidden')
     this.mpButtons?.classList.add('hidden')
+    this.mpStatus?.classList.add('hidden')
   }
 
   onExit = () => {
@@ -305,6 +307,7 @@ export default class UI {
     this.save && (this.save.innerHTML = 'Load Game')
     this.feature?.classList.remove('hidden')
     this.mpButtons?.classList.remove('hidden')
+    this.mpStatus?.classList.remove('hidden')
     this.joinMenuContent?.classList.add('hidden')
     this.mainMenuContent?.classList.remove('hidden')
   }
