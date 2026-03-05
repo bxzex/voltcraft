@@ -1013,9 +1013,17 @@ function animate() {
         if (actionElapsed < CONFIG.actionDuration) {
             const pVal = actionElapsed / CONFIG.actionDuration; const sVal = Math.sin(pVal * Math.PI);
             fpItem.position.set(0.4, -0.3 - sVal * 0.2, -0.5 - sVal * 0.3); fpItem.rotation.set(-sVal * 1.2, -Math.PI / 4, 0);
-            if(pModel.arms) pModel.arms[1].rotation.x = -sVal * 2;
+            if(pModel.arms) {
+                pModel.arms[1].rotation.x = -sVal * 2; // Right arm swing
+                if (tpItem.children.length > 0) {
+                    tpItem.position.set(0, -0.4, 0.2 + sVal * 0.2); // Item pushes forward slightly with arm
+                }
+            }
         } else {
             fpItem.position.set(0.4, -0.3, -0.5); fpItem.rotation.set(0, -Math.PI / 4, 0);
+            if(pModel.arms) {
+                if(tpItem.children.length > 0) tpItem.position.set(0, -0.4, 0.2);
+            }
         }
 
         if (isMoving && !state.isFlying && state.velocity.y === 0) {
