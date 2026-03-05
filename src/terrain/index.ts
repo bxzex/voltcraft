@@ -46,7 +46,38 @@ export enum BlockType {
   netherBricks = 35,
   pumpkin = 36,
   melon = 37,
-  sponge = 38
+  sponge = 38,
+  amethyst = 39,
+  ancientDebris = 40,
+  andesite = 41,
+  polishedAndesite = 42,
+  diorite = 43,
+  polishedDiorite = 44,
+  granite = 45,
+  polishedGranite = 46,
+  deepslate = 47,
+  deepslateBricks = 48,
+  deepslateTiles = 49,
+  basalt = 50,
+  polishedBasalt = 51,
+  blackstone = 52,
+  gildedBlackstone = 53,
+  chiseledBlackstone = 54,
+  endStone = 55,
+  endStoneBricks = 56,
+  purpur = 57,
+  purpurPillar = 58,
+  redSandstone = 59,
+  chiseledRedSandstone = 60,
+  cutRedSandstone = 61,
+  magma = 62,
+  soulSand = 63,
+  soulSoil = 64,
+  boneBlock = 65,
+  copperBlock = 66,
+  rawIron = 67,
+  rawGold = 68,
+  rawCopper = 69
 }
 export default class Terrain {
   constructor(scene: THREE.Scene, camera: THREE.PerspectiveCamera) {
@@ -135,7 +166,38 @@ export default class Terrain {
     MaterialType.netherBricks,
     MaterialType.pumpkin,
     MaterialType.melon,
-    MaterialType.sponge
+    MaterialType.sponge,
+    MaterialType.amethyst,
+    MaterialType.ancientDebris,
+    MaterialType.andesite,
+    MaterialType.polishedAndesite,
+    MaterialType.diorite,
+    MaterialType.polishedDiorite,
+    MaterialType.granite,
+    MaterialType.polishedGranite,
+    MaterialType.deepslate,
+    MaterialType.deepslateBricks,
+    MaterialType.deepslateTiles,
+    MaterialType.basalt,
+    MaterialType.polishedBasalt,
+    MaterialType.blackstone,
+    MaterialType.gildedBlackstone,
+    MaterialType.chiseledBlackstone,
+    MaterialType.endStone,
+    MaterialType.endStoneBricks,
+    MaterialType.purpur,
+    MaterialType.purpurPillar,
+    MaterialType.redSandstone,
+    MaterialType.chiseledRedSandstone,
+    MaterialType.cutRedSandstone,
+    MaterialType.magma,
+    MaterialType.soulSand,
+    MaterialType.soulSoil,
+    MaterialType.boneBlock,
+    MaterialType.copperBlock,
+    MaterialType.rawIron,
+    MaterialType.rawGold,
+    MaterialType.rawCopper
   ]
 
   // other properties
@@ -144,7 +206,9 @@ export default class Terrain {
   blocksFactor = [
     1, 0.2, 0.1, 0.7, 0.1, 0.2, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.3,
     // New blocks (all player-placeable, small factor)
-    0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1
+    0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1,
+    // 31 additional blocks
+    0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1
   ]
 
   customBlocks: Block[] = []

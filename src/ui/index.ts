@@ -34,6 +34,8 @@ export default class UI {
         terrain.generate()
         terrain.camera.position.y = 40
         control.player.setMode(Mode.walking)
+      } else {
+        this.onPlay()
       }
       !isMobile && control.control.lock()
     })
@@ -293,7 +295,6 @@ export default class UI {
 
   onPause = () => {
     this.menu?.classList.remove('hidden')
-    this.menu?.classList.add('start')
     this.crossHair.classList.add('hidden')
     document.getElementById('watermark')?.classList.add('hidden')
     this.save && (this.save.innerHTML = 'Save and Exit')

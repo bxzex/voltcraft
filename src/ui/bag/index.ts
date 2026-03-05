@@ -1,10 +1,10 @@
-import grass from '../../static/block-icon/grass.png'
-import stone from '../../static/block-icon/stone.png'
-import tree from '../../static/block-icon/tree.png'
-import wood from '../../static/block-icon/wood.png'
-import diamond from '../../static/block-icon/diamond.png'
-import quartz from '../../static/block-icon/quartz.png'
-import glass from '../../static/block-icon/glass.png'
+import grass from '../../static/textures/block/grass_block_side.png'
+import stone from '../../static/textures/block/stone.png'
+import tree from '../../static/textures/block/oak_log.png'
+import wood from '../../static/textures/block/oak_planks.png'
+import diamond from '../../static/textures/block/diamond_block.png'
+import quartz from '../../static/textures/block/quartz_block_side.png'
+import glass from '../../static/textures/block/glass.png'
 import { isMobile } from '../../utils'
 import Control from '../../control'
 import { BlockType } from '../../terrain'
@@ -41,6 +41,39 @@ import netherBricks from '../../static/textures/block/nether_bricks.png'
 import pumpkin from '../../static/textures/block/pumpkin_side.png'
 import melon from '../../static/textures/block/melon_side.png'
 import sponge from '../../static/textures/block/sponge.png'
+
+// 31 additional textures
+import amethyst from '../../static/textures/block/amethyst_block.png'
+import ancientDebris from '../../static/textures/block/ancient_debris_side.png'
+import andesite from '../../static/textures/block/andesite.png'
+import polishedAndesite from '../../static/textures/block/polished_andesite.png'
+import diorite from '../../static/textures/block/diorite.png'
+import polishedDiorite from '../../static/textures/block/polished_diorite.png'
+import granite from '../../static/textures/block/granite.png'
+import polishedGranite from '../../static/textures/block/polished_granite.png'
+import deepslate from '../../static/textures/block/deepslate.png'
+import deepslateBricks from '../../static/textures/block/deepslate_bricks.png'
+import deepslateTiles from '../../static/textures/block/deepslate_tiles.png'
+import basalt from '../../static/textures/block/basalt_side.png'
+import polishedBasalt from '../../static/textures/block/polished_basalt_side.png'
+import blackstone from '../../static/textures/block/blackstone.png'
+import gildedBlackstone from '../../static/textures/block/gilded_blackstone.png'
+import chiseledBlackstone from '../../static/textures/block/chiseled_polished_blackstone.png'
+import endStone from '../../static/textures/block/end_stone.png'
+import endStoneBricks from '../../static/textures/block/end_stone_bricks.png'
+import purpur from '../../static/textures/block/purpur_block.png'
+import purpurPillar from '../../static/textures/block/purpur_pillar.png'
+import redSandstone from '../../static/textures/block/red_sandstone.png'
+import chiseledRedSandstone from '../../static/textures/block/chiseled_red_sandstone.png'
+import cutRedSandstone from '../../static/textures/block/cut_red_sandstone.png'
+import magma from '../../static/textures/block/magma.png'
+import soulSand from '../../static/textures/block/soul_sand.png'
+import soulSoil from '../../static/textures/block/soul_soil.png'
+import boneBlock from '../../static/textures/block/bone_block_side.png'
+import copperBlock from '../../static/textures/block/copper_block.png'
+import rawIron from '../../static/textures/block/raw_iron_block.png'
+import rawGold from '../../static/textures/block/raw_gold_block.png'
+import rawCopper from '../../static/textures/block/raw_copper_block.png'
 
 const allBlocks = [
   { type: BlockType.grass, src: grass },
@@ -80,6 +113,37 @@ const allBlocks = [
   { type: BlockType.pumpkin, src: pumpkin },
   { type: BlockType.melon, src: melon },
   { type: BlockType.sponge, src: sponge },
+  { type: BlockType.amethyst, src: amethyst },
+  { type: BlockType.ancientDebris, src: ancientDebris },
+  { type: BlockType.andesite, src: andesite },
+  { type: BlockType.polishedAndesite, src: polishedAndesite },
+  { type: BlockType.diorite, src: diorite },
+  { type: BlockType.polishedDiorite, src: polishedDiorite },
+  { type: BlockType.granite, src: granite },
+  { type: BlockType.polishedGranite, src: polishedGranite },
+  { type: BlockType.deepslate, src: deepslate },
+  { type: BlockType.deepslateBricks, src: deepslateBricks },
+  { type: BlockType.deepslateTiles, src: deepslateTiles },
+  { type: BlockType.basalt, src: basalt },
+  { type: BlockType.polishedBasalt, src: polishedBasalt },
+  { type: BlockType.blackstone, src: blackstone },
+  { type: BlockType.gildedBlackstone, src: gildedBlackstone },
+  { type: BlockType.chiseledBlackstone, src: chiseledBlackstone },
+  { type: BlockType.endStone, src: endStone },
+  { type: BlockType.endStoneBricks, src: endStoneBricks },
+  { type: BlockType.purpur, src: purpur },
+  { type: BlockType.purpurPillar, src: purpurPillar },
+  { type: BlockType.redSandstone, src: redSandstone },
+  { type: BlockType.chiseledRedSandstone, src: chiseledRedSandstone },
+  { type: BlockType.cutRedSandstone, src: cutRedSandstone },
+  { type: BlockType.magma, src: magma },
+  { type: BlockType.soulSand, src: soulSand },
+  { type: BlockType.soulSoil, src: soulSoil },
+  { type: BlockType.boneBlock, src: boneBlock },
+  { type: BlockType.copperBlock, src: copperBlock },
+  { type: BlockType.rawIron, src: rawIron },
+  { type: BlockType.rawGold, src: rawGold },
+  { type: BlockType.rawCopper, src: rawCopper },
   { type: BlockType.bedrock, src: bedrock }
 ];
 

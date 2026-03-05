@@ -51,6 +51,48 @@ import melon_side_tex from '../../static/textures/block/melon_side.png'
 import melon_top_tex from '../../static/textures/block/melon_top.png'
 import sponge_tex from '../../static/textures/block/sponge.png'
 
+// 31 additional textures
+import amethyst_tex from '../../static/textures/block/amethyst_block.png'
+import ancient_debris_side from '../../static/textures/block/ancient_debris_side.png'
+import ancient_debris_top from '../../static/textures/block/ancient_debris_top.png'
+import andesite_tex from '../../static/textures/block/andesite.png'
+import polished_andesite_tex from '../../static/textures/block/polished_andesite.png'
+import diorite_tex from '../../static/textures/block/diorite.png'
+import polished_diorite_tex from '../../static/textures/block/polished_diorite.png'
+import granite_tex from '../../static/textures/block/granite.png'
+import polished_granite_tex from '../../static/textures/block/polished_granite.png'
+import deepslate_tex from '../../static/textures/block/deepslate.png'
+import deepslate_top_tex from '../../static/textures/block/deepslate_top.png'
+import deepslate_bricks_tex from '../../static/textures/block/deepslate_bricks.png'
+import deepslate_tiles_tex from '../../static/textures/block/deepslate_tiles.png'
+import basalt_side_tex from '../../static/textures/block/basalt_side.png'
+import basalt_top_tex from '../../static/textures/block/basalt_top.png'
+import polished_basalt_side_tex from '../../static/textures/block/polished_basalt_side.png'
+import polished_basalt_top_tex from '../../static/textures/block/polished_basalt_top.png'
+import blackstone_tex from '../../static/textures/block/blackstone.png'
+import blackstone_top_tex from '../../static/textures/block/blackstone_top.png'
+import gilded_blackstone_tex from '../../static/textures/block/gilded_blackstone.png'
+import chiseled_blackstone_tex from '../../static/textures/block/chiseled_polished_blackstone.png'
+import end_stone_tex from '../../static/textures/block/end_stone.png'
+import end_stone_bricks_tex from '../../static/textures/block/end_stone_bricks.png'
+import purpur_tex from '../../static/textures/block/purpur_block.png'
+import purpur_pillar_tex from '../../static/textures/block/purpur_pillar.png'
+import purpur_pillar_top_tex from '../../static/textures/block/purpur_pillar_top.png'
+import red_sandstone_tex from '../../static/textures/block/red_sandstone.png'
+import red_sandstone_top_tex from '../../static/textures/block/red_sandstone_top.png'
+import red_sandstone_bottom_tex from '../../static/textures/block/red_sandstone_bottom.png'
+import chiseled_red_sandstone_tex from '../../static/textures/block/chiseled_red_sandstone.png'
+import cut_red_sandstone_tex from '../../static/textures/block/cut_red_sandstone.png'
+import magma_tex from '../../static/textures/block/magma.png'
+import soul_sand_tex from '../../static/textures/block/soul_sand.png'
+import soul_soil_tex from '../../static/textures/block/soul_soil.png'
+import bone_block_side_tex from '../../static/textures/block/bone_block_side.png'
+import bone_block_top_tex from '../../static/textures/block/bone_block_top.png'
+import copper_block_tex from '../../static/textures/block/copper_block.png'
+import raw_iron_tex from '../../static/textures/block/raw_iron_block.png'
+import raw_gold_tex from '../../static/textures/block/raw_gold_block.png'
+import raw_copper_tex from '../../static/textures/block/raw_copper_block.png'
+
 export enum MaterialType {
   grass = 'grass',
   dirt = 'dirt',
@@ -91,7 +133,38 @@ export enum MaterialType {
   netherBricks = 'netherBricks',
   pumpkin = 'pumpkin',
   melon = 'melon',
-  sponge = 'sponge'
+  sponge = 'sponge',
+  amethyst = 'amethyst',
+  ancientDebris = 'ancientDebris',
+  andesite = 'andesite',
+  polishedAndesite = 'polishedAndesite',
+  diorite = 'diorite',
+  polishedDiorite = 'polishedDiorite',
+  granite = 'granite',
+  polishedGranite = 'polishedGranite',
+  deepslate = 'deepslate',
+  deepslateBricks = 'deepslateBricks',
+  deepslateTiles = 'deepslateTiles',
+  basalt = 'basalt',
+  polishedBasalt = 'polishedBasalt',
+  blackstone = 'blackstone',
+  gildedBlackstone = 'gildedBlackstone',
+  chiseledBlackstone = 'chiseledBlackstone',
+  endStone = 'endStone',
+  endStoneBricks = 'endStoneBricks',
+  purpur = 'purpur',
+  purpurPillar = 'purpurPillar',
+  redSandstone = 'redSandstone',
+  chiseledRedSandstone = 'chiseledRedSandstone',
+  cutRedSandstone = 'cutRedSandstone',
+  magma = 'magma',
+  soulSand = 'soulSand',
+  soulSoil = 'soulSoil',
+  boneBlock = 'boneBlock',
+  copperBlock = 'copperBlock',
+  rawIron = 'rawIron',
+  rawGold = 'rawGold',
+  rawCopper = 'rawCopper'
 }
 
 let loader = new THREE.TextureLoader()
@@ -155,6 +228,48 @@ const pumpkinTopTex = loadTex(pumpkin_top_tex)
 const melonSideTex = loadTex(melon_side_tex)
 const melonTopTex = loadTex(melon_top_tex)
 const spongeTex = loadTex(sponge_tex)
+
+// 31 new textures
+const amethystTex = loadTex(amethyst_tex)
+const ancientDebrisSideTex = loadTex(ancient_debris_side)
+const ancientDebrisTopTex = loadTex(ancient_debris_top)
+const andesiteTex = loadTex(andesite_tex)
+const polishedAndesiteTex = loadTex(polished_andesite_tex)
+const dioriteTex = loadTex(diorite_tex)
+const polishedDioriteTex = loadTex(polished_diorite_tex)
+const graniteTex = loadTex(granite_tex)
+const polishedGraniteTex = loadTex(polished_granite_tex)
+const deepslateTex = loadTex(deepslate_tex)
+const deepslateTopTex = loadTex(deepslate_top_tex)
+const deepslateBricksTex = loadTex(deepslate_bricks_tex)
+const deepslateTilesTex = loadTex(deepslate_tiles_tex)
+const basaltSideTex = loadTex(basalt_side_tex)
+const basaltTopTex = loadTex(basalt_top_tex)
+const polishedBasaltSideTex = loadTex(polished_basalt_side_tex)
+const polishedBasaltTopTex = loadTex(polished_basalt_top_tex)
+const blackstoneTex = loadTex(blackstone_tex)
+const blackstoneTopTex = loadTex(blackstone_top_tex)
+const gildedBlackstoneTex = loadTex(gilded_blackstone_tex)
+const chiseledBlackstoneTex = loadTex(chiseled_blackstone_tex)
+const endStoneTex = loadTex(end_stone_tex)
+const endStoneBricksTex = loadTex(end_stone_bricks_tex)
+const purpurTex = loadTex(purpur_tex)
+const purpurPillarTex = loadTex(purpur_pillar_tex)
+const purpurPillarTopTex = loadTex(purpur_pillar_top_tex)
+const redSandstoneTex = loadTex(red_sandstone_tex)
+const redSandstoneTopTex = loadTex(red_sandstone_top_tex)
+const redSandstoneBottomTex = loadTex(red_sandstone_bottom_tex)
+const chiseledRedSandstoneTex = loadTex(chiseled_red_sandstone_tex)
+const cutRedSandstoneTex = loadTex(cut_red_sandstone_tex)
+const magmaTex = loadTex(magma_tex)
+const soulSandTex = loadTex(soul_sand_tex)
+const soulSoilTex = loadTex(soul_soil_tex)
+const boneBlockSideTex = loadTex(bone_block_side_tex)
+const boneBlockTopTex = loadTex(bone_block_top_tex)
+const copperBlockTex = loadTex(copper_block_tex)
+const rawIronTex = loadTex(raw_iron_tex)
+const rawGoldTex = loadTex(raw_gold_tex)
+const rawCopperTex = loadTex(raw_copper_tex)
 
 const mat = (map: THREE.Texture, opts?: any) => new THREE.MeshStandardMaterial({ map, ...opts })
 
@@ -231,7 +346,70 @@ export default class Materials {
       mat(melonTopTex), mat(melonTopTex),
       mat(melonSideTex), mat(melonSideTex)
     ],
-    sponge: mat(spongeTex)
+    sponge: mat(spongeTex),
+    amethyst: mat(amethystTex),
+    ancientDebris: [
+      mat(ancientDebrisSideTex), mat(ancientDebrisSideTex),
+      mat(ancientDebrisTopTex), mat(ancientDebrisTopTex),
+      mat(ancientDebrisSideTex), mat(ancientDebrisSideTex)
+    ],
+    andesite: mat(andesiteTex),
+    polishedAndesite: mat(polishedAndesiteTex),
+    diorite: mat(dioriteTex),
+    polishedDiorite: mat(polishedDioriteTex),
+    granite: mat(graniteTex),
+    polishedGranite: mat(polishedGraniteTex),
+    deepslate: [
+      mat(deepslateTex), mat(deepslateTex),
+      mat(deepslateTopTex), mat(deepslateTopTex),
+      mat(deepslateTex), mat(deepslateTex)
+    ],
+    deepslateBricks: mat(deepslateBricksTex),
+    deepslateTiles: mat(deepslateTilesTex),
+    basalt: [
+      mat(basaltSideTex), mat(basaltSideTex),
+      mat(basaltTopTex), mat(basaltTopTex),
+      mat(basaltSideTex), mat(basaltSideTex)
+    ],
+    polishedBasalt: [
+      mat(polishedBasaltSideTex), mat(polishedBasaltSideTex),
+      mat(polishedBasaltTopTex), mat(polishedBasaltTopTex),
+      mat(polishedBasaltSideTex), mat(polishedBasaltSideTex)
+    ],
+    blackstone: [
+      mat(blackstoneTex), mat(blackstoneTex),
+      mat(blackstoneTopTex), mat(blackstoneTopTex),
+      mat(blackstoneTex), mat(blackstoneTex)
+    ],
+    gildedBlackstone: mat(gildedBlackstoneTex),
+    chiseledBlackstone: mat(chiseledBlackstoneTex),
+    endStone: mat(endStoneTex),
+    endStoneBricks: mat(endStoneBricksTex),
+    purpur: mat(purpurTex),
+    purpurPillar: [
+      mat(purpurPillarTex), mat(purpurPillarTex),
+      mat(purpurPillarTopTex), mat(purpurPillarTopTex),
+      mat(purpurPillarTex), mat(purpurPillarTex)
+    ],
+    redSandstone: [
+      mat(redSandstoneTex), mat(redSandstoneTex),
+      mat(redSandstoneTopTex), mat(redSandstoneBottomTex),
+      mat(redSandstoneTex), mat(redSandstoneTex)
+    ],
+    chiseledRedSandstone: mat(chiseledRedSandstoneTex),
+    cutRedSandstone: mat(cutRedSandstoneTex),
+    magma: mat(magmaTex),
+    soulSand: mat(soulSandTex),
+    soulSoil: mat(soulSoilTex),
+    boneBlock: [
+      mat(boneBlockSideTex), mat(boneBlockSideTex),
+      mat(boneBlockTopTex), mat(boneBlockTopTex),
+      mat(boneBlockSideTex), mat(boneBlockSideTex)
+    ],
+    copperBlock: mat(copperBlockTex),
+    rawIron: mat(rawIronTex),
+    rawGold: mat(rawGoldTex),
+    rawCopper: mat(rawCopperTex)
   }
 
   get = (
