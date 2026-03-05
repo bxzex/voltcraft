@@ -675,7 +675,8 @@ const pitchPivot = new THREE.Group(); player.add(pitchPivot); pitchPivot.add(cam
 const pModel = createMobModel('player'); pModel.g.position.y = -1.5; pModel.g.rotation.y = Math.PI; player.add(pModel.g);
 
 const fpItem = new THREE.Group(); fpItem.position.set(0.4, -0.3, -0.5); camera.add(fpItem);
-const tpItem = new THREE.Group(); 
+const tpItem = new THREE.Group();
+tpItem.visible = false;
 // Attach to right arm (arms[0] is typically left visually, arms[1] is right based on x offsets, let's attach to the one at x=-0.35 in local space which becomes right hand)
 if (pModel.arms && pModel.arms.length > 1) {
     pModel.arms[1].add(tpItem);
@@ -789,6 +790,7 @@ function toggleCamera() {
     camera.position.set(0, 0, state.firstPerson ? 0 : 5);
     pModel.g.visible = !state.firstPerson;
     fpItem.visible = state.firstPerson;
+    tpItem.visible = !state.firstPerson;
 }
 
 document.addEventListener('pointerlockchange', () => {
