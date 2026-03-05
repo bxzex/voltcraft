@@ -77,7 +77,8 @@ export enum BlockType {
   copperBlock = 66,
   rawIron = 67,
   rawGold = 68,
-  rawCopper = 69
+  rawCopper = 69,
+  torch = 70
 }
 export default class Terrain {
   constructor(scene: THREE.Scene, camera: THREE.PerspectiveCamera) {
@@ -197,7 +198,8 @@ export default class Terrain {
     MaterialType.copperBlock,
     MaterialType.rawIron,
     MaterialType.rawGold,
-    MaterialType.rawCopper
+    MaterialType.rawCopper,
+    MaterialType.torch
   ]
 
   // other properties
@@ -208,7 +210,7 @@ export default class Terrain {
     // New blocks (all player-placeable, small factor)
     0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1,
     // 31 additional blocks
-    0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1
+    0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1
   ]
 
   customBlocks: Block[] = []

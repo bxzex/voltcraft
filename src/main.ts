@@ -59,42 +59,75 @@ function buildAnimalBox(type: 'pig' | 'cow', u: number, v: number, w: number, h:
     ];
 }
 
-function spawnMob(type: 'pig' | 'cow', x: number, y: number, z: number) {
+function spawnMob(type: 'pig' | 'cow' | 'chicken', x: number, y: number, z: number) {
     const group = new THREE.Group();
 
-    // Body (28, 8, 10x16x8 mapped horizontally in some versions, but let's approximate)
-    const bodyMat = buildAnimalBox(type, 28, 8, 10, 16, 8);
-    const bodyGeo = new THREE.BoxGeometry(0.8, 0.6, 1.2);
-    const body = new THREE.Mesh(bodyGeo, bodyMat);
-    body.position.set(0, 0.6, 0);
-    group.add(body);
+    if (type === 'chicken') {
+        const buildChickenBox = (u: number, v: number, w: number, h: number, d: number) => {
+            const getM = (ox: number, oy: number, mw: number, mh: number) => {
+                const mat = new THREE.MeshLambertMaterial({ transparent: true, alphaTest: 0.5 });
+                const img = new Image();
+                img.src = ASSET_URL + 'textures/entity/chicken/chicken.png';
+                img.crossOrigin = 'anonymous';
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 64; canvas.height = 32;
+                    const ctx = canvas.getContext('2d')!;
+                    ctx.drawImage(img, 0, 0);
+                    const tex = new THREE.CanvasTexture(canvas);
+                    tex.magFilter = THREE.NearestFilter;
+                    tex.repeat.set(mw / 64, mh / 32);
+                    tex.offset.set(ox / 64, 1 - (oy + mh) / 32);
+                    mat.map = tex;
+                    mat.needsUpdate = true;
+                }
+                return mat;
+            };
+            return [getM(u + d + w, v + d, d, h), getM(u, v + d, d, h), getM(u + d, v, w, d), getM(u + d + w, v, w, d), getM(u + d, v + d, w, h), getM(u + d + w + d, v + d, w, h)];
+        };
+        // Chicken Body
+        const body = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.4, 0.6), buildChickenBox(0, 9, 6, 6, 8));
+        body.position.set(0, 0.4, 0); group.add(body);
+        // Chicken Head
+        const head = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.3, 0.2), buildChickenBox(0, 0, 4, 6, 3));
+        head.position.set(0, 0.7, 0.3); group.add(head);
+    } else {
+        // Body (28, 8, 10x16x8 mapped horizontally in some versions, but let's approximate)
+        const bodyMat = buildAnimalBox(type, 28, 8, 10, 16, 8);
+        const bodyGeo = new THREE.BoxGeometry(0.8, 0.6, 1.2);
+        const body = new THREE.Mesh(bodyGeo, bodyMat);
+        body.position.set(0, 0.6, 0);
+        group.add(body);
 
-    // Head (0, 0, 8x8x8)
-    const headMat = buildAnimalBox(type, 0, 0, 8, 8, 8);
-    const headGeo = new THREE.BoxGeometry(0.5, 0.5, 0.5);
-    const head = new THREE.Mesh(headGeo, headMat);
-    head.position.set(0, 0.9, 0.7);
-    group.add(head);
+        // Head (0, 0, 8x8x8)
+        const headMat = buildAnimalBox(type, 0, 0, 8, 8, 8);
+        const headGeo = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+        const head = new THREE.Mesh(headGeo, headMat);
+        head.position.set(0, 0.9, 0.7);
+        group.add(head);
 
-    // Legs
-    const legMat = buildAnimalBox(type, 0, 16, 4, 12, 4); // Standard animal leg texture position
-    const legGeo = new THREE.BoxGeometry(0.25, 0.4, 0.25);
-    [[0.25, 0.4], [-0.25, 0.4], [0.25, -0.4], [-0.25, -0.4]].forEach(p => {
-        const l = new THREE.Mesh(legGeo, legMat);
-        l.position.set(p[0], 0.2, p[1]);
-        group.add(l);
-    });
+        // Legs
+        const legMat = buildAnimalBox(type, 0, 16, 4, 12, 4); // Standard animal leg texture position
+        const legGeo = new THREE.BoxGeometry(0.25, 0.4, 0.25);
+        [[0.25, 0.4], [-0.25, 0.4], [0.25, -0.4], [-0.25, -0.4]].forEach(p => {
+            const l = new THREE.Mesh(legGeo, legMat);
+            l.position.set(p[0], 0.2, p[1]);
+            group.add(l);
+        });
+    }
 
     group.position.set(x, y, z);
     scene.add(group);
     mobs.push({ mesh: group, type, timer: Math.random() * 100 });
 }
-for (let i = 0; i < 12; i++) {
-    const x = (Math.random() - 0.5) * 40 + 8;
-    const z = (Math.random() - 0.5) * 40 + 8;
+for (let i = 0; i < 15; i++) {
+    const x = (Math.random() - 0.5) * 60 + 8;
+    const z = (Math.random() - 0.5) * 60 + 8;
     const noise = terrain.noise;
     const groundY = Math.floor(noise.get(x / noise.gap, z / noise.gap, noise.seed) * noise.amp) + 30;
-    spawnMob(Math.random() > 0.5 ? 'pig' : 'cow', x, groundY + 0.5, z);
+    const rand = Math.random();
+    const type = rand < 0.33 ? 'pig' : (rand < 0.66 ? 'cow' : 'chicken');
+    spawnMob(type, x, groundY + 0.5, z);
 }
 
 // Weather
@@ -374,14 +407,18 @@ let currentHeldBlock = -1;
             m.mesh.position.y = groundY + 0.5 + Math.sin(m.timer) * 0.005;
 
             // Sounds
-            if (m.type === 'pig' || m.type === 'cow') {
-                if (Math.random() < 0.001) { // say sounds (reduced)
-                    control.audio.playMobSound(m.type, 'say');
+            if (m.type === 'pig' || m.type === 'cow' || m.type === 'chicken') {
+                if (Math.random() < 0.0005) { // say sounds (approx every 30s at 60fps)
+                    if (m.type !== 'chicken') {
+                        control.audio.playMobSound(m.type as any, 'say');
+                    }
                 }
                 if (m.mesh.position.y < 29.5) { // splash in water
                     if (Math.random() < 0.005) control.audio.playSplash(); // reduced
-                } else if (Math.random() < 0.002) { // step sounds (reduced)
-                    control.audio.playMobSound(m.type, 'step');
+                } else if (Math.random() < 0.001) { // step sounds (reduced)
+                    if (m.type !== 'chicken') {
+                        control.audio.playMobSound(m.type as any, 'step');
+                    }
                 }
             }
 

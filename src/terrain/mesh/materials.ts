@@ -414,7 +414,8 @@ export default class Materials {
     copperBlock: mat(copperBlockTex),
     rawIron: mat(rawIronTex),
     rawGold: mat(rawGoldTex),
-    rawCopper: mat(rawCopperTex)
+    rawCopper: mat(rawCopperTex),
+    torch: mat(glowstoneTex)
   }
 
   get = (

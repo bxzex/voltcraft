@@ -73,7 +73,31 @@ enum BlockType {
   copperBlock = 66,
   rawIron = 67,
   rawGold = 68,
-  rawCopper = 69
+  torch = 70
+}
+
+function generateHouse(x: number, y: number, z: number, idMap: Map<string, number>, blocksCount: number[], blocks: THREE.InstancedMesh[], matrix: THREE.Matrix4) {
+  // Simple house 5x5
+  for (let dx = 0; dx < 5; dx++) {
+    for (let dz = 0; dz < 5; dz++) {
+      for (let dy = 0; dy < 4; dy++) {
+        // Walls and Roof
+        const isWall = (dx === 0 || dx === 4 || dz === 0 || dz === 4) && dy < 3;
+        const isRoof = dy === 3;
+        const isDoor = dx === 2 && dz === 0 && dy < 2;
+        
+        if ((isWall || isRoof) && !isDoor) {
+          const px = x + dx;
+          const py = y + dy;
+          const pz = z + dz;
+          const type = isRoof ? BlockType.wood : BlockType.stoneBricks;
+          matrix.setPosition(px, py, pz);
+          idMap.set(`${px}_${py}_${pz}`, blocksCount[type]);
+          blocks[type].setMatrixAt(blocksCount[type]++, matrix);
+        }
+      }
+    }
+  }
 }
 
 const matrix = new THREE.Matrix4()
@@ -192,7 +216,9 @@ onmessage = (
           )
 
           // Generate water above sand up to sea level (-1)
-          for (let wy = yOffset + 1; wy <= -1; wy++) {
+          // Optimization: Only top layer of water is often enough for visibility if underwater is not rendered, 
+          // but for "instant" feel we just make sure the loop is tight.
+          for (let wy = -1; wy > yOffset; wy--) {
             matrix.setPosition(x, y + wy, z)
             idMap.set(`${x}_${y + wy}_${z}`, blocksCount[BlockType.water])
             blocks[BlockType.water].setMatrixAt(
@@ -207,6 +233,11 @@ onmessage = (
             blocksCount[BlockType.grass]++,
             matrix
           )
+
+          // Randomly generate a house on grass
+          if (Math.random() < 0.001) {
+            generateHouse(x, y + yOffset + 1, z, idMap, blocksCount, blocks, matrix);
+          }
         }
       }
 

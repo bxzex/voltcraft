@@ -9,7 +9,9 @@ import { isMobile } from '../utils'
 import * as THREE from 'three'
 
 export default class UI {
+  control: Control
   constructor(terrain: Terrain, control: Control) {
+    this.control = control
     this.fps = new FPS()
     this.bag = new Bag(control)
     this.joystick = new Joystick(control)
@@ -347,6 +349,10 @@ export default class UI {
   }
 
   onExit = () => {
+    this.control.audio.stopAll();
+    if ((window as any).rainAudio) (window as any).rainAudio.pause();
+    if ((window as any).thunderAudio) (window as any).thunderAudio.pause();
+
     this.menu?.classList.add('start')
     this.play && (this.play.innerHTML = 'Singleplayer')
     this.save && (this.save.innerHTML = 'Load Game')

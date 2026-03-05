@@ -129,6 +129,23 @@ export default class Audio {
     }
   }
 
+  stopAll() {
+    if (this.bgm && this.bgm.isPlaying) {
+      this.bgm.stop()
+    }
+    // Also stop all other playing sounds if any
+    for (const audios of this.soundSet) {
+      for (const audio of audios) {
+        if (audio.isPlaying) audio.stop()
+      }
+    }
+    for (const key in this.mobSounds) {
+      for (const audio of this.mobSounds[key]) {
+        if (audio.isPlaying) audio.stop()
+      }
+    }
+  }
+
   setMusicVolume(v: number) {
     this.musicVolume = v
     if (this.bgm) {
