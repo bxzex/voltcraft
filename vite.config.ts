@@ -1,5 +1,5 @@
 export default {
-  base: '/voltcraft/',
+  base: '/',
   publicDir: 'src/static',
   build: {
     chunkSizeWarningLimit: 2000,
