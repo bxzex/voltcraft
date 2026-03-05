@@ -19,12 +19,12 @@ let state = {
 
 const inventoryItems = [
     'grass', 'dirt', 'stone', 'cobblestone', 'wood', 'planks', 'leaves', 
-    'sand', 'glass', 'brick', 'bookshelf', 'obsidian', 'diamond_ore', 
-    'gold_ore', 'iron_ore', 'coal_ore', 'crafting_table', 'furnace', 'tnt',
-    'water', 'lava',
+    'sand', 'glass', 'brick', 'bookshelf', 'obsidian', 'diamond ore', 
+    'gold ore', 'iron ore', 'coal ore', 'crafting table', 'furnace', 'tnt',
+    'water', 'lava', 'bed',
     'dandelion', 'poppy', 'pickaxe', 'sword'
 ];
-let hotbarSlots = ['grass', 'cobblestone', 'planks', 'crafting_table', 'furnace', 'diamond_ore', 'water', 'pickaxe', 'sword'];
+let hotbarSlots = ['grass', 'cobblestone', 'planks', 'crafting table', 'furnace', 'diamond ore', 'water', 'pickaxe', 'sword'];
 state.selectedItem = hotbarSlots[state.activeSlot];
 
 const isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
@@ -198,7 +198,7 @@ const genOre = (name, color) => {
         for(let i=0; i<8; i++) { ctx.fillRect(2+Math.random()*10, 2+Math.random()*10, 2+Math.random()*2, 2+Math.random()*2); }
     });
 };
-genOre('diamond_ore', '#00FFFF'); genOre('gold_ore', '#FFD700'); genOre('iron_ore', '#F5F5DC'); genOre('coal_ore', '#111111');
+genOre('diamond ore', '#00FFFF'); genOre('gold ore', '#FFD700'); genOre('iron ore', '#F5F5DC'); genOre('coal ore', '#111111');
 
 createTexture('craft_top', 16, ctx => {
     ctx.fillStyle = '#C19A6B'; ctx.fillRect(0,0,16,16); ctx.fillStyle = '#8B5A2B'; ctx.fillRect(2,2,12,12);
@@ -249,6 +249,18 @@ createTexture('sword', 16, ctx => {
     ctx.fillStyle = '#FFFFFF'; for(let i=0; i<7; i++) ctx.fillRect(9-i, 7-i, 1, 1);
 });
 
+createTexture('bed_top', 16, ctx => {
+    ctx.fillStyle = '#DDDDDD'; ctx.fillRect(0,0,16,16);
+    ctx.fillStyle = '#FF2222'; ctx.fillRect(0,0,16,6);
+    ctx.fillStyle = '#AAAAAA'; ctx.fillRect(0,6,16,1);
+});
+createTexture('bed_side', 16, ctx => {
+    ctx.fillStyle = '#DDDDDD'; ctx.fillRect(0,0,16,8);
+    ctx.fillStyle = '#FF2222'; ctx.fillRect(0,0,6,8);
+    ctx.fillStyle = '#8B5A2B'; ctx.fillRect(0,8,16,8);
+    ctx.fillStyle = '#4A3525'; ctx.fillRect(1,14,2,2); ctx.fillRect(13,14,2,2);
+});
+
 // Entity skins (Minecraft original)
 const entitySkins = {
     pig: extTex('entity/pig/pig.png'),
@@ -268,11 +280,12 @@ const materialsMap = {
     planks: m('planks'), leaves: mT('leaves'), sand: m('sand'),
     glass: new THREE.MeshLambertMaterial({ map: texCache['glass'], transparent: true, opacity: 0.6 }),
     brick: m('brick'), bookshelf: [m('bookshelf'), m('bookshelf'), m('planks'), m('planks'), m('bookshelf'), m('bookshelf')],
+    bed: [m('bed_side'), m('bed_side'), m('bed_top'), m('planks'), m('bed_side'), m('bed_side')],
     obsidian: m('obsidian'), bedrock: m('bedrock'), 
     water: new THREE.MeshLambertMaterial({ map: texCache['water'], transparent: true, opacity: 0.7, color: 0x88CCFF }), 
     lava: new THREE.MeshBasicMaterial({ map: texCache['lava'] }),
-    diamond_ore: m('diamond_ore'), gold_ore: m('gold_ore'), iron_ore: m('iron_ore'), coal_ore: m('coal_ore'),
-    crafting_table: [m('craft_side'), m('craft_side'), m('craft_top'), m('planks'), m('craft_side'), m('craft_side')],
+    diamond ore: m('diamond ore'), gold ore: m('gold ore'), iron ore: m('iron ore'), coal ore: m('coal ore'),
+    crafting table: [m('craft_side'), m('craft_side'), m('craft_top'), m('planks'), m('craft_side'), m('craft_side')],
     furnace: [m('cobblestone'), m('cobblestone'), m('cobblestone'), m('cobblestone'), m('furnace_front'), m('cobblestone')],
     tnt: [m('tnt_side'), m('tnt_side'), m('tnt_top'), m('tnt_top'), m('tnt_side'), m('tnt_side')],
     dandelion: mD('dandelion'), poppy: mD('poppy'),
@@ -430,7 +443,7 @@ function buildHouse(wx, wy, wz) {
             world.set(getBlockKey(wx + hx, wy + 4, wz + hz), { type: 'wood' });
         }
     }
-    world.set(getBlockKey(wx - 1, wy + 1, wz - 1), { type: 'crafting_table' });
+    world.set(getBlockKey(wx - 1, wy + 1, wz - 1), { type: 'crafting table' });
     world.set(getBlockKey(wx + 1, wy + 1, wz - 1), { type: 'furnace' });
     world.set(getBlockKey(wx - 1, wy + 1, wz + 1), { type: 'bookshelf' });
 }
@@ -490,10 +503,10 @@ function generateWorld() {
                         }
                         else if (y > h - 4) type = 'dirt';
                         else {
-                            if (Math.random() < 0.005) type = 'diamond_ore';
-                            else if (Math.random() < 0.01) type = 'gold_ore';
-                            else if (Math.random() < 0.03) type = 'iron_ore';
-                            else if (Math.random() < 0.04) type = 'coal_ore';
+                            if (Math.random() < 0.005) type = 'diamond ore';
+                            else if (Math.random() < 0.01) type = 'gold ore';
+                            else if (Math.random() < 0.03) type = 'iron ore';
+                            else if (Math.random() < 0.04) type = 'coal ore';
                         }
                         world.set(getBlockKey(wx, y, wz), { type });
                     }
@@ -688,7 +701,7 @@ const invMenu = document.getElementById('inventory-menu');
 function getIconUrl(t) {
     if(t === 'wood') return dataUrls['wood_top'];
     if(t === 'grass') return dataUrls['grass_side'];
-    if(t === 'crafting_table') return dataUrls['craft_top'];
+    if(t === 'crafting table') return dataUrls['craft_top'];
     if(t === 'furnace') return dataUrls['furnace_front'];
     if(t === 'tnt') return dataUrls['tnt_side'];
     return dataUrls[t];
