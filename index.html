@@ -198,7 +198,15 @@
             <p><span class="key">V/CAM</span> 1st/3rd Person</p>
             <p><span class="key">ESC</span> Pause</p>
         </div>
-        <button class="mc-btn" id="start-btn">Enter World</button>
+        <div style="display: flex; flex-direction: column; gap: 10px; align-items: center; background: rgba(0,0,0,0.5); padding: 20px; border: 2px solid #555;">
+            <button class="mc-btn" id="start-btn" style="margin: 0;">Singleplayer</button>
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <button class="mc-btn" id="host-btn" style="margin: 0; font-size: 24px; padding: 10px 20px;">Host World</button>
+                <button class="mc-btn" id="join-btn" style="margin: 0; font-size: 24px; padding: 10px 20px;">Join World</button>
+            </div>
+            <input type="text" id="world-id-input" placeholder="Enter World ID to Join" style="padding: 10px; font-family: 'VT323', monospace; font-size: 20px; text-align: center; width: 250px; background: #c6c6c6; border: 3px solid #000; border-top-color: #555; border-left-color: #555; border-bottom-color: #fff; border-right-color: #fff; outline: none;">
+            <div id="mp-status" style="color: #ffff00; font-size: 20px; text-shadow: 2px 2px 0px #000; height: 24px;"></div>
+        </div>
         <div class="social-footer">
             <p>built by bxzex</p>
             <div class="social-links">
@@ -256,6 +264,7 @@
         </div>
     </div>
 
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <script type="importmap">
         {
             "imports": {
