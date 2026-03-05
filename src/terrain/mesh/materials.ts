@@ -3,13 +3,13 @@ import stone from '../../static/textures/block/stone.png'
 import coal_ore from '../../static/textures/block/coal_ore.png'
 import iron_ore from '../../static/textures/block/iron_ore.png'
 import grass_side from '../../static/textures/block/grass_block_side.png'
-import grass_top_green from '../../static/textures/block/grass_top_green.png'
+import grass_top from '../../static/textures/block/grass_block_top.png'
 import dirt from '../../static/textures/block/dirt.png'
 import oak_log from '../../static/textures/block/oak_log.png'
 import oak_log_top from '../../static/textures/block/oak_log_top.png'
 import oak_leaves from '../../static/textures/block/oak_leaves.png'
 import sand from '../../static/textures/block/sand.png'
-import water from '../../static/textures/block/water.png'
+import water from '../../static/textures/block/water_still.png'
 import oak_wood from '../../static/textures/block/oak_planks.png'
 import diamond from '../../static/textures/block/diamond_block.png'
 import quartz from '../../static/textures/block/quartz_block_side.png'
@@ -34,7 +34,7 @@ export enum MaterialType {
 let loader = new THREE.TextureLoader()
 
 // load texture
-const grassTopMaterial = loader.load(grass_top_green)
+const grassTopMaterial = loader.load(grass_top)
 const grassMaterial = loader.load(grass_side)
 const treeMaterial = loader.load(oak_log)
 const treeTopMaterial = loader.load(oak_log_top)

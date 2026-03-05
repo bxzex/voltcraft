@@ -9,7 +9,7 @@ import { isMobile } from '../../utils'
 import Control from '../../control'
 import { BlockType } from '../../terrain'
 
-const ASSET_URL = 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.21.11/assets/minecraft/textures/block/';
+const ASSET_URL = '/src/static/textures/block/';
 const dirt = ASSET_URL + 'dirt.png';
 const cobblestone = ASSET_URL + 'cobblestone.png';
 const bedrock = ASSET_URL + 'bedrock.png';

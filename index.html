@@ -13,6 +13,7 @@
     <title>Voltcraft</title>
   </head>
   <body>
+    <div id="watermark" class="hidden" style="position: absolute; top: 10px; left: 10px; font-family: Minecraft; color: rgba(255,255,255,0.5); pointer-events: none; z-index: 10; font-size: 1.2rem; text-shadow: 1px 1px 0px #000;">Voltcraft Beta</div>
     <script type="module" src="./src/main.ts"></script>
     <a
       href="https://buy.stripe.com/9B6eVfd9E6OC3sr7cEaAw03"
@@ -43,6 +44,10 @@
     </a>
     <div class="menu start" id="main-menu-container">
       <div id="main-menu-content" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+        <div class="voltcraft-logo" style="margin-bottom: 30px; position: relative;">
+          <h1 style="font-family: Minecraft; font-size: 5rem; color: #ffcc00; text-shadow: 4px 4px 0px #b38f00, 8px 8px 0px #000; margin: 0; letter-spacing: 4px;">VOLTCRAFT</h1>
+          <div style="position: absolute; top: -20px; right: -30px; background: #ff0000; color: white; padding: 5px 10px; font-family: Minecraft; font-size: 1.2rem; transform: rotate(15deg); box-shadow: 2px 2px 0px #000; border: 2px solid #fff;">THE REAL GAME</div>
+        </div>
         <input type="text" id="username" placeholder="Username" value="Player" class="button" style="text-align: center; background-color: #fff; color: #000;" />
         <button id="play" class="button">Singleplayer</button>
         

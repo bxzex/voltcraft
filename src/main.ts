@@ -25,17 +25,8 @@ const multiplayer = new Multiplayer(scene, terrain, player, control)
 ;(window as any).multiplayer = multiplayer;
 
 // Animals
-const ASSET_URL = 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.21.11/assets/minecraft/';
+const ASSET_URL = '/src/static/';
 const texLoader = new THREE.TextureLoader();
-const extTex = (path: string) => {
-    const t = texLoader.load(ASSET_URL + 'textures/' + path);
-    t.magFilter = THREE.NearestFilter;
-    return t;
-};
-const entitySkins = {
-    pig: extTex('entity/pig/pig.png'),
-    cow: extTex('entity/cow/cow.png')
-};
 const mobs: { mesh: THREE.Group, type: string, timer: number }[] = [];
 
 function buildAnimalBox(type: 'pig' | 'cow', u: number, v: number, w: number, h: number, d: number) {

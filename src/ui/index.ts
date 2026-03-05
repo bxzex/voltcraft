@@ -285,6 +285,7 @@ export default class UI {
     this.joinMenuContent?.classList.add('hidden')
     this.play && (this.play.innerHTML = 'Resume')
     this.crossHair.classList.remove('hidden')
+    document.getElementById('watermark')?.classList.remove('hidden')
     this.github && this.github.classList.add('hidden')
     this.donate && this.donate.classList.add('hidden')
     this.feature?.classList.add('hidden')
@@ -294,6 +295,7 @@ export default class UI {
     this.menu?.classList.remove('hidden')
     this.menu?.classList.add('start')
     this.crossHair.classList.add('hidden')
+    document.getElementById('watermark')?.classList.add('hidden')
     this.save && (this.save.innerHTML = 'Save and Exit')
     this.github && this.github.classList.remove('hidden')
     this.donate && this.donate.classList.remove('hidden')
@@ -308,6 +310,7 @@ export default class UI {
     this.play && (this.play.innerHTML = 'Singleplayer')
     this.save && (this.save.innerHTML = 'Load Game')
     this.feature?.classList.remove('hidden')
+    document.getElementById('watermark')?.classList.add('hidden')
     if (this.mpButtons) (this.mpButtons as HTMLElement).style.display = 'flex'
     if (this.mpStatus) (this.mpStatus as HTMLElement).style.display = 'block'
     const username = document.getElementById('username');
