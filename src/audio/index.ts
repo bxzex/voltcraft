@@ -36,6 +36,17 @@ import splash1 from '../static/sounds/liquid/splash.ogg'
 import splash2 from '../static/sounds/liquid/splash2.ogg'
 import splash3 from '../static/sounds/liquid/heavy_splash.ogg'
 
+// Mob sounds
+import cow_say1 from '../static/sounds/mob/cow/say1.ogg'
+import cow_say2 from '../static/sounds/mob/cow/say2.ogg'
+import cow_say3 from '../static/sounds/mob/cow/say3.ogg'
+import cow_step from '../static/sounds/mob/cow/step1.ogg'
+
+import pig_say1 from '../static/sounds/mob/pig/say1.ogg'
+import pig_say2 from '../static/sounds/mob/pig/say2.ogg'
+import pig_say3 from '../static/sounds/mob/pig/say3.ogg'
+import pig_step from '../static/sounds/mob/pig/step1.ogg'
+
 import { isMobile } from '../utils'
 
 export default class Audio {
@@ -81,9 +92,30 @@ export default class Audio {
       }
       this.soundSet.push(audios)
     }
+
+    // load mob sounds
+    const mobSources: Record<string, string[]> = {
+      cow_say: [cow_say1, cow_say2, cow_say3],
+      cow_step: [cow_step],
+      pig_say: [pig_say1, pig_say2, pig_say3],
+      pig_step: [pig_step]
+    }
+
+    for (const key in mobSources) {
+      this.mobSounds[key] = []
+      for (const src of mobSources[key]) {
+        audioLoader.load(src, buffer => {
+          const audio = new THREE.Audio(listener!)
+          audio.setBuffer(buffer)
+          audio.setVolume(0.1)
+          this.mobSounds[key].push(audio)
+        })
+      }
+    }
   }
 
   disabled = false
+  mobSounds: Record<string, THREE.Audio[]> = {}
 
   sourceSet = [
     [grass1, grass2, grass3, grass4],       // 0  grass
@@ -167,6 +199,29 @@ export default class Audio {
     if (!this.disabled && !isMobile) {
       this.index++ === 3 && (this.index = 0)
       this.soundSet[type]?.[this.index]?.play()
+    }
+  }
+
+  playMobSound(mob: 'cow' | 'pig', type: 'say' | 'step') {
+    if (this.disabled || isMobile) return
+    const key = `${mob}_${type}`
+    const sounds = this.mobSounds[key]
+    if (sounds && sounds.length > 0) {
+      const s = sounds[Math.floor(Math.random() * sounds.length)]
+      if (!s.isPlaying) s.play()
+    }
+  }
+
+  playSplash() {
+    if (this.disabled || isMobile) return
+    const splashIdx = 12 // Water index
+    const sounds = this.soundSet[splashIdx]
+    if (sounds && sounds.length > 0) {
+      const s = sounds[Math.floor(Math.random() * sounds.length)]
+      if (!s.isPlaying) {
+        s.setVolume(0.1) // Slightly quieter for continuous movement
+        s.play()
+      }
     }
   }
 }

@@ -1171,6 +1171,13 @@ export default class Control {
 
       this.camera.position.y += this.velocity.y * delta
 
+      // water splash sounds
+      if (this.camera.position.y < 27.5 && (Math.abs(this.velocity.x) > 0 || Math.abs(this.velocity.z) > 0)) {
+        if (Math.random() < 0.1) { // Throttle sounds
+          this.audio.playSplash()
+        }
+      }
+
       // catching net
       if (this.camera.position.y < -100) {
         this.camera.position.y = 60

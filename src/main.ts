@@ -371,6 +371,18 @@ let currentHeldBlock = -1;
             // Set Y to top of block (groundY + 0.5)
             m.mesh.position.y = groundY + 0.5 + Math.sin(m.timer) * 0.005;
 
+            // Sounds
+            if (m.type === 'pig' || m.type === 'cow') {
+                if (Math.random() < 0.01) { // say sounds
+                    control.audio.playMobSound(m.type, 'say');
+                }
+                if (m.mesh.position.y < 27.5) { // splash in water
+                    if (Math.random() < 0.05) control.audio.playSplash();
+                } else if (Math.random() < 0.05) { // step sounds
+                    control.audio.playMobSound(m.type, 'step');
+                }
+            }
+
             // Animate Legs (children 2 to 5)
             if (m.mesh.children.length >= 6) {
                 const sCycle = Math.sin(m.timer * 5) * 0.5;
