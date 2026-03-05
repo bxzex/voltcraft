@@ -397,8 +397,19 @@ let currentHeldBlock = -1;
     // Player Mesh Update
     playerGroup.position.copy(camera.position);
     playerGroup.position.y -= 1.5;
-    playerGroup.rotation.y = camera.rotation.y;
-    if (playerParts.head) playerParts.head.rotation.x = camera.rotation.x;
+    playerGroup.rotation.y = camera.rotation.y + Math.PI; // Face same direction as camera
+    if (playerParts.head) playerParts.head.rotation.x = -camera.rotation.x; // Head follows pitch
+
+    // Sneaking animation
+    const isSneaking = control.player.mode === Mode.sneaking;
+    if (isSneaking) {
+        playerGroup.position.y -= 0.15; // Lower overall group
+        if (playerParts.body) playerParts.body.rotation.x = 0.3; // Tilt body forward
+        if (playerParts.head) playerParts.head.position.y = 0.35; // Lower head
+    } else {
+        if (playerParts.body) playerParts.body.rotation.x = 0;
+        if (playerParts.head) playerParts.head.position.y = 0.55; // Default head Y
+    }
 
     if (control.velocity.x !== 0 || control.velocity.z !== 0) {
         const sCycle = Math.sin(performance.now() * 0.015) * 0.8;
