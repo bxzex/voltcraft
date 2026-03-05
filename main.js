@@ -675,6 +675,12 @@ const pitchPivot = new THREE.Group(); player.add(pitchPivot); pitchPivot.add(cam
 const pModel = createMobModel('player'); pModel.g.position.y = -1.5; pModel.g.rotation.y = Math.PI; player.add(pModel.g);
 
 const fpItem = new THREE.Group(); fpItem.position.set(0.4, -0.3, -0.5); camera.add(fpItem);
+const tpItem = new THREE.Group(); 
+// Attach to right arm (arms[0] is typically left visually, arms[1] is right based on x offsets, let's attach to the one at x=-0.35 in local space which becomes right hand)
+if (pModel.arms && pModel.arms.length > 1) {
+    pModel.arms[1].add(tpItem);
+    tpItem.position.set(0, -0.4, 0.2); // Position at hand level
+}
 
 function createTool(type) {
     const g = new THREE.Group();
@@ -720,6 +726,13 @@ function renderUI() {
     }
     while(fpItem.children.length > 0) fpItem.remove(fpItem.children[0]);
     fpItem.add(createTool(state.selectedItem));
+    
+    while(tpItem.children.length > 0) tpItem.remove(tpItem.children[0]);
+    const tool = createTool(state.selectedItem);
+    // Adjust scale/rotation for third person view
+    tool.scale.set(0.6, 0.6, 0.6);
+    tool.rotation.set(Math.PI/4, 0, 0);
+    tpItem.add(tool);
 }
 
 if (invGrid) {
