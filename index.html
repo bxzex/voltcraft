@@ -4,158 +4,139 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Voxelcraft: Origins</title>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
     <style>
-        body { margin: 0; overflow: hidden; background-color: #87CEEB; font-family: 'Roboto', sans-serif; user-select: none; }
-        canvas { display: block; width: 100vw; height: 100vh; }
+        body { margin: 0; overflow: hidden; background-color: #87CEEB; font-family: 'VT323', monospace; user-select: none; }
+        canvas { display: block; width: 100vw; height: 100vh; image-rendering: pixelated; }
         
         /* UI Elements */
         #crosshair {
-            position: absolute; top: 50%; left: 50%; width: 20px; height: 20px;
+            position: absolute; top: 50%; left: 50%; width: 24px; height: 24px;
             transform: translate(-50%, -50%); pointer-events: none;
             display: flex; justify-content: center; align-items: center;
+            opacity: 0.8;
         }
         #crosshair::before, #crosshair::after {
-            content: ''; position: absolute; background-color: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 0 2px rgba(0,0,0,0.8);
+            content: ''; position: absolute; background-color: rgba(255, 255, 255, 1);
+            box-shadow: 0 0 2px rgba(0,0,0,1);
         }
-        #crosshair::before { width: 2px; height: 100%; }
-        #crosshair::after { width: 100%; height: 2px; }
+        #crosshair::before { width: 4px; height: 100%; }
+        #crosshair::after { width: 100%; height: 4px; }
         
         #ui {
-            position: absolute; top: 20px; left: 20px; color: white;
-            text-shadow: 1px 1px 3px black; pointer-events: none;
-            background: rgba(0, 0, 0, 0.6); padding: 15px; border-radius: 8px;
-            font-weight: bold; border: 2px solid rgba(255,255,255,0.2);
-            backdrop-filter: blur(4px);
+            position: absolute; top: 10px; left: 10px; color: white;
+            text-shadow: 2px 2px 0px #3f3f3f; pointer-events: none;
+            font-size: 24px;
         }
         
-        #hotbar {
-            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
-            display: flex; gap: 12px; background: rgba(0,0,0,0.6); padding: 12px; 
-            border-radius: 12px; border: 2px solid rgba(255,255,255,0.2);
-            backdrop-filter: blur(4px);
+        /* Minecraft Style Hotbar */
+        #hotbar-container {
+            position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 0; background: #8b8b8b; padding: 4px; 
+            border: 2px solid #373737; border-top-color: #ffffff; border-left-color: #ffffff;
+            border-bottom-color: #373737; border-right-color: #373737;
         }
         .slot {
-            width: 65px; height: 65px; border: 3px solid #444; background: rgba(255,255,255,0.1);
-            color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; 
-            font-weight: bold; font-size: 13px; text-shadow: 1px 1px 2px black; border-radius: 8px;
-            transition: all 0.2s ease;
+            width: 48px; height: 48px; background: #8b8b8b;
+            border: 2px solid #373737; border-top-color: #373737; border-left-color: #373737;
+            border-bottom-color: #ffffff; border-right-color: #ffffff;
+            color: white; display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-end; 
+            font-weight: bold; font-size: 20px; text-shadow: 2px 2px 0px #3f3f3f;
+            position: relative; box-sizing: border-box;
+            background-size: 32px 32px; background-position: center; background-repeat: no-repeat;
         }
-        .slot span { font-size: 22px; margin-bottom: 4px; color: #aaa; }
         .slot.active { 
-            border-color: #fff; background: rgba(255,255,255,0.4); 
-            box-shadow: 0 0 15px rgba(255,255,255,0.8); transform: translateY(-5px);
+            border: 2px solid #ffffff; box-shadow: inset 0 0 10px rgba(255,255,255,0.5);
+            outline: 2px solid #000; z-index: 2;
         }
-        .slot.active span { color: #fff; }
         
         /* Menus */
         #pause-menu, #instructions, #inventory-menu {
             position: absolute; width: 100%; height: 100%;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            background: radial-gradient(circle, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.95) 100%);
-            color: white; z-index: 10; backdrop-filter: blur(8px);
+            background: rgba(0,0,0,0.6); color: white; z-index: 10;
         }
         #pause-menu, #inventory-menu { display: none; }
         
-        /* Inventory Grid */
+        /* Minecraft Style Inventory */
+        .inv-window {
+            background: #c6c6c6; border: 4px solid #000; border-top-color: #fff; border-left-color: #fff;
+            border-bottom-color: #555; border-right-color: #555;
+            padding: 20px; width: 600px; color: #373737; text-shadow: none;
+            display: flex; flex-direction: column; align-items: flex-start;
+        }
+        .inv-title { font-size: 32px; margin-bottom: 10px; font-family: 'Press Start 2P', cursive; font-size: 16px;}
         .inventory-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 15px;
-            background: rgba(255,255,255,0.1);
-            padding: 30px;
-            border-radius: 15px;
-            border: 1px solid rgba(255,255,255,0.2);
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
-            margin-bottom: 20px;
+            display: grid; grid-template-columns: repeat(9, 1fr); gap: 4px;
+            background: #c6c6c6; margin-bottom: 20px;
         }
         .inv-slot {
-            width: 80px; height: 80px; border: 3px solid #444; background: rgba(0,0,0,0.5);
-            color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; 
-            font-weight: bold; font-size: 12px; text-shadow: 1px 1px 2px black; border-radius: 8px;
-            cursor: pointer; transition: all 0.2s ease;
+            width: 52px; height: 52px; background: #8b8b8b;
+            border: 2px solid #373737; border-top-color: #373737; border-left-color: #373737;
+            border-bottom-color: #ffffff; border-right-color: #ffffff;
+            cursor: pointer; position: relative;
+            background-size: 36px 36px; background-position: center; background-repeat: no-repeat;
         }
-        .inv-slot:hover {
-            border-color: #fff; background: rgba(255,255,255,0.3); 
-            box-shadow: 0 0 15px rgba(255,255,255,0.8); transform: translateY(-3px);
+        .inv-slot:hover { background-color: #a0a0a0; }
+        .inv-slot::after {
+            content: attr(data-item); position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.8); color: white; padding: 2px 4px; font-size: 16px;
+            white-space: nowrap; display: none; z-index: 5; text-shadow: 2px 2px 0px #3f3f3f;
         }
+        .inv-slot:hover::after { display: block; }
         
         h1 {
-            font-family: 'Press Start 2P', cursive;
-            font-size: 48px; margin-bottom: 10px;
-            text-shadow: 4px 4px 0px #3b7a2d, 8px 8px 0px #222;
-            color: #fff; text-align: center; line-height: 1.4;
-        }
-        .subtitle {
-            font-size: 20px; color: #ccc; margin-bottom: 40px; font-weight: bold; letter-spacing: 2px;
+            font-family: 'Press Start 2P', cursive; font-size: 36px; margin-bottom: 10px;
+            text-shadow: 4px 4px 0px #3f3f3f; color: #fff; text-align: center; line-height: 1.4;
         }
         
-        .btn {
-            margin-top: 30px; padding: 18px 40px; font-size: 24px; font-weight: bold; cursor: pointer;
-            background: linear-gradient(180deg, #5cb85c 0%, #4CAF50 100%);
-            border: 3px solid #fff; color: white; border-radius: 8px; 
-            transition: all 0.2s; box-shadow: 0 6px 0 #3e8e41, 0 10px 20px rgba(0,0,0,0.5);
-            font-family: 'Roboto', sans-serif; text-transform: uppercase; letter-spacing: 1px;
+        .mc-btn {
+            background: #c6c6c6; border: 3px solid #000; border-top-color: #fff; border-left-color: #fff;
+            border-bottom-color: #555; border-right-color: #555;
+            padding: 10px 40px; font-family: 'VT323', monospace; font-size: 32px; color: #000;
+            cursor: pointer; margin: 10px; text-transform: uppercase; text-shadow: 1px 1px 0px #fff;
         }
-        .btn:hover { background: linear-gradient(180deg, #66cc66 0%, #5cb85c 100%); transform: translateY(-2px); box-shadow: 0 8px 0 #3e8e41, 0 12px 25px rgba(0,0,0,0.6); }
-        .btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #3e8e41, 0 5px 10px rgba(0,0,0,0.5); }
+        .mc-btn:hover { background: #5e81ce; color: #fff; border-top-color: #7d9eeb; border-left-color: #7d9eeb; border-bottom-color: #384d7a; border-right-color: #384d7a; text-shadow: 2px 2px 0px #3f3f3f; }
+        .mc-btn:active { border-top-color: #555; border-left-color: #555; border-bottom-color: #fff; border-right-color: #fff; }
         
-        .controls-list { 
-            background: rgba(255,255,255,0.1); padding: 30px 40px; border-radius: 15px; 
-            text-align: left; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.2);
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
-        }
-        .controls-list p { margin: 12px 0; font-size: 18px; display: flex; align-items: center; }
-        .controls-list b { 
-            display: inline-block; background: #fff; color: #333; padding: 4px 10px; 
-            border-radius: 4px; margin-right: 15px; min-width: 150px; text-align: center;
-            box-shadow: 0 3px 0 #ccc; font-family: 'Press Start 2P', cursive; font-size: 10px;
-        }
+        .controls-list { font-size: 24px; text-align: left; margin-bottom: 30px; }
+        .controls-list p { margin: 10px 0; }
+        .key { color: #ffff00; text-shadow: 2px 2px 0px #3f3f3f; }
     </style>
 </head>
 <body>
     <div id="instructions">
-        <h1>VOXELCRAFT</h1>
-        <div class="subtitle">ORIGINS</div>
+        <h1>VOLTCRAFT</h1>
         <div class="controls-list">
-            <p><b>MOUSE</b> Look Around (Auto-Locks)</p>
-            <p><b>L-CLICK</b> Attack / Break Block</p>
-            <p><b>R-CLICK</b> Use Item / Place Block</p>
-            <p><b>WASD / SPACE</b> Move & Jump</p>
-            <p><b>I</b> Open Inventory</p>
-            <p><b>V</b> Toggle 1st/3rd Person</p>
-            <p><b>ESC</b> Pause / Unlock Mouse</p>
+            <p><span class="key">MOUSE</span> Look Around</p>
+            <p><span class="key">L-CLICK</span> Break Block / Attack</p>
+            <p><span class="key">R-CLICK</span> Place Block / Use</p>
+            <p><span class="key">WASD</span> Move</p>
+            <p><span class="key">SPACE</span> Jump (Double tap to fly)</p>
+            <p><span class="key">E</span> Inventory</p>
+            <p><span class="key">V</span> 1st/3rd Person</p>
+            <p><span class="key">ESC</span> Pause</p>
         </div>
-        <button class="btn" id="start-btn">Enter World</button>
+        <button class="mc-btn" id="start-btn">Back to Game</button>
     </div>
     
     <div id="pause-menu">
-        <h1>GAME PAUSED</h1>
-        <div class="controls-list" style="margin-bottom: 30px; min-width: 400px;">
-            <p><b>WORLD RENDER</b> <input type="range" id="render-dist" min="4" max="12" value="8"> <span id="render-val">8</span></p>
-            <p><b>TIME SPEED</b> <input type="range" id="time-speed" min="0" max="50" value="10"> <span id="time-val">10</span></p>
-            <button class="btn" id="regen-btn" style="font-size: 14px; padding: 10px 20px; margin-top: 10px;">Regenerate World</button>
-        </div>
-        <button class="btn" id="resume-btn">Resume Game</button>
+        <h1>Game Menu</h1>
+        <button class="mc-btn" id="resume-btn">Back to Game</button>
+        <button class="mc-btn" id="regen-btn">Regenerate World</button>
     </div>
     
     <div id="inventory-menu">
-        <h1>INVENTORY</h1>
-        <div class="inventory-grid" id="inventory-grid">
-            <!-- Populated by JS -->
+        <div class="inv-window">
+            <div class="inv-title">Inventory</div>
+            <div class="inventory-grid" id="inventory-grid"></div>
         </div>
-        <button class="btn" id="close-inv-btn">Close Inventory</button>
     </div>
     
     <div id="crosshair"></div>
+    <div id="ui">Voltcraft v1.1</div>
     
-    <div id="ui">
-        Mode: <span id="camera-mode" style="color:#5cb85c;">First Person</span><br>
-        Time: <span id="time-display" style="color:#ffcc00;">Day</span>
-    </div>
-    
-    <div id="hotbar">
+    <div id="hotbar-container">
         <!-- Populated by JS -->
     </div>
     
