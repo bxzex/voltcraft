@@ -26,7 +26,7 @@ body {
 }
 
 .menu {
-  z-index: 1;
+  z-index: 200;
   position: fixed;
   left: 0%;
   top: 0%;
@@ -36,8 +36,9 @@ body {
   align-items: center;
 
   width: 100vw;
-  height: 75vh;
-  padding-top: 25vh;
+  height: 100vh;
+  padding-top: 10vh;
+  overflow-y: auto;
 
   text-align: center;
   user-select: none;
@@ -101,6 +102,7 @@ body {
   width: fit-content;
   background-color: hsla(0, 0%, 11%, 0.5);
   height: 62px;
+  z-index: 150;
 }
 
 .item {
@@ -444,6 +446,13 @@ body {
   .face.right { transform: rotateY(90deg) translateZ(12px); }
   .face.top { transform: rotateX(90deg) translateZ(12px); }
   .face.bottom { transform: rotateX(-90deg) translateZ(12px); }
+
+  .bag {
+    bottom: 20px !important;
+    top: auto !important;
+    transform: translate(-50%, 0) !important;
+    z-index: 150 !important;
+  }
 }
 
 * {
