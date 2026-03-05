@@ -690,33 +690,39 @@ let currentHeldBlock = -1;
     sunMesh.lookAt(camera.position);
     moonMesh.lookAt(camera.position);
 
-    // Target colors and intensities
+    // Target colors, intensities and fog distance
     let targetBg = new THREE.Color(0x87ceeb);
     let targetSun = 1.0;
     let targetFill = 0.4;
     let targetReflect = 0.4;
+    let targetFogFar = 250; // Clear Day
 
     if (timeMode === 'night') {
         targetBg = new THREE.Color(0x050510);
         targetSun = 0.05;
         targetFill = 0.1;
         targetReflect = 0.1;
+        targetFogFar = 400; // Clear Night (to see stars)
     }
 
     if (weather === 'rain') {
         targetBg.lerp(new THREE.Color(0x333333), 0.5);
         targetSun *= 0.5;
         targetFill *= 0.8;
+        targetFogFar = 120;
     } else if (weather === 'thunder') {
         targetBg.lerp(new THREE.Color(0x222222), 0.7);
         targetSun *= 0.3;
         targetFill *= 0.6;
+        targetFogFar = 80;
     }
 
     // Smoothly transition colors
     const currentBg = (scene.background as THREE.Color);
     currentBg.lerp(targetBg, 0.02);
-    (scene.fog as THREE.Fog).color.copy(currentBg);
+    const currentFog = (scene.fog as THREE.Fog);
+    currentFog.color.copy(currentBg);
+    currentFog.far += (targetFogFar - currentFog.far) * 0.02;
     
     // Smoothly transition light intensities
     core.sunLight.intensity += (targetSun - core.sunLight.intensity) * 0.02;
@@ -725,7 +731,7 @@ let currentHeldBlock = -1;
 
     if (weather === 'thunder' && Math.random() < 0.002) {
         scene.background = new THREE.Color(0xffffff);
-        scene.fog = new THREE.Fog(0xffffff, 1, 96);
+        scene.fog = new THREE.Fog(0xffffff, 1, 200);
         
         // Play thunder sound with flash
         thunderAudio.currentTime = 0;
@@ -733,7 +739,7 @@ let currentHeldBlock = -1;
 
         setTimeout(() => {
             scene.background = currentBg;
-            scene.fog = new THREE.Fog(currentBg, 1, 96);
+            scene.fog = new THREE.Fog(currentBg, 1, targetFogFar);
         }, 100);
     }
 
