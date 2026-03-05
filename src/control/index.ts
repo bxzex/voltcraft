@@ -740,8 +740,14 @@ export default class Control {
 
       // down collide and jump handler
       if (this.downCollide && !this.isJumping) {
+        if (this.velocity.y < -15) {
+          this.audio.playLanding()
+        }
         this.velocity.y = 0
       } else if (this.downCollide && this.isJumping) {
+        if (this.velocity.y < -15) {
+          this.audio.playLanding()
+        }
         this.isJumping = false
       }
 

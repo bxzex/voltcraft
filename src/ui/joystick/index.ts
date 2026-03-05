@@ -122,7 +122,10 @@ export default class Joystick {
       callback: () => {
         const menu = document.querySelector('.menu');
         if (menu?.classList.contains('hidden')) {
-          this.control.control.unlock(); // This triggers pointerlockchange -> onPause
+          this.control.control.unlock(); 
+        } else {
+          // If already visible (paused), resume
+          this.control.control.lock();
         }
       }
     })

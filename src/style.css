@@ -28,21 +28,35 @@ body {
 .menu {
   z-index: 200;
   position: fixed;
-  left: 0%;
-  top: 0%;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
 
   width: 100vw;
   height: 100vh;
-  padding-top: 10vh;
   overflow-y: auto;
 
   text-align: center;
   user-select: none;
   background-color: hsla(0, 0%, 11%, 0.7);
+}
+
+@media (max-width: 768px) {
+  .menu {
+    width: 100vw;
+    height: 100vh;
+    padding: 20px;
+  }
+  
+  .menu-footer {
+    max-width: 90vw !important;
+    font-size: 0.7rem !important;
+  }
 }
 
 .button {

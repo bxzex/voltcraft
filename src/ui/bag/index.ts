@@ -2,47 +2,40 @@ import grass from '../../static/textures/block/grass_block_side.png'
 import stone from '../../static/textures/block/stone.png'
 import tree from '../../static/textures/block/oak_log.png'
 import wood from '../../static/textures/block/oak_planks.png'
-import diamond from '../../static/textures/block/diamond_block.png'
-import quartz from '../../static/textures/block/quartz_block_side.png'
-import glass from '../../static/textures/block/glass.png'
-import { isMobile } from '../../utils'
-import Control from '../../control'
-import { BlockType } from '../../terrain'
-
-// Block textures for inventory
-import dirt from '../../static/textures/block/dirt.png'
-import cobblestone from '../../static/textures/block/cobblestone.png'
-import bedrock from '../../static/textures/block/bedrock.png'
-import sand from '../../static/textures/block/sand.png'
 import leaf from '../../static/textures/block/oak_leaves.png'
+import dirt from '../../static/textures/block/dirt.png'
+import sand from '../../static/textures/block/sand.png'
 import coal from '../../static/textures/block/coal_ore.png'
+import ironOre from '../../static/textures/block/iron_ore.png'
+import redstoneOre from '../../static/textures/block/redstone_ore.png'
+import diamond from '../../static/textures/block/diamond_ore.png'
+import emeraldBlock from '../../static/textures/block/emerald_block.png'
+import goldBlock from '../../static/textures/block/gold_block.png'
+import ironBlock from '../../static/textures/block/iron_block.png'
+import lapisBlock from '../../static/textures/block/lapis_block.png'
+import glass from '../../static/textures/block/glass.png'
+import bedrock from '../../static/textures/block/bedrock.png'
+import birchPlanks from '../../static/textures/block/birch_planks.png'
+import sprucePlanks from '../../static/textures/block/spruce_planks.png'
 import bricks from '../../static/textures/block/bricks.png'
 import stoneBricks from '../../static/textures/block/stone_bricks.png'
-import obsidian from '../../static/textures/block/obsidian.png'
-import ironOre from '../../static/textures/block/iron_ore.png'
-import ironBlock from '../../static/textures/block/iron_block.png'
-import goldBlock from '../../static/textures/block/gold_block.png'
-import emeraldBlock from '../../static/textures/block/emerald_block.png'
-import lapisBlock from '../../static/textures/block/lapis_block.png'
-import redstoneOre from '../../static/textures/block/redstone_ore.png'
-import tnt from '../../static/textures/block/tnt_side.png'
-import bookshelf from '../../static/textures/block/bookshelf.png'
+import cobblestone from '../../static/textures/block/cobblestone.png'
 import mossyCobblestone from '../../static/textures/block/mossy_cobblestone.png'
-import netherrack from '../../static/textures/block/netherrack.png'
-import glowstone from '../../static/textures/block/glowstone.png'
+import obsidian from '../../static/textures/block/obsidian.png'
+import quartz from '../../static/textures/block/quartz_block_side.png'
 import gravel from '../../static/textures/block/gravel.png'
 import clay from '../../static/textures/block/clay.png'
 import snow from '../../static/textures/block/snow.png'
-import craftingTable from '../../static/textures/block/crafting_table_front.png'
+import craftingTable from '../../static/textures/block/crafting_table_side.png'
 import furnace from '../../static/textures/block/furnace_front.png'
-import birchPlanks from '../../static/textures/block/birch_planks.png'
-import sprucePlanks from '../../static/textures/block/spruce_planks.png'
+import bookshelf from '../../static/textures/block/bookshelf.png'
+import tnt from '../../static/textures/block/tnt_side.png'
+import glowstone from '../../static/textures/block/glowstone.png'
+import netherrack from '../../static/textures/block/netherrack.png'
 import netherBricks from '../../static/textures/block/nether_bricks.png'
 import pumpkin from '../../static/textures/block/pumpkin_side.png'
 import melon from '../../static/textures/block/melon_side.png'
 import sponge from '../../static/textures/block/sponge.png'
-
-// 31 additional textures
 import amethyst from '../../static/textures/block/amethyst_block.png'
 import ancientDebris from '../../static/textures/block/ancient_debris_side.png'
 import andesite from '../../static/textures/block/andesite.png'
@@ -74,6 +67,14 @@ import copperBlock from '../../static/textures/block/copper_block.png'
 import rawIron from '../../static/textures/block/raw_iron_block.png'
 import rawGold from '../../static/textures/block/raw_gold_block.png'
 import rawCopper from '../../static/textures/block/raw_copper_block.png'
+
+import diamond_pickaxe from '../../static/textures/item/diamond_pickaxe.png'
+import diamond_shovel from '../../static/textures/item/diamond_shovel.png'
+import diamond_sword from '../../static/textures/item/diamond_sword.png'
+
+import { BlockType } from '../../terrain'
+import Control from '../../control'
+import { isMobile } from '../../utils'
 
 const allBlocks = [
   { type: BlockType.grass, src: grass },
@@ -147,59 +148,50 @@ const allBlocks = [
   { type: BlockType.torch, src: glowstone },
   { type: BlockType.door, src: wood },
   { type: BlockType.bed, src: wood },
-  { type: BlockType.bedrock, src: bedrock }
-];
+  { type: BlockType.bedrock, src: bedrock },
+  { type: 100, src: diamond_pickaxe },
+  { type: 101, src: diamond_shovel },
+  { type: 102, src: diamond_sword }
+]
 
 // Specific block textures for 3D icons
 import grass_top from '../../static/textures/block/grass_block_top.png'
+import dirt_img from '../../static/textures/block/dirt.png'
 import oak_log_top from '../../static/textures/block/oak_log_top.png'
-import tnt_top from '../../static/textures/block/tnt_top.png'
-import furnace_top from '../../static/textures/block/furnace_top.png'
-import crafting_top from '../../static/textures/block/crafting_table_top.png'
-import pumpkin_top from '../../static/textures/block/pumpkin_top.png'
-import melon_top from '../../static/textures/block/melon_top.png'
 
-const createBlockIcon = (type: BlockType, src: string) => {
-  const container = document.createElement('div');
-  container.className = 'cube-container';
-  
-  const cube = document.createElement('div');
-  cube.className = 'cube';
-  
-  // Define textures for faces
-  let frontSrc = src;
-  let topSrc = src;
-  let rightSrc = src;
+const blockTextures: Record<number, string[]> = {
+  [BlockType.grass]: [grass, grass, grass_top, dirt_img, grass, grass],
+  [BlockType.tree]: [tree, tree, oak_log_top, oak_log_top, tree, tree]
+}
 
-  // Handle special blocks with multi-textures
-  if (type === BlockType.grass) topSrc = grass_top;
-  if (type === BlockType.tree) topSrc = oak_log_top;
-  if (type === BlockType.tnt) topSrc = tnt_top;
-  if (type === BlockType.furnace) topSrc = furnace_top;
-  if (type === BlockType.craftingTable) topSrc = crafting_top;
-  if (type === BlockType.pumpkin) topSrc = pumpkin_top;
-  if (type === BlockType.melon) topSrc = melon_top;
+const createBlockIcon = (type: number, src: string) => {
+  const container = document.createElement('div')
+  container.className = 'cube-container'
 
-  const createFace = (faceClass: string, texture: string) => {
-    const face = document.createElement('div');
-    face.className = `face ${faceClass}`;
-    const img = document.createElement('img');
-    img.src = texture;
-    img.crossOrigin = 'anonymous';
-    face.appendChild(img);
-    return face;
-  };
+  if (type < 100 && (type === BlockType.grass || type === BlockType.tree)) {
+    const cube = document.createElement('div')
+    cube.className = 'cube'
+    const faces = ['right', 'left', 'top', 'bottom', 'front', 'back']
+    const textures = blockTextures[type]
 
-  cube.appendChild(createFace('front', frontSrc));
-  cube.appendChild(createFace('back', frontSrc));
-  cube.appendChild(createFace('left', frontSrc));
-  cube.appendChild(createFace('right', rightSrc));
-  cube.appendChild(createFace('top', topSrc));
-  cube.appendChild(createFace('bottom', frontSrc));
+    faces.forEach((face, i) => {
+      const faceEl = document.createElement('div')
+      faceEl.className = `face ${face}`
+      faceEl.style.backgroundImage = `url(${textures[i]})`
+      cube.appendChild(faceEl)
+    })
+    container.appendChild(cube)
+  } else {
+    const img = document.createElement('img')
+    img.src = src
+    img.style.width = '100%'
+    img.style.height = '100%'
+    img.style.imageRendering = 'pixelated'
+    container.appendChild(img)
+  }
 
-  container.appendChild(cube);
-  return container;
-};
+  return container
+}
 
 export default class Bag {
   constructor(control: Control) {
@@ -209,90 +201,68 @@ export default class Bag {
     for (let i = 0; i < this.items.length; i++) {
       this.bag.appendChild(this.items[i])
     }
+
     document.body.appendChild(this.bag)
 
-    // Build Inventory Grid Overlay
-    const grid = document.getElementById('inventory-grid');
-    if (grid) {
-      allBlocks.forEach(b => {
-        const cell = document.createElement('div');
-        cell.style.width = '60px'; cell.style.height = '60px';
-        cell.style.cursor = 'pointer'; cell.style.border = '2px solid transparent';
-        cell.style.backgroundColor = '#8b8b8b'; cell.style.display = 'flex';
-        cell.style.justifyContent = 'center'; cell.style.alignItems = 'center';
+    // inventory
+    const inventoryGrid = document.getElementById('inventory-grid')
+    if (inventoryGrid) {
+      allBlocks.forEach(block => {
+        const item = document.createElement('div')
+        item.className = 'inventory-item'
+        item.style.cssText = `
+          width: 60px;
+          height: 60px;
+          background: #8b8b8b;
+          border: 4px solid #373737;
+          border-top-color: #fff;
+          border-left-color: #fff;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          cursor: pointer;
+        `
+        item.appendChild(createBlockIcon(block.type, block.src))
 
-        const iconNode = createBlockIcon(b.type, b.src);
-        cell.appendChild(iconNode);
+        item.onclick = () => {
+          control.holdingBlock = block.type
+          const selectedItem = this.items[control.hotbarIndex]
+          selectedItem.innerHTML = ''
+          selectedItem.appendChild(createBlockIcon(block.type, block.src))
 
-        cell.onmouseover = () => cell.style.border = '2px solid white';
-        cell.onmouseout = () => cell.style.border = '2px solid transparent';
-        cell.onclick = () => {
-          control.holdingBlocks[this.current] = b.type;
-          control.holdingBlock = b.type;
-          this.icon[this.current] = b.src;
-          const slotDiv = this.items[this.current];
-          slotDiv.innerHTML = '';
-          slotDiv.appendChild(createBlockIcon(b.type, b.src));
-        };
-        grid.appendChild(cell);
-      });
+          // Close inventory after selection
+          const inv = document.getElementById('inventory-menu')
+          if (inv) {
+            inv.style.display = 'none'
+            inv.classList.add('hidden')
+            !isMobile && control.control.lock()
+          }
+        }
+        inventoryGrid.appendChild(item)
+      })
     }
-
-    document.body.addEventListener('keydown', (e: KeyboardEvent) => {
-      if (isNaN(parseInt(e.key)) || e.key === '0') {
-        return
-      }
-
-      for (let i = 0; i < this.items.length; i++) {
-        this.items[i].classList.remove('selected')
-      }
-
-      this.current = parseInt(e.key) - 1
-      this.items[this.current].classList.add('selected')
-      control.holdingBlock = control.holdingBlocks[this.current];
-    })
-
-    document.body.addEventListener('wheel', (e: WheelEvent) => {
-      if (!this.wheelGap) {
-        this.wheelGap = true
-        setTimeout(() => {
-          this.wheelGap = false
-        }, 100)
-        if (e.deltaY > 0) {
-          this.current++
-          this.current > 9 && (this.current = 0)
-        } else if (e.deltaY < 0) {
-          this.current--
-          this.current < 0 && (this.current = 9)
-        }
-        for (let i = 0; i < this.items.length; i++) {
-          this.items[i].classList.remove('selected')
-        }
-        this.items[this.current].classList.add('selected')
-        control.holdingBlock = control.holdingBlocks[this.current];
-      }
-    })
   }
-  wheelGap = false
-  current = 0
-  icon = [grass, stone, tree, wood, diamond, quartz, glass, dirt, cobblestone, bedrock]
-  iconIndex = 0
-  y = 0
 
   bag = document.createElement('div')
-
-  items = new Array(10).fill(null).map((_, i) => {
-    let item = document.createElement('div')
+  items = Array.from({ length: 8 }).map((_, i) => {
+    const item = document.createElement('div')
     item.className = 'item'
 
     const defaultBlocks = [
-        BlockType.grass, BlockType.stone, BlockType.tree, BlockType.wood, 
-        BlockType.diamond, BlockType.quartz, BlockType.glass, BlockType.dirt, 
-        BlockType.cobblestone, BlockType.bedrock
-    ];
+      BlockType.grass,
+      BlockType.stone,
+      BlockType.wood,
+      BlockType.tree,
+      BlockType.leaf,
+      BlockType.glass,
+      BlockType.bricks,
+      BlockType.tnt
+    ]
 
-    if (this.icon[i]) {
-      item.appendChild(createBlockIcon(defaultBlocks[i], this.icon[i]));
+    const type = defaultBlocks[i]
+    const blockData = allBlocks.find(b => b.type === type)
+    if (blockData) {
+      item.appendChild(createBlockIcon(type, blockData.src))
     }
 
     return item

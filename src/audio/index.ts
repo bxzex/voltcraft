@@ -53,6 +53,7 @@ export default class Audio {
   bgm: THREE.Audio | null = null
   listener: THREE.AudioListener | null = null
   mobSounds: Record<string, THREE.Audio[]> = {}
+  landingSounds: THREE.Audio[] = []
   soundSet: THREE.Audio[][] = []
   index = 0
   disabled = false
@@ -63,6 +64,14 @@ export default class Audio {
     this.listener = new THREE.AudioListener()
     const audioLoader = new THREE.AudioLoader()
     camera.add(this.listener)
+
+    // load landing sounds
+    audioLoader.load(stone1, buffer => {
+      const audio = new THREE.Audio(this.listener!)
+      audio.setBuffer(buffer)
+      audio.setVolume(this.soundVolume * 0.2)
+      this.landingSounds.push(audio)
+    })
 
     // load bgm
     this.bgm = new THREE.Audio(this.listener)
@@ -170,6 +179,9 @@ export default class Audio {
         audio.setVolume(v * 0.1)
       }
     }
+    for (const audio of this.landingSounds) {
+      audio.setVolume(v * 0.2)
+    }
   }
 
   sourceSet = [
@@ -269,6 +281,18 @@ export default class Audio {
       const s = sounds[Math.floor(Math.random() * sounds.length)]
       if (!s.isPlaying) {
         s.setVolume(this.soundVolume * 0.1)
+        s.play()
+      }
+    }
+  }
+
+  playLanding() {
+    if (this.disabled) return
+    const sounds = this.landingSounds
+    if (sounds && sounds.length > 0) {
+      const s = sounds[Math.floor(Math.random() * sounds.length)]
+      if (!s.isPlaying) {
+        s.setVolume(this.soundVolume * 0.2)
         s.play()
       }
     }
