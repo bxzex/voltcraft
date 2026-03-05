@@ -326,7 +326,7 @@ function buildSkinBox(texUrl: string, u: number, v: number, w: number, h: number
 
 let playerParts: any = {};
 const fpHand = new THREE.Group();
-fpHand.position.set(0.6, -0.5, -0.8);
+fpHand.position.set(0.3, -0.3, -0.5); // Move into view (right, down, forward)
 camera.add(fpHand);
 const tpHand = new THREE.Group();
 tpHand.position.set(0, -0.6, -0.4);
@@ -433,14 +433,14 @@ let currentHeldBlock = -1;
 
         if (currentHeldBlock >= 100) {
             // Render Tool
-            const tex = textureLoader.load(itemTextures[currentHeldBlock]);
+            const tex = texLoader.load(itemTextures[currentHeldBlock]);
             tex.magFilter = THREE.NearestFilter;
-            const mat = new THREE.MeshStandardMaterial({ map: tex, transparent: true, alphaTest: 0.5, side: THREE.DoubleSide });
+            const mat = new THREE.MeshLambertMaterial({ map: tex, transparent: true, alphaTest: 0.5, side: THREE.DoubleSide });
             const geo = new THREE.PlaneGeometry(0.4, 0.4);
             
             const meshFP = new THREE.Mesh(geo, mat);
-            meshFP.rotation.set(0, Math.PI / 4, 0);
-            meshFP.position.set(0, 0.1, 0);
+            meshFP.rotation.set(0, -Math.PI / 2, Math.PI / 4);
+            meshFP.position.set(0.1, 0.1, 0);
             fpHand.add(meshFP);
 
             const meshTP = new THREE.Mesh(geo, mat);
@@ -453,8 +453,9 @@ let currentHeldBlock = -1;
             if (typeStr !== undefined) {
                 const mat = terrain.materials.get(typeStr);
                 if (mat) {
-                    const meshFP = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.3, 0.3), mat);
+                    const meshFP = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, 0.2), mat);
                     meshFP.rotation.set(0.3, 0.4, 0.1);
+                    meshFP.position.set(0.1, 0, 0);
                     fpHand.add(meshFP);
                     const meshTP = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.3, 0.3), mat);
                     meshTP.rotation.set(0.3, 0.4, 0.1);
