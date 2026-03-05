@@ -38,10 +38,11 @@ const entitySkins = {
 };
 const mobs: { mesh: THREE.Group, type: string, timer: number }[] = [];
 
-function buildAnimalBox(tex: THREE.Texture, u: number, v: number, w: number, h: number, d: number) {
+function buildAnimalBox(type: 'pig' | 'cow', u: number, v: number, w: number, h: number, d: number) {
     const getM = (ox: number, oy: number, mw: number, mh: number) => {
-        const t = tex.clone();
-        t.needsUpdate = true;
+        // Load the texture directly instead of cloning to prevent 'image is undefined' async error
+        const t = texLoader.load(ASSET_URL + 'textures/entity/' + type + '/' + type + '.png');
+        t.magFilter = THREE.NearestFilter;
         // Assume standard 64x32 for older Minecraft skins (like Pig/Cow)
         t.repeat.set(mw / 64, mh / 32);
         t.offset.set(ox / 64, 1 - (oy + mh) / 32);
@@ -59,17 +60,16 @@ function buildAnimalBox(tex: THREE.Texture, u: number, v: number, w: number, h: 
 
 function spawnMob(type: 'pig' | 'cow', x: number, y: number, z: number) {
     const group = new THREE.Group();
-    const tex = entitySkins[type];
 
     // Head (0, 0, 8x8x8)
-    const headMat = buildAnimalBox(tex, 0, 0, 8, 8, 8);
+    const headMat = buildAnimalBox(type, 0, 0, 8, 8, 8);
     const headGeo = new THREE.BoxGeometry(0.8, 0.8, 0.8);
     const head = new THREE.Mesh(headGeo, headMat);
     head.position.set(0, 0.4, 0.6);
     group.add(head);
 
     // Body (28, 8, 10x16x8 mapped horizontally in some versions, but let's approximate)
-    const bodyMat = buildAnimalBox(tex, 28, 8, 10, 16, 8);
+    const bodyMat = buildAnimalBox(type, 28, 8, 10, 16, 8);
     const bodyGeo = new THREE.BoxGeometry(1.0, 0.8, 1.6);
     const body = new THREE.Mesh(bodyGeo, bodyMat);
     body.position.set(0, 0, -0.2);
