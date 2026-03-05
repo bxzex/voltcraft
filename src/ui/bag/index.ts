@@ -147,16 +147,52 @@ const allBlocks = [
   { type: BlockType.bedrock, src: bedrock }
 ];
 
-const createBlockIcon = (src: string) => {
-  const img = document.createElement('img');
-  img.src = src;
-  img.className = 'icon';
-  img.style.width = '48px';
-  img.style.height = '48px';
-  img.crossOrigin = 'anonymous';
-  img.style.imageRendering = 'pixelated';
-  img.style.objectFit = 'contain';
-  return img;
+// Specific block textures for 3D icons
+import grass_top from '../../static/textures/block/grass_block_top.png'
+import oak_log_top from '../../static/textures/block/oak_log_top.png'
+import tnt_top from '../../static/textures/block/tnt_top.png'
+import furnace_top from '../../static/textures/block/furnace_top.png'
+import crafting_top from '../../static/textures/block/crafting_table_top.png'
+import pumpkin_top from '../../static/textures/block/pumpkin_top.png'
+import melon_top from '../../static/textures/block/melon_top.png'
+
+const createBlockIcon = (type: BlockType, src: string) => {
+  const container = document.createElement('div');
+  container.className = 'cube-container';
+  
+  const cube = document.createElement('div');
+  cube.className = 'cube';
+  
+  // Define textures for faces
+  let frontSrc = src;
+  let topSrc = src;
+  let rightSrc = src;
+
+  // Handle special blocks with multi-textures
+  if (type === BlockType.grass) topSrc = grass_top;
+  if (type === BlockType.tree) topSrc = oak_log_top;
+  if (type === BlockType.tnt) topSrc = tnt_top;
+  if (type === BlockType.furnace) topSrc = furnace_top;
+  if (type === BlockType.craftingTable) topSrc = crafting_top;
+  if (type === BlockType.pumpkin) topSrc = pumpkin_top;
+  if (type === BlockType.melon) topSrc = melon_top;
+
+  const createFace = (faceClass: string, texture: string) => {
+    const face = document.createElement('div');
+    face.className = `face ${faceClass}`;
+    const img = document.createElement('img');
+    img.src = texture;
+    img.crossOrigin = 'anonymous';
+    face.appendChild(img);
+    return face;
+  };
+
+  cube.appendChild(createFace('front', frontSrc));
+  cube.appendChild(createFace('top', topSrc));
+  cube.appendChild(createFace('right', rightSrc));
+
+  container.appendChild(cube);
+  return container;
 };
 
 export default class Bag {
@@ -181,7 +217,7 @@ export default class Bag {
         cell.style.backgroundColor = '#8b8b8b'; cell.style.display = 'flex';
         cell.style.justifyContent = 'center'; cell.style.alignItems = 'center';
 
-        const iconNode = createBlockIcon(b.src);
+        const iconNode = createBlockIcon(b.type, b.src);
         cell.appendChild(iconNode);
 
         cell.onmouseover = () => cell.style.border = '2px solid white';
@@ -192,7 +228,7 @@ export default class Bag {
           this.icon[this.current] = b.src;
           const slotDiv = this.items[this.current];
           slotDiv.innerHTML = '';
-          slotDiv.appendChild(createBlockIcon(b.src));
+          slotDiv.appendChild(createBlockIcon(b.type, b.src));
         };
         grid.appendChild(cell);
       });
@@ -241,12 +277,18 @@ export default class Bag {
 
   bag = document.createElement('div')
 
-  items = new Array(10).fill(null).map(() => {
+  items = new Array(10).fill(null).map((_, i) => {
     let item = document.createElement('div')
     item.className = 'item'
 
-    if (this.icon[this.iconIndex]) {
-      item.appendChild(createBlockIcon(this.icon[this.iconIndex++]));
+    const defaultBlocks = [
+        BlockType.grass, BlockType.stone, BlockType.tree, BlockType.wood, 
+        BlockType.diamond, BlockType.quartz, BlockType.glass, BlockType.dirt, 
+        BlockType.cobblestone, BlockType.bedrock
+    ];
+
+    if (this.icon[i]) {
+      item.appendChild(createBlockIcon(defaultBlocks[i], this.icon[i]));
     }
 
     return item

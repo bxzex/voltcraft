@@ -152,6 +152,12 @@ export default class UI {
           terrain.distance * 24 + 24
         )
       }
+      this.settings?.classList.add('hidden')
+      // If we are in-game (Resume shown), automatically resume after applying
+      if (this.play?.innerHTML === 'Resume') {
+          this.onPlay();
+          !isMobile && control.control.lock();
+      }
     })
 
     // menu and fullscreen
