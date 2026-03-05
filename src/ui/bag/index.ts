@@ -56,6 +56,7 @@ export default class Bag {
             const img = document.createElement('img');
             img.src = b.src; img.style.width = '48px'; img.style.height = '48px';
             img.crossOrigin = 'anonymous';
+            img.style.imageRendering = 'pixelated';
             cell.appendChild(img);
             
             cell.onmouseover = () => cell.style.border = '2px solid white';

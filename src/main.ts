@@ -40,17 +40,27 @@ const mobs: { mesh: THREE.Group, type: string, timer: number }[] = [];
 
 function buildAnimalBox(type: 'pig' | 'cow', u: number, v: number, w: number, h: number, d: number) {
     const getM = (ox: number, oy: number, mw: number, mh: number) => {
-        // Load the texture directly instead of cloning to prevent 'image is undefined' async error
-        const t = texLoader.load(ASSET_URL + 'textures/entity/' + type + '/' + type + '.png');
-        t.magFilter = THREE.NearestFilter;
-        // Assume standard 64x32 for older Minecraft skins (like Pig/Cow)
-        t.repeat.set(mw / 64, mh / 32);
-        t.offset.set(ox / 64, 1 - (oy + mh) / 32);
-        return new THREE.MeshLambertMaterial({ map: t, transparent: true, alphaTest: 0.5 });
+        const mat = new THREE.MeshLambertMaterial({ transparent: true, alphaTest: 0.5 });
+        const img = new Image();
+        img.src = ASSET_URL + 'textures/entity/' + type + '/' + type + '.png';
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = 64; canvas.height = 32;
+            const ctx = canvas.getContext('2d')!;
+            ctx.drawImage(img, 0, 0);
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.magFilter = THREE.NearestFilter;
+            tex.repeat.set(mw / 64, mh / 32);
+            tex.offset.set(ox / 64, 1 - (oy + mh) / 32);
+            mat.map = tex;
+            mat.needsUpdate = true;
+        }
+        return mat;
     };
     return [
-        getM(u + d + w, v + d, d, h), // left
-        getM(u, v + d, d, h),         // right
+        getM(u + d + w, v + d, d, h), // right (left side from front)
+        getM(u, v + d, d, h),         // left
         getM(u + d, v, w, d),         // top
         getM(u + d + w, v, w, d),     // bottom
         getM(u + d, v + d, w, h),     // front
@@ -61,19 +71,28 @@ function buildAnimalBox(type: 'pig' | 'cow', u: number, v: number, w: number, h:
 function spawnMob(type: 'pig' | 'cow', x: number, y: number, z: number) {
     const group = new THREE.Group();
 
-    // Head (0, 0, 8x8x8)
-    const headMat = buildAnimalBox(type, 0, 0, 8, 8, 8);
-    const headGeo = new THREE.BoxGeometry(0.8, 0.8, 0.8);
-    const head = new THREE.Mesh(headGeo, headMat);
-    head.position.set(0, 0.4, 0.6);
-    group.add(head);
-
     // Body (28, 8, 10x16x8 mapped horizontally in some versions, but let's approximate)
     const bodyMat = buildAnimalBox(type, 28, 8, 10, 16, 8);
-    const bodyGeo = new THREE.BoxGeometry(1.0, 0.8, 1.6);
+    const bodyGeo = new THREE.BoxGeometry(0.8, 0.6, 1.2);
     const body = new THREE.Mesh(bodyGeo, bodyMat);
-    body.position.set(0, 0, -0.2);
+    body.position.set(0, 0.6, 0);
     group.add(body);
+
+    // Head (0, 0, 8x8x8)
+    const headMat = buildAnimalBox(type, 0, 0, 8, 8, 8);
+    const headGeo = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+    const head = new THREE.Mesh(headGeo, headMat);
+    head.position.set(0, 0.9, 0.7);
+    group.add(head);
+
+    // Legs
+    const legMat = buildAnimalBox(type, 0, 16, 4, 12, 4); // Standard animal leg texture position
+    const legGeo = new THREE.BoxGeometry(0.25, 0.4, 0.25);
+    [[0.25, 0.4], [-0.25, 0.4], [0.25, -0.4], [-0.25, -0.4]].forEach(p => {
+        const l = new THREE.Mesh(legGeo, legMat);
+        l.position.set(p[0], 0.2, p[1]);
+        group.add(l);
+    });
 
     group.position.set(x, y, z);
     scene.add(group);
@@ -169,11 +188,46 @@ let thirdPerson = false;
 
 function buildSkinBox(texUrl: string, u: number, v: number, w: number, h: number, d: number) {
     const getM = (ox: number, oy: number, mw: number, mh: number) => {
-        const t = texLoader.load(texUrl);
-        t.magFilter = THREE.NearestFilter;
-        t.repeat.set(mw / 64, mh / 64);
-        t.offset.set(ox / 64, 1 - (oy + mh) / 64);
-        return new THREE.MeshLambertMaterial({ map: t, transparent: true, alphaTest: 0.5 });
+        const mat = new THREE.MeshLambertMaterial({ transparent: true, alphaTest: 0.5 });
+        
+        const img = new Image();
+        img.src = texUrl;
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = 64; canvas.height = 64;
+            const ctx = canvas.getContext('2d')!;
+            ctx.drawImage(img, 0, 0);
+            // If it's a 64x32 legacy skin, copy the left arm/leg to the right side if they are empty
+            if (img.height === 32) {
+                // Copy right leg to left leg
+                ctx.scale(-1, 1);
+                ctx.drawImage(canvas, -16, 20, 4, 12, -24, 52, 4, 12); // Leg Front
+                ctx.drawImage(canvas, -8, 20, 4, 12, -28, 52, 4, 12);  // Leg Back
+                ctx.drawImage(canvas, -12, 20, 4, 12, -20, 52, 4, 12); // Leg Right
+                ctx.drawImage(canvas, -4, 20, 4, 12, -16, 52, 4, 12);  // Leg Left
+                ctx.drawImage(canvas, -12, 16, 4, 4, -24, 48, 4, 4);   // Leg Top
+                ctx.drawImage(canvas, -16, 16, 4, 4, -28, 48, 4, 4);   // Leg Bottom
+
+                // Copy right arm to left arm
+                ctx.drawImage(canvas, -44, 20, 4, 12, -40, 52, 4, 12); // Arm Front
+                ctx.drawImage(canvas, -52, 20, 4, 12, -32, 52, 4, 12); // Arm Back
+                ctx.drawImage(canvas, -48, 20, 4, 12, -36, 52, 4, 12); // Arm Right
+                ctx.drawImage(canvas, -40, 20, 4, 12, -44, 52, 4, 12); // Arm Left
+                ctx.drawImage(canvas, -48, 16, 4, 4, -40, 48, 4, 4);   // Arm Top
+                ctx.drawImage(canvas, -52, 16, 4, 4, -44, 48, 4, 4);   // Arm Bottom
+                ctx.setTransform(1, 0, 0, 1, 0, 0); // reset transform
+            }
+
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.magFilter = THREE.NearestFilter;
+            tex.repeat.set(mw / 64, mh / 64);
+            tex.offset.set(ox / 64, 1 - (oy + mh) / 64);
+            mat.map = tex;
+            mat.needsUpdate = true;
+        };
+        
+        return mat;
     };
     return [
         getM(u + d + w, v + d, d, h), // left
@@ -190,7 +244,7 @@ const fpHand = new THREE.Group();
 fpHand.position.set(0.4, -0.3, -0.6);
 camera.add(fpHand);
 const tpHand = new THREE.Group();
-tpHand.position.set(0, -0.4, 0.2);
+tpHand.position.set(0, -0.6, -0.4);
 
 function createPlayerMesh(skinName: string) {
     playerGroup.clear();
@@ -219,7 +273,11 @@ function createPlayerMesh(skinName: string) {
     const rightArm = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.8, 0.2), armMat);
     rightArm.position.y = -0.4;
     playerParts.rightArmGroup.add(rightArm);
+    
+    // Add tpHand to the right arm group
+    if (tpHand.parent) tpHand.parent.remove(tpHand);
     playerParts.rightArmGroup.add(tpHand);
+    
     playerGroup.add(playerParts.rightArmGroup);
 
     const legMat = buildSkinBox(texUrl, 0, 16, 4, 12, 4);
@@ -258,7 +316,7 @@ document.querySelectorAll('.skin-btn').forEach((btn) => {
 });
 
 document.addEventListener('keydown', (e) => {
-    if (e.code === 'F5') {
+    if (e.code === 'KeyV') {
         thirdPerson = !thirdPerson;
     }
 });
@@ -303,6 +361,17 @@ let currentHeldBlock = -1;
       } else {
           m.mesh.position.y += Math.sin(m.timer)*0.005;
           m.mesh.rotation.y += Math.cos(m.timer*0.5)*0.005;
+          m.mesh.position.x += Math.cos(m.timer*0.5)*0.01;
+          m.mesh.position.z += Math.sin(m.timer*0.5)*0.01;
+          
+          // Animate Legs (children 2 to 5)
+          if (m.mesh.children.length >= 6) {
+              const sCycle = Math.sin(m.timer * 5) * 0.5;
+              m.mesh.children[2].rotation.x = sCycle; // Front right
+              m.mesh.children[3].rotation.x = -sCycle; // Front left
+              m.mesh.children[4].rotation.x = -sCycle; // Back right
+              m.mesh.children[5].rotation.x = sCycle; // Back left
+          }
       }
   });
 
