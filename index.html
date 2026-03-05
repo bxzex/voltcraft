@@ -1,347 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Voltcraft</title>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
-    <style>
-        body { margin: 0; overflow: hidden; background-color: #87CEEB; font-family: 'VT323', monospace; user-select: none; -webkit-user-select: none; }
-        canvas { display: block; width: 100vw; height: 100vh; image-rendering: pixelated; }
-        
-        
-        #crosshair {
-            position: absolute; top: 50%; left: 50%; width: 24px; height: 24px;
-            transform: translate(-50%, -50%); pointer-events: none;
-            display: flex; justify-content: center; align-items: center;
-            opacity: 0.8; z-index: 4;
-        }
-        #crosshair::before, #crosshair::after {
-            content: ''; position: absolute; background-color: rgba(255, 255, 255, 1);
-            box-shadow: 0 0 2px rgba(0,0,0,1);
-        }
-        #crosshair::before { width: 4px; height: 100%; }
-        #crosshair::after { width: 100%; height: 4px; }
-        
-        #ui {
-            position: absolute; top: 10px; left: 10px; color: white;
-            text-shadow: 2px 2px 0px #3f3f3f; pointer-events: none;
-            font-size: 24px; z-index: 4;
-        }
-        
-        
-        #hotbar-container {
-            position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
-            display: flex; gap: 0; background: #8b8b8b; padding: 4px; 
-            border: 2px solid #373737; border-top-color: #ffffff; border-left-color: #ffffff;
-            border-bottom-color: #373737; border-right-color: #373737; z-index: 6;
-        }
-        .slot {
-            width: 48px; height: 48px; background: #8b8b8b;
-            border: 2px solid #373737; border-top-color: #373737; border-left-color: #373737;
-            border-bottom-color: #ffffff; border-right-color: #ffffff;
-            color: white; display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-end; 
-            font-weight: bold; font-size: 20px; text-shadow: 2px 2px 0px #3f3f3f;
-            position: relative; box-sizing: border-box; cursor: pointer;
-            background-size: 32px 32px; background-position: center; background-repeat: no-repeat;
-        }
-        .slot.active { 
-            border: 2px solid #ffffff; box-shadow: inset 0 0 10px rgba(255,255,255,0.5);
-            outline: 2px solid #000; z-index: 2;
-        }
-        
-        /* Menus */
-        #pause-menu, #instructions, #inventory-menu {
-            position: absolute; width: 100%; height: 100%;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            background-color: hsla(0, 0%, 11%, 0.9); color: white; z-index: 10;
-        }
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/src/static/mc.ico" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,maximum-scale=1"
+    />
+    <meta
+      name="description"
+      content="Minecraft clone made with Three.js + TypeScript, play minecraft in your own browser!"
+    />
+    <title>Minecraft - Three.js</title>
+  </head>
+  <body>
+    <script type="module" src="./src/main.ts"></script>
+    <a
+      href="https://github.com/Vyse12138/minecraft-threejs"
+      title="Source on GitHub"
+      class="github"
+      target="_blank"
+      rel="noopener"
+    >
+      <svg width="72" height="72" viewBox="0 0 250 250">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path
+          d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+          fill="white"
+        ></path>
+        <path
+          d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+          fill="white"
+        ></path>
+      </svg>
+    </a>
+    <div class="menu start">
+      <h1 style="font-family: Minecraft; font-size: 4rem; color: white; margin-bottom: 20px; text-shadow: 4px 4px 0px #000;">VOLTCRAFT</h1>
+      
+      <input type="text" id="username" placeholder="Username" value="Player" class="button" style="text-align: center; background-color: #fff; color: #000;" />
+      
+      <button id="play" class="button">Singleplayer</button>
+      <div style="display: flex; gap: 10px;">
+        <button id="host" class="button" style="width: 145px;">Host World</button>
+        <button id="join" class="button" style="width: 145px;">Join World</button>
+      </div>
+      <input type="text" id="join-id" placeholder="Enter World ID" class="button" style="text-align: center; background-color: #fff; color: #000;" />
+      <div id="mp-status" style="color: #ffff00; font-family: Minecraft; font-size: 1.2rem; text-shadow: 2px 2px 0px #000; margin-bottom: 10px;"></div>
 
-        #instructions {
-            background-image: url('https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.19.2/assets/minecraft/textures/gui/options_background.png');
-            background-repeat: repeat; background-size: 64px 64px;
-        }
-        #pause-menu, #inventory-menu { display: none; }
-        
-        
-        .inv-window {
-            background: #c6c6c6; border: 4px solid #000; border-top-color: #fff; border-left-color: #fff;
-            border-bottom-color: #555; border-right-color: #555;
-            padding: 20px; max-width: 90vw; color: #373737; text-shadow: none;
-            display: flex; flex-direction: column; align-items: flex-start;
-        }
-        .inv-title { font-size: 32px; margin-bottom: 10px; font-family: 'Press Start 2P', cursive; font-size: 16px;}
-        .inventory-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(48px, 1fr)); gap: 4px;
-            background: #c6c6c6; margin-bottom: 20px; width: 100%; max-height: 50vh; overflow-y: auto;
-        }
-        .inv-slot {
-            width: 48px; height: 48px; background: #8b8b8b;
-            border: 2px solid #373737; border-top-color: #373737; border-left-color: #373737;
-            border-bottom-color: #ffffff; border-right-color: #ffffff;
-            cursor: pointer; position: relative;
-            background-size: 32px 32px; background-position: center; background-repeat: no-repeat;
-        }
-        .inv-slot:hover { background-color: #a0a0a0; }
-        .inv-slot::after {
-            content: attr(data-item); position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%);
-            background: rgba(0,0,0,0.8); color: white; padding: 2px 4px; font-size: 16px;
-            white-space: nowrap; display: none; z-index: 5; text-shadow: 2px 2px 0px #3f3f3f;
-        }
-        .inv-slot:hover::after { display: block; }
-        
-        h1 {
-            font-family: 'Press Start 2P', cursive; font-size: 36px; margin-bottom: 10px;
-            text-shadow: 4px 4px 0px #3f3f3f; color: #fff; text-align: center; line-height: 1.4;
-        }
-        
-        .mc-btn {
-            width: 300px; margin-bottom: 15px; padding: 10px;
-            font-family: 'VT323', monospace; font-size: 32px; color: white;
-            background-color: #727272; cursor: pointer; text-align: center;
-            border-left: 2px solid #a4a4a4; border-top: 2px solid #a4a4a4;
-            border-bottom: 2px solid #545655; border-right: 2px solid #545655;
-            box-shadow: 0 0 0 2px black; text-transform: uppercase;
-        }
-        .mc-btn:hover {
-            background-color: #218306;
-            border-left: 2px solid #17cd07; border-top: 2px solid #17cd07;
-            border-bottom: 2px solid #004e00; border-right: 2px solid #004e00;
-            box-shadow: 0 0 0 2px white;
-        }
-        .mc-btn:active {
-            border-top: 2px solid #555; border-left: 2px solid #555; border-bottom: 2px solid #fff; border-right: 2px solid #fff;
-        }
-        
-        .controls-list { font-size: 24px; text-align: left; margin-bottom: 30px; }
-        .controls-list p { margin: 10px 0; }
-        .key { color: #ffff00; text-shadow: 2px 2px 0px #3f3f3f; }
-
-        /* Social Footer */
-        .social-footer {
-            margin-top: 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-size: 20px;
-            color: #ccc;
-        }
-        .social-footer p {
-            margin-bottom: 15px;
-            text-shadow: 2px 2px 0px #000;
-        }
-        .social-links {
-            display: flex;
-            gap: 20px;
-        }
-        .social-icon {
-            width: 32px;
-            height: 32px;
-            transition: transform 0.2s;
-            filter: drop-shadow(2px 2px 0px rgba(0,0,0,0.8));
-        }
-        .social-icon:hover {
-            transform: scale(1.2);
-        }
-        .social-icon.invert {
-            filter: invert(1) drop-shadow(-2px -2px 0px rgba(0,0,0,0.8));
-        }
-
-        /* Mobile Controls */
-        #mobile-controls {
-            display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
-            pointer-events: none; z-index: 5;
-        }
-        #dpad {
-            position: absolute; bottom: 80px; left: 20px; width: 160px; height: 160px;
-            pointer-events: auto;
-        }
-        .dbtn {
-            position: absolute; width: 50px; height: 50px; background: rgba(255,255,255,0.4);
-            border: 2px solid rgba(0,0,0,0.5); border-radius: 8px; display: flex; justify-content: center;
-            align-items: center; font-size: 24px; font-weight: bold; color: #000;
-        }
-        .dbtn:active { background: rgba(255,255,255,0.8); }
-        #btn-up { top: 0; left: 55px; }
-        #btn-left { top: 55px; left: 0; }
-        #btn-right { top: 55px; left: 110px; }
-        #btn-down { top: 110px; left: 55px; }
-
-        #action-btns {
-            position: absolute; bottom: 80px; right: 20px; pointer-events: auto;
-            display: grid; grid-template-columns: 60px 60px; gap: 10px;
-        }
-        .abtn {
-            width: 60px; height: 60px; background: rgba(255,255,255,0.4);
-            border: 2px solid rgba(0,0,0,0.5); border-radius: 50%; display: flex; justify-content: center;
-            align-items: center; font-size: 16px; font-weight: bold; color: #000;
-        }
-        .abtn:active { background: rgba(255,255,255,0.8); }
-        #btn-jump { grid-column: span 2; width: 130px; border-radius: 12px; }
-        
-        #top-btns {
-            position: absolute; top: 10px; right: 10px; pointer-events: auto;
-            display: flex; gap: 10px;
-        }
-        .tbtn {
-            width: 40px; height: 40px; background: rgba(255,255,255,0.4);
-            border: 2px solid rgba(0,0,0,0.5); border-radius: 8px; display: flex; justify-content: center;
-            align-items: center; font-size: 14px; font-weight: bold; color: #000;
-        }
-        .tbtn:active { background: rgba(255,255,255,0.8); }
-        
-        /* Chat System */
-        #chat-container {
-            position: absolute; bottom: 80px; left: 10px; width: 300px; max-height: 200px;
-            display: none; flex-direction: column; justify-content: flex-end; z-index: 5;
-            pointer-events: none;
-        }
-        #chat-messages {
-            overflow-y: hidden; max-height: 160px; color: white;
-            font-size: 16px; text-shadow: 1px 1px 0px #000;
-            display: flex; flex-direction: column; gap: 4px; pointer-events: none;
-        }
-        .chat-msg { background: rgba(0,0,0,0.5); padding: 4px; border-radius: 4px; word-wrap: break-word; }
-        #chat-input-wrapper { display: none; margin-top: 5px; pointer-events: auto; }
-        #chat-input {
-            width: 100%; padding: 5px; font-family: 'VT323', monospace; font-size: 16px;
-            background: rgba(0,0,0,0.7); color: white; border: 2px solid #aaa; outline: none;
-        }
-
-        @media (max-width: 768px) {
-            #hotbar-container { bottom: 10px; transform: translateX(-50%) scale(0.8); transform-origin: bottom center; }
-            .inv-grid { grid-template-columns: repeat(5, 1fr); }
-            h1 { font-size: 24px; }
-            .mc-btn { font-size: 20px; padding: 10px 20px; }
-            .controls-list { font-size: 18px; }
-            #chat-container { bottom: 130px; width: 250px; }
-        }
-    </style>
-</head>
-<body>
-    <div id="instructions">
-        <h1>VOLTCRAFT</h1>
-        <div class="controls-list">
-            <p><span class="key">MOUSE/TOUCH</span> Look Around</p>
-            <p><span class="key">L-CLICK/BREAK</span> Break Block</p>
-            <p><span class="key">R-CLICK/PLACE</span> Place Block</p>
-            <p><span class="key">WASD/DPAD</span> Move</p>
-            <p><span class="key">SPACE/JUMP</span> Jump (Double to fly)</p>
-            <p><span class="key">E/INV</span> Inventory</p>
-            <p><span class="key">V/CAM</span> 1st/3rd Person</p>
-            <p><span class="key">T/ENTER</span> Chat</p>
-            <p><span class="key">ESC</span> Pause</p>
-        </div>
-        <div style="display: flex; flex-direction: column; gap: 10px; align-items: center; background: rgba(0,0,0,0.5); padding: 20px; border: 2px solid #555;">
-            <input type="text" id="username-input" placeholder="Enter Username" value="Player" style="padding: 10px; font-family: 'VT323', monospace; font-size: 24px; text-align: center; width: 250px; background: #c6c6c6; border: 3px solid #000; border-top-color: #555; border-left-color: #555; border-bottom-color: #fff; border-right-color: #fff; outline: none; margin-bottom: 10px;">
-            
-            <button class="mc-btn" id="start-btn" style="margin: 0;">Singleplayer</button>
-            <div style="display: flex; gap: 10px; margin-top: 10px;">
-                <button class="mc-btn" id="host-btn" style="margin: 0; font-size: 24px; padding: 10px 20px;">Host World</button>
-                <button class="mc-btn" id="join-btn" style="margin: 0; font-size: 24px; padding: 10px 20px;">Join World</button>
-            </div>
-            <input type="text" id="world-id-input" placeholder="Enter World ID to Join" style="padding: 10px; font-family: 'VT323', monospace; font-size: 20px; text-align: center; width: 250px; background: #c6c6c6; border: 3px solid #000; border-top-color: #555; border-left-color: #555; border-bottom-color: #fff; border-right-color: #fff; outline: none;">
-            <div id="mp-status" style="color: #ffff00; font-size: 20px; text-shadow: 2px 2px 0px #000; height: 24px;"></div>
-        </div>
-        <div class="social-footer">
-            <p>built by bxzex</p>
-            <div class="social-links">
-                <a href="https://github.com/bxzex" target="_blank" title="GitHub">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" alt="GitHub" class="social-icon invert">
-                </a>
-                <a href="https://www.instagram.com/bxzex/" target="_blank" title="Instagram">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg" alt="Instagram" class="social-icon">
-                </a>
-                <a href="https://www.linkedin.com/in/bxzex/" target="_blank" title="LinkedIn">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png" alt="LinkedIn" class="social-icon">
-                </a>
-            </div>
-        </div>
-    </div>
-    
-    <div id="pause-menu">
-        <h1>Game Paused</h1>
-        <div style="background: rgba(0,0,0,0.7); padding: 20px; border: 2px solid #555; text-align: center; margin-bottom: 20px;">
-            <p style="font-size: 20px; color: #aaa; margin: 5px;">World ID:</p>
-            <div style="display: flex; gap: 10px; align-items: center; justify-content: center;">
-                <span id="pause-world-id" style="font-size: 24px; color: #fff; background: #333; padding: 5px 10px; user-select: text;">Not Hosting</span>
-                <button class="mc-btn" id="copy-id-btn" style="font-size: 16px; padding: 5px 10px; margin: 0;">Copy</button>
-            </div>
-            <p style="font-size: 18px; color: #aaa; margin-top: 15px;">Generated Blocks: <span id="pause-block-count" style="color: #fff;">0</span></p>
-        </div>
-        
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
-            <button class="mc-btn" id="time-day-btn" style="font-size: 20px; padding: 10px;">Set Day</button>
-            <button class="mc-btn" id="time-night-btn" style="font-size: 20px; padding: 10px;">Set Night</button>
-            <button class="mc-btn" id="weather-clear-btn" style="font-size: 20px; padding: 10px;">Sunny</button>
-            <button class="mc-btn" id="weather-rain-btn" style="font-size: 20px; padding: 10px;">Rain</button>
-            <button class="mc-btn" id="weather-thunder-btn" style="font-size: 20px; padding: 10px; grid-column: span 2;">Thunder</button>
-        </div>
-
-        <button class="mc-btn" id="resume-btn">Resume</button>
-        <button class="mc-btn" id="regen-btn">Regenerate World</button>
-    </div>
-    
-    <div id="inventory-menu">
-        <div class="inv-window">
-            <div class="inv-title">Inventory</div>
-            <div class="inventory-grid" id="inventory-grid"></div>
-            <button class="mc-btn" id="close-inv-btn" style="align-self: center;">Close</button>
-        </div>
-    </div>
-    
-    <div id="crosshair"></div>
-    <div id="ui">Voltcraft v1.3</div>
-    
-    <div id="hotbar-container">
-        <!-- Populated by JS -->
+      <button id="save" class="button">Load Game</button>
+      <button id="setting" class="button">Setting</button>
+      <button id="feature" class="button">Guide</button>
+      <button id="exit" class="button">Exit</button>
+      <footer class="footer">© Voltcraft Open Source - built by bxzex</footer>
     </div>
 
     <!-- Chat Overlay -->
-    <div id="chat-container">
-        <div id="chat-messages"></div>
-        <div id="chat-input-wrapper">
-            <input type="text" id="chat-input" placeholder="Type a message...">
-        </div>
-    </div>
-    
-    <!-- Mobile UI Overlays -->
-    <div id="mobile-controls">
-        <div id="top-btns">
-            <div class="tbtn" id="btn-inv">INV</div>
-            <div class="tbtn" id="btn-cam">CAM</div>
-            <div class="tbtn" id="btn-pause">||</div>
-        </div>
-        <div id="dpad">
-            <div class="dbtn" id="btn-up">▲</div>
-            <div class="dbtn" id="btn-left">◀</div>
-            <div class="dbtn" id="btn-right">▶</div>
-            <div class="dbtn" id="btn-down">▼</div>
-        </div>
-        <div id="action-btns">
-            <div class="abtn" id="btn-break">Break</div>
-            <div class="abtn" id="btn-place">Place</div>
-            <div class="abtn" id="btn-jump">Jump</div>
+    <div id="chat-container" style="position: absolute; bottom: 80px; left: 10px; width: 300px; max-height: 200px; display: none; flex-direction: column; justify-content: flex-end; z-index: 5; pointer-events: none; font-family: Minecraft;">
+        <div id="chat-messages" style="overflow-y: hidden; max-height: 160px; color: white; font-size: 16px; text-shadow: 1px 1px 0px #000; display: flex; flex-direction: column; gap: 4px; pointer-events: none;"></div>
+        <div id="chat-input-wrapper" style="display: none; margin-top: 5px; pointer-events: auto;">
+            <input type="text" id="chat-input" placeholder="Type a message..." style="width: 100%; padding: 5px; font-family: Minecraft; font-size: 16px; background: rgba(0,0,0,0.7); color: white; border: 2px solid #aaa; outline: none;">
         </div>
     </div>
 
-    <!-- Loading Screen -->
-    <div id="loading-screen" style="display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background-image: url('https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.19.2/assets/minecraft/textures/gui/options_background.png'); background-repeat: repeat; background-size: 64px 64px; z-index: 9999; flex-direction: column; justify-content: center; align-items: center; color: white;">
-        <h1 id="loading-text" style="font-size: 48px; text-shadow: 4px 4px 0px #000;">Loading World...</h1>
-        <div style="width: 300px; height: 10px; border: 2px solid #555; background: #000; margin-top: 20px;">
-            <div id="loading-bar" style="width: 0%; height: 100%; background: #17cd07; transition: width 0.3s;"></div>
-        </div>
+    <div class="features hidden">
+      <p>
+        <b> Left-Click: </b> destroy block <br />
+        <b> Right-Click:</b> place block <br />
+        <b> Wheel / Number Key: </b>change block <br />
+        <b> WASD: </b>move <br />
+        <b> Space: </b>jump / fly up<br />
+        <b> Q:</b> toggle normal / dev mode <br />
+        <b> Shift:</b> sneaking / fly down <br />
+        <b> F: </b>full screen <br />
+        <b> E: </b>menu <br />
+      </p>
+      <button id="back" class="button">Back</button>
     </div>
 
-    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-            }
-        }
-    </script>
-    <script type="module" src="./main.js"></script>
-</body>
+    <div class="settings hidden">
+      <p id="distance">Render Distance: 3</p>
+      <input
+        type="range"
+        id="distance-input"
+        min="1"
+        max="8"
+        value="3"
+        step="1"
+      />
+
+      <p id="fov">Field of View: 70</p>
+      <input
+        type="range"
+        id="fov-input"
+        min="40"
+        max="100"
+        value="70"
+        step="1"
+      />
+
+      <p id="music">Music: On</p>
+      <input type="range" id="music-input" min="0" max="1" value="1" step="1" />
+
+      <br />
+      <br />
+      <button id="setting-back" class="button">Apply</button>
+    </div>
+
+    <div class="save-modal hidden">Game Saved!</div>
+    <div class="load-modal hidden">Game Loaded!</div>
+  </body>
 </html>

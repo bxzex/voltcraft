@@ -1,14 +1,30 @@
-Voltcraft
+# minecraft-threejs
 
-A free, open-source world exploration game inspired by Minecraft.
+English ｜ [中文](https://github.com/vyse12138/minecraft-threejs/blob/main/README_ZH.md)
 
-Features
-- **Sandbox World**: Build and explore in a block-based environment.
-- **Pure JavaScript**: Runs entirely in the browser with no plugins.
-- **Fast & Lightweight**: Smooth performance on any modern device.
+Minecraft clone made with Three.js and TypeScript
 
-How to Play
-Just open `index.html` in your browser and start building.
+Check it out: [Minecraft - Three.js](https://mc.yulei.me/)
 
----
-Built by [bxzex](https://github.com/bxzex).
+Recommend to use Chrome to get the best experience
+
+![preview](https://user-images.githubusercontent.com/88306344/154383952-9b33bad4-eebb-4a98-a12e-f5f137422d06.gif)
+
+## Features:
+
+- Destroy block and place block
+- Mouse wheel (or number key) to select different block types
+- Movement and collision detection
+- Random terrain / blocks / tree generations
+- Infinite world
+- Game save / load
+- Sound effect and BGM
+- Highlight the block at crosshair
+- Basic UI and settings
+- Mobile friendly
+
+## Working on:
+
+- Multiplayer
+- Generates water
+- Higher performance algorithm
