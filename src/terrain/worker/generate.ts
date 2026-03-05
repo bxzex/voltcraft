@@ -71,12 +71,20 @@ enum BlockType {
   soulSoil = 64,
   boneBlock = 65,
   copperBlock = 66,
-  rawIron = 67,
   rawGold = 68,
-  torch = 70
-}
+  rawCopper = 69,
+  torch = 70,
+  door = 71,
+  bed = 72
+  }
 
-function generateHouse(x: number, y: number, z: number, idMap: Map<string, number>, blocksCount: number[], blocks: THREE.InstancedMesh[], matrix: THREE.Matrix4) {
+  function hash(x: number, z: number) {
+  let h = (x * 31 + z) | 0;
+  h = Math.sin(h) * 10000;
+  return h - Math.floor(h);
+  }
+
+  function generateHouse(x: number, y: number, z: number, idMap: Map<string, number>, blocksCount: number[], blocks: THREE.InstancedMesh[], matrix: THREE.Matrix4) {
   // Simple house 5x5
   for (let dx = 0; dx < 5; dx++) {
     for (let dz = 0; dz < 5; dz++) {
@@ -85,20 +93,38 @@ function generateHouse(x: number, y: number, z: number, idMap: Map<string, numbe
         const isWall = (dx === 0 || dx === 4 || dz === 0 || dz === 4) && dy < 3;
         const isRoof = dy === 3;
         const isDoor = dx === 2 && dz === 0 && dy < 2;
-        
+        const isWindow = (dy === 1) && ((dz === 2 && (dx === 0 || dx === 4)) || (dx === 2 && dz === 4));
+
         if ((isWall || isRoof) && !isDoor) {
+          let type = isRoof ? BlockType.wood : BlockType.stoneBricks;
+          if (isWindow) type = BlockType.glass;
+
           const px = x + dx;
           const py = y + dy;
           const pz = z + dz;
-          const type = isRoof ? BlockType.wood : BlockType.stoneBricks;
           matrix.setPosition(px, py, pz);
           idMap.set(`${px}_${py}_${pz}`, blocksCount[type]);
           blocks[type].setMatrixAt(blocksCount[type]++, matrix);
         }
+
+        // Add a door block
+        if (isDoor && dy === 0) {
+          const px = x + dx;
+          const py = y + dy;
+          const pz = z + dz;
+          matrix.setPosition(px, py, pz);
+          idMap.set(`${px}_${py}_${pz}`, blocksCount[BlockType.door]);
+          blocks[BlockType.door].setMatrixAt(blocksCount[BlockType.door]++, matrix);
+        }
       }
     }
   }
-}
+  // Add a bed inside
+  const bx = x + 1, by = y, bz = z + 2;
+  matrix.setPosition(bx, by, bz);
+  idMap.set(`${bx}_${by}_${bz}`, blocksCount[BlockType.bed]);
+  blocks[BlockType.bed].setMatrixAt(blocksCount[BlockType.bed]++, matrix);
+  }
 
 const matrix = new THREE.Matrix4()
 const noise = new Noise()
@@ -234,8 +260,8 @@ onmessage = (
             matrix
           )
 
-          // Randomly generate a house on grass
-          if (Math.random() < 0.001) {
+          // Deterministic house generation
+          if (hash(x, z) < 0.001) {
             generateHouse(x, y + yOffset + 1, z, idMap, blocksCount, blocks, matrix);
           }
         }

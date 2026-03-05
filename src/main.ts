@@ -385,7 +385,7 @@ let currentHeldBlock = -1;
     tpHand.visible = thirdPerson;
 
     // Animate Animals
-    mobs.forEach(m => {
+    mobs.forEach((m, idx) => {
         m.timer += 0.01;
         if (m.type === 'parrot') {
             m.mesh.position.y += Math.sin(m.timer) * 0.05;
@@ -403,8 +403,17 @@ let currentHeldBlock = -1;
             const nz = m.mesh.position.z;
             const noise = terrain.noise;
             const groundY = Math.floor(noise.get(nx / noise.gap, nz / noise.gap, noise.seed) * noise.amp) + 30;
-            // Set Y to top of block (groundY + 0.5)
-            m.mesh.position.y = groundY + 0.5 + Math.sin(m.timer) * 0.005;
+            
+            // Jumping in water (1 in 10 animals)
+            const shouldJump = (idx % 10 === 0);
+            let yBase = groundY + 0.5;
+            if (groundY < 30 && shouldJump) {
+                // If in water, jump up and down
+                yBase += Math.abs(Math.sin(m.timer * 3)) * 0.8;
+            } else {
+                yBase += Math.sin(m.timer) * 0.005;
+            }
+            m.mesh.position.y = yBase;
 
             // Sounds
             if (m.type === 'pig' || m.type === 'cow' || m.type === 'chicken') {

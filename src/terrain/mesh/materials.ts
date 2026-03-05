@@ -415,7 +415,9 @@ export default class Materials {
     rawIron: mat(rawIronTex),
     rawGold: mat(rawGoldTex),
     rawCopper: mat(rawCopperTex),
-    torch: mat(glowstoneTex)
+    torch: mat(glowstoneTex),
+    door: mat(woodTex),
+    bed: mat(woodTex, { color: 0xff0000 })
   }
 
   get = (
