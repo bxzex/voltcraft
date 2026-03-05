@@ -4,8 +4,6 @@ import Terrain from '../terrain'
 import Block from '../terrain/mesh/block'
 import Control from '../control'
 import { Mode } from '../player'
-import Joystick from './joystick'
-import { isMobile } from '../utils'
 import * as THREE from 'three'
 
 export default class UI {
@@ -14,7 +12,6 @@ export default class UI {
     this.control = control
     this.fps = new FPS()
     this.bag = new Bag(control)
-    this.joystick = new Joystick(control)
 
     this.crossHair.className = 'cross-hair'
     this.crossHair.innerHTML = '+'
@@ -41,7 +38,7 @@ export default class UI {
       } else {
         this.onPlay()
       }
-      !isMobile && control.control.lock()
+      control.control.lock()
     })
 
     // save load
@@ -94,7 +91,7 @@ export default class UI {
         // ui update
         this.onPlay()
         this.onLoad()
-        !isMobile && control.control.lock()
+        control.control.lock()
       }
     })
 
@@ -193,7 +190,7 @@ export default class UI {
       // If we are in-game (Resume shown), automatically resume after applying
       if (this.play?.innerHTML === 'Resume') {
           this.onPlay();
-          !isMobile && control.control.lock();
+          control.control.lock();
       }
     })
 
@@ -207,7 +204,7 @@ export default class UI {
           // Close inventory
           inv.style.display = 'none';
           inv.classList.add('hidden');
-          !isMobile && control.control.lock();
+          control.control.lock();
           // Prevent ESC from triggering pause menu logic
           e.stopPropagation();
           return;
@@ -216,7 +213,7 @@ export default class UI {
           if (inv) {
             inv.style.display = 'flex';
             inv.classList.remove('hidden');
-            !isMobile && control.control.unlock();
+            control.control.unlock();
           }
         }
       }
@@ -277,13 +274,12 @@ export default class UI {
     // fallback lock handler
     document.querySelector('canvas')?.addEventListener('click', (e: Event) => {
       e.preventDefault()
-      !isMobile && control.control.lock()
+      control.control.lock()
     })
   }
 
   fps: FPS
   bag: Bag
-  joystick: Joystick
 
   menu = document.querySelector('#main-menu-container')
   crossHair = document.createElement('div')
@@ -332,7 +328,6 @@ export default class UI {
   settingBack = document.querySelector('#setting-back')
 
   onPlay = () => {
-    isMobile && this.joystick.init()
     this.menu?.classList.add('hidden')
     this.menu?.classList.remove('start')
     this.joinMenuContent?.classList.add('hidden')

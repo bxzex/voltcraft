@@ -47,8 +47,6 @@ import pig_say2 from '../static/sounds/mob/pig/say2.ogg'
 import pig_say3 from '../static/sounds/mob/pig/say3.ogg'
 import pig_step from '../static/sounds/mob/pig/step1.ogg'
 
-import { isMobile } from '../utils'
-
 export default class Audio {
   bgm: THREE.Audio | null = null
   listener: THREE.AudioListener | null = null
@@ -123,7 +121,7 @@ export default class Audio {
       this.mobSounds[key] = []
       for (const src of mobSources[key]) {
         audioLoader.load(src, buffer => {
-          const audio = new THREE.Audio(this.listener!)
+          const audio = new THREE.Audio(listener!)
           audio.setBuffer(buffer)
           audio.setVolume(this.soundVolume * 0.1)
           this.mobSounds[key].push(audio)

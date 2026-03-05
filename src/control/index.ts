@@ -6,7 +6,7 @@ import Terrain, { BlockType } from '../terrain'
 import Block from '../terrain/mesh/block'
 import Noise from '../terrain/noise'
 import Audio from '../audio'
-import { isMobile } from '../utils'
+
 enum Side {
   front,
   back,
@@ -84,19 +84,15 @@ export default class Control {
   holdingBlocks = [
     BlockType.grass,
     BlockType.stone,
-    BlockType.tree,
     BlockType.wood,
-    BlockType.diamond,
-    BlockType.quartz,
+    BlockType.tree,
+    BlockType.leaf,
     BlockType.glass,
-    BlockType.dirt,
-    BlockType.cobblestone,
-    BlockType.bedrock
+    BlockType.bricks,
+    BlockType.tnt
   ]
-  holdingIndex = 0
-  wheelGap = false
+  hotbarIndex = 0
   clickInterval?: ReturnType<typeof setInterval>
-  jumpInterval?: ReturnType<typeof setInterval>
   mouseHolding = false
   spaceHolding = false
 
@@ -210,6 +206,8 @@ export default class Control {
     }
   }
 
+  jumpInterval?: ReturnType<typeof setInterval>
+
   resetMovementHandler = (e: KeyboardEvent) => {
     if (e.repeat) {
       return
@@ -278,7 +276,6 @@ export default class Control {
 
   mousedownHandler = (e: MouseEvent) => {
     e.preventDefault()
-    // let p1 = performance.now()
     this.raycaster.setFromCamera({ x: 0, y: 0 }, this.camera)
     const block = this.raycaster.intersectObjects(this.terrain.blocks)[0]
     const matrix = new THREE.Matrix4()
@@ -305,22 +302,7 @@ export default class Control {
             block.object.setMatrixAt(
               block.instanceId!,
               new THREE.Matrix4().set(
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
               )
             )
 
@@ -355,21 +337,21 @@ export default class Control {
             // update
             block.object.instanceMatrix.needsUpdate = true
 
-            // check existence
-            let existed = false
+            // check existence and update
+            let found = false
             for (const customBlock of this.terrain.customBlocks) {
               if (
                 customBlock.x === position.x &&
                 customBlock.y === position.y &&
                 customBlock.z === position.z
               ) {
-                existed = true
+                found = true
                 customBlock.placed = false
+                break
               }
             }
 
-            // add to custom blocks when it's not existed
-            if (!existed) {
+            if (!found) {
               this.terrain.customBlocks.push(
                 new Block(
                   position.x,
@@ -381,7 +363,6 @@ export default class Control {
               )
             }
 
-            // generate adjacent blocks
             this.terrain.generateAdjacentBlocks(position)
 
             if ((window as any).multiplayer) {
@@ -401,23 +382,22 @@ export default class Control {
             block.object.getMatrixAt(block.instanceId!, matrix)
             const position = new THREE.Vector3().setFromMatrixPosition(matrix)
 
+            const newX = normal.x + position.x
+            const newY = normal.y + position.y
+            const newZ = normal.z + position.z
+
             // return when block overlaps with player
             if (
-              position.x + normal.x === Math.round(this.camera.position.x) &&
-              position.z + normal.z === Math.round(this.camera.position.z) &&
-              (position.y + normal.y === Math.round(this.camera.position.y) ||
-                position.y + normal.y ===
-                Math.round(this.camera.position.y - 1))
+              newX === Math.round(this.camera.position.x) &&
+              newZ === Math.round(this.camera.position.z) &&
+              (newY === Math.round(this.camera.position.y) ||
+                newY === Math.round(this.camera.position.y - 1))
             ) {
               return
             }
 
             // put the block
-            matrix.setPosition(
-              normal.x + position.x,
-              normal.y + position.y,
-              normal.z + position.z
-            )
+            matrix.setPosition(newX, newY, newZ)
             this.terrain.blocks[this.holdingBlock].setMatrixAt(
               this.terrain.getCount(this.holdingBlock),
               matrix
@@ -431,16 +411,22 @@ export default class Control {
             this.terrain.blocks[this.holdingBlock].instanceMatrix.needsUpdate =
               true
 
-            // add to custom blocks
-            this.terrain.customBlocks.push(
-              new Block(
-                normal.x + position.x,
-                normal.y + position.y,
-                normal.z + position.z,
-                this.holdingBlock,
-                true
+            // check existence and update
+            let found = false
+            for (const b of this.terrain.customBlocks) {
+              if (b.x === newX && b.y === newY && b.z === newZ) {
+                b.placed = true
+                b.type = this.holdingBlock
+                found = true
+                break
+              }
+            }
+
+            if (!found) {
+              this.terrain.customBlocks.push(
+                new Block(newX, newY, newZ, this.holdingBlock, true)
               )
-            )
+            }
 
             if ((window as any).multiplayer) {
               (window as any).multiplayer.syncBlocks()
@@ -452,70 +438,33 @@ export default class Control {
         break
     }
 
-    if (!isMobile && !this.mouseHolding) {
+    if (!this.mouseHolding) {
       this.mouseHolding = true
       this.clickInterval = setInterval(() => {
         this.mousedownHandler(e)
       }, 333)
     }
-
-    // console.log(performance.now() - p1)
   }
   mouseupHandler = () => {
     this.clickInterval && clearInterval(this.clickInterval)
     this.mouseHolding = false
   }
 
-  changeHoldingBlockHandler = (e: KeyboardEvent) => {
-    if (isNaN(parseInt(e.key)) || e.key === '0') {
-      return
-    }
-    this.holdingIndex = parseInt(e.key) - 1
-
-    this.holdingBlock = this.holdingBlocks[this.holdingIndex] ?? BlockType.grass
-  }
-
-  wheelHandler = (e: WheelEvent) => {
-    if (!this.wheelGap) {
-      this.wheelGap = true
-      setTimeout(() => {
-        this.wheelGap = false
-      }, 100)
-      if (e.deltaY > 0) {
-        this.holdingIndex++
-        this.holdingIndex > 9 && (this.holdingIndex = 0)
-      } else if (e.deltaY < 0) {
-        this.holdingIndex--
-        this.holdingIndex < 0 && (this.holdingIndex = 9)
-      }
-      this.holdingBlock =
-        this.holdingBlocks[this.holdingIndex] ?? BlockType.grass
-    }
-  }
-
   initEventListeners = () => {
     // add / remove handler when pointer lock / unlock
     document.addEventListener('pointerlockchange', () => {
       if (document.pointerLockElement) {
-        document.body.addEventListener(
-          'keydown',
-          this.changeHoldingBlockHandler
-        )
-        document.body.addEventListener('wheel', this.wheelHandler)
         document.body.addEventListener('keydown', this.setMovementHandler)
         document.body.addEventListener('keyup', this.resetMovementHandler)
         document.body.addEventListener('mousedown', this.mousedownHandler)
         document.body.addEventListener('mouseup', this.mouseupHandler)
       } else {
-        document.body.removeEventListener(
-          'keydown',
-          this.changeHoldingBlockHandler
-        )
-        document.body.removeEventListener('wheel', this.wheelHandler)
         document.body.removeEventListener('keydown', this.setMovementHandler)
         document.body.removeEventListener('keyup', this.resetMovementHandler)
         document.body.removeEventListener('mousedown', this.mousedownHandler)
         document.body.removeEventListener('mouseup', this.mouseupHandler)
+        this.clickInterval && clearInterval(this.clickInterval)
+        this.mouseHolding = false
         this.velocity = new THREE.Vector3(0, 0, 0)
       }
     })

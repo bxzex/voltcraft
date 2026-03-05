@@ -5,9 +5,6 @@ body {
   margin: 0;
   overflow: hidden;
 }
-* {
-  touch-action: none;
-}
 
 @font-face {
   font-family: Minecraft;
@@ -44,19 +41,6 @@ body {
   text-align: center;
   user-select: none;
   background-color: hsla(0, 0%, 11%, 0.7);
-}
-
-@media (max-width: 768px) {
-  .menu {
-    width: 100vw;
-    height: 100vh;
-    padding: 20px;
-  }
-  
-  .menu-footer {
-    max-width: 90vw !important;
-    font-size: 0.7rem !important;
-  }
 }
 
 .button {
@@ -402,71 +386,6 @@ body {
   box-shadow: 0 0 0 2px black;
 
   cursor: pointer;
-}
-
-@media (max-width: 768px) {
-  .menu.start {
-    background-size: cover;
-    background-position: center;
-  }
-
-  .voltcraft-logo h1 {
-    font-size: 3.5rem ! from 5rem;
-  }
-
-  .settings, .features {
-    width: 85vw;
-    padding: 15px 20px;
-  }
-
-  .button {
-    width: 260px;
-    font-size: 1rem;
-  }
-
-  #mp-buttons {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  #mp-buttons .button {
-    width: 260px !important;
-  }
-
-  #inventory-grid {
-    grid-template-columns: repeat(4, 50px) !important;
-    gap: 8px !important;
-    padding: 10px !important;
-  }
-
-  .cube-container {
-    width: 40px;
-    height: 40px;
-  }
-
-  .cube {
-    width: 24px;
-    height: 24px;
-  }
-
-  .face {
-    width: 24px;
-    height: 24px;
-  }
-
-  .face.front { transform: rotateY(0deg) translateZ(12px); }
-  .face.back { transform: rotateY(180deg) translateZ(12px); }
-  .face.left { transform: rotateY(-90deg) translateZ(12px); }
-  .face.right { transform: rotateY(90deg) translateZ(12px); }
-  .face.top { transform: rotateX(90deg) translateZ(12px); }
-  .face.bottom { transform: rotateX(-90deg) translateZ(12px); }
-
-  .bag {
-    bottom: 20px !important;
-    top: auto !important;
-    transform: translate(-50%, 0) !important;
-    z-index: 150 !important;
-  }
 }
 
 * {

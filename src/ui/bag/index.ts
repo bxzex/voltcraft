@@ -74,7 +74,6 @@ import diamond_sword from '../../static/textures/item/diamond_sword.png'
 
 import { BlockType } from '../../terrain'
 import Control from '../../control'
-import { isMobile } from '../../utils'
 
 const allBlocks = [
   { type: BlockType.grass, src: grass },
@@ -231,6 +230,7 @@ export default class Bag {
 
         item.onclick = () => {
           control.audio.playSound(BlockType.stone); // Play click sound
+          control.holdingBlocks[control.hotbarIndex] = block.type
           control.holdingBlock = block.type
           
           // Clear current icon and add new one
@@ -243,14 +243,55 @@ export default class Bag {
           if (inv) {
             inv.style.display = 'none'
             inv.classList.add('hidden')
-            !isMobile && control.control.lock()
+            control.control.lock()
           }
         }
         inventoryGrid.appendChild(item)
       })
     }
+
+    document.body.addEventListener('keydown', (e: KeyboardEvent) => {
+      const key = parseInt(e.key)
+      if (isNaN(key) || key === 0 || key > 8) {
+        return
+      }
+
+      for (let i = 0; i < this.items.length; i++) {
+        this.items[i].classList.remove('selected')
+      }
+
+      control.hotbarIndex = key - 1
+      this.items[control.hotbarIndex].classList.add('selected')
+      control.holdingBlock = control.holdingBlocks[control.hotbarIndex];
+    })
+
+    document.body.addEventListener('wheel', (e: WheelEvent) => {
+      if (!this.wheelGap) {
+        this.wheelGap = true
+        setTimeout(() => {
+          this.wheelGap = false
+        }, 100)
+        
+        let newIndex = control.hotbarIndex
+        if (e.deltaY > 0) {
+          newIndex++
+          if (newIndex > 7) newIndex = 0
+        } else if (e.deltaY < 0) {
+          newIndex--
+          if (newIndex < 0) newIndex = 7
+        }
+        
+        for (let i = 0; i < this.items.length; i++) {
+          this.items[i].classList.remove('selected')
+        }
+        control.hotbarIndex = newIndex
+        this.items[control.hotbarIndex].classList.add('selected')
+        control.holdingBlock = control.holdingBlocks[control.hotbarIndex];
+      }
+    })
   }
 
+  wheelGap = false
   bag = document.createElement('div')
   items = Array.from({ length: 8 }).map((_, i) => {
     const item = document.createElement('div')
