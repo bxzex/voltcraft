@@ -252,6 +252,7 @@ export default class UI {
   settings = document.querySelector('.settings')
   features = document.querySelector('.features')
   github = document.querySelector('.github')
+  donate = document.querySelector('.donate-btn')
 
   // settings
   distance = document.querySelector('#distance')
@@ -272,6 +273,7 @@ export default class UI {
     this.play && (this.play.innerHTML = 'Resume')
     this.crossHair.classList.remove('hidden')
     this.github && this.github.classList.add('hidden')
+    this.donate && this.donate.classList.add('hidden')
     this.feature?.classList.add('hidden')
   }
 
@@ -281,6 +283,7 @@ export default class UI {
     this.crossHair.classList.add('hidden')
     this.save && (this.save.innerHTML = 'Save and Exit')
     this.github && this.github.classList.remove('hidden')
+    this.donate && this.donate.classList.remove('hidden')
     this.mpButtons?.classList.add('hidden')
   }
 
