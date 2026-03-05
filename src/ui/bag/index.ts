@@ -203,8 +203,6 @@ const createBlockIcon = (type: BlockType, src: string) => {
 
 export default class Bag {
   constructor(control: Control) {
-    if (isMobile) return
-
     this.bag.className = 'bag'
     this.items[0].classList.add('selected')
 

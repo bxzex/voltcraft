@@ -4,7 +4,6 @@
         <div class="dbtn" id="action-left"></div>
         <div class="dbtn" id="action-right"></div>
         <div class="dbtn" id="action-back"></div>
-        <div id="dpad-center"></div>
     </div>
 
     <div id="top-btns">
@@ -17,9 +16,9 @@
     </div>
 
     <div id="action-btns">
+        <div class="abtn" id="action-jump"></div>
         <div class="abtn" id="action-break">BREAK</div>
         <div class="abtn" id="action-place">PLACE</div>
-        <div class="abtn" id="action-jump">JUMP</div>
     </div>
 </div>
 
@@ -55,11 +54,10 @@
 
     #dpad {
         position: absolute;
-        bottom: 50px;
-        left: 50px;
+        bottom: 40px;
+        left: 40px;
         width: 180px;
         height: 180px;
-        pointer-events: auto;
         display: grid;
         grid-template-columns: repeat(3, 60px);
         grid-template-rows: repeat(3, 60px);
@@ -68,76 +66,34 @@
     .dbtn {
         width: 60px;
         height: 60px;
-        background: url('/textures/block/stone.png');
-        background-size: cover;
+        background-size: 100% 100%;
         image-rendering: pixelated;
-        position: relative;
-        opacity: 0.8;
-    }
-
-    /* Classic Stone D-Pad borders */
-    .dbtn {
-        border: 4px solid #000;
+        background-repeat: no-repeat;
     }
 
     #action-front { 
         grid-column: 2; grid-row: 1; 
-        border-bottom: none;
-        border-top-color: #fff;
-        border-left-color: #fff;
-        border-right-color: #555;
+        background-image: url('/textures/ui/up.png');
     }
+    #action-front:active { background-image: url('/textures/ui/up_pressed.png'); }
+
     #action-left { 
         grid-column: 1; grid-row: 2; 
-        border-right: none;
-        border-top-color: #fff;
-        border-left-color: #fff;
-        border-bottom-color: #555;
+        background-image: url('/textures/ui/left.png');
     }
-    #dpad-center { 
-        grid-column: 2; grid-row: 2; 
-        background: url('/textures/block/stone.png');
-        background-size: cover;
-        image-rendering: pixelated;
-        border: 4px solid #000;
-        opacity: 0.8;
-    }
+    #action-left:active { background-image: url('/textures/ui/left_pressed.png'); }
+
     #action-right { 
         grid-column: 3; grid-row: 2; 
-        border-left: none;
-        border-top-color: #fff;
-        border-right-color: #555;
-        border-bottom-color: #555;
+        background-image: url('/textures/ui/right.png');
     }
+    #action-right:active { background-image: url('/textures/ui/right_pressed.png'); }
+
     #action-back { 
         grid-column: 2; grid-row: 3; 
-        border-top: none;
-        border-left-color: #fff;
-        border-right-color: #555;
-        border-bottom-color: #555;
+        background-image: url('/textures/ui/down.png');
     }
-
-    .dbtn:active, #dpad-center:active {
-        filter: brightness(0.7);
-    }
-
-    /* Directional arrows for the stone pads */
-    .dbtn::after {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 0;
-        height: 0;
-        border-style: solid;
-        opacity: 0.5;
-    }
-
-    #action-front::after { border-width: 0 10px 15px 10px; border-color: transparent transparent #fff transparent; }
-    #action-back::after { border-width: 15px 10px 0 10px; border-color: #fff transparent transparent transparent; }
-    #action-left::after { border-width: 10px 15px 10px 0; border-color: transparent #fff transparent transparent; }
-    #action-right::after { border-width: 10px 0 10px 15px; border-color: transparent transparent transparent #fff; }
+    #action-back:active { background-image: url('/textures/ui/down_pressed.png'); }
 
     #top-btns {
         position: absolute;
@@ -146,7 +102,6 @@
         transform: translateX(-50%);
         display: flex;
         gap: 20px;
-        pointer-events: auto;
     }
 
     .top-btn {
@@ -166,9 +121,8 @@
 
     #action-btns {
         position: absolute;
-        bottom: 50px;
-        right: 50px;
-        pointer-events: auto;
+        bottom: 40px;
+        right: 40px;
         display: flex;
         flex-direction: column;
         gap: 15px;
@@ -177,7 +131,7 @@
 
     .abtn {
         min-width: 90px;
-        padding: 15px 25px;
+        padding: 12px 20px;
         background: url('/textures/block/stone.png');
         background-size: cover;
         image-rendering: pixelated;
@@ -187,12 +141,11 @@
         border-bottom-color: #555;
         border-right-color: #555;
         color: white;
-        font-size: 16px;
-        text-shadow: 2px 2px 0px #000;
+        font-size: 14px;
+        text-shadow: 1px 1px 2px black;
         display: flex;
         justify-content: center;
         align-items: center;
-        opacity: 0.9;
     }
 
     .abtn:active {
@@ -201,12 +154,18 @@
     }
 
     #action-jump {
-        width: 110px;
-        height: 110px;
-        border-radius: 50%;
-        margin-top: 10px;
-        font-weight: bold;
-        font-size: 18px;
+        width: 80px;
+        height: 80px;
+        background-image: url('/textures/ui/jump.png');
+        background-size: 100% 100%;
+        border: none;
+        border-radius: 0;
+        padding: 0;
+    }
+    #action-jump:active {
+        background-image: url('/textures/ui/jump_pressed.png');
+        transform: none;
+        filter: none;
     }
 
     @media (max-height: 500px) {
