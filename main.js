@@ -560,6 +560,18 @@ function getSkinMat(tex, u, v, w, h, tW=64, tH=64) {
     return new THREE.MeshLambertMaterial({ map: t, transparent: true, alphaTest: 0.5 });
 }
 
+// Maps standard Minecraft layout to a 6-face material array: [Right, Left, Top, Bottom, Front, Back]
+function getBoxMats(tex, u, v, w, h, d, tW=64, tH=64) {
+    return [
+        getSkinMat(tex, u + d + w, v + d, d, h, tW, tH),     // Right
+        getSkinMat(tex, u, v + d, d, h, tW, tH),             // Left
+        getSkinMat(tex, u + d, v, w, d, tW, tH),             // Top
+        getSkinMat(tex, u + d + w, v, w, d, tW, tH),         // Bottom
+        getSkinMat(tex, u + d, v + d, w, h, tW, tH),         // Front
+        getSkinMat(tex, u + d + w + d, v + d, w, h, tW, tH)  // Back
+    ];
+}
+
 function createMobModel(type) {
     const g = new THREE.Group();
     const isQuad = (type === 'pig' || type === 'cow');
@@ -567,25 +579,27 @@ function createMobModel(type) {
     
     let mBody, mHead, mLeg, mArm;
     if (type === 'player') {
-        mHead = getSkinMat(tex, 8, 8, 8, 8);
-        mBody = getSkinMat(tex, 20, 20, 8, 12);
-        mArm = getSkinMat(tex, 44, 20, 4, 12);
-        mLeg = getSkinMat(tex, 4, 20, 4, 12);
+        mHead = getBoxMats(tex, 0, 0, 8, 8, 8);
+        mBody = getBoxMats(tex, 16, 16, 8, 12, 4);
+        mArm = getBoxMats(tex, 40, 16, 4, 12, 4);
+        mLeg = getBoxMats(tex, 0, 16, 4, 12, 4);
     } else if (type === 'pig') {
-        mHead = getSkinMat(tex, 8, 8, 8, 8, 64, 32);
-        mBody = getSkinMat(tex, 28, 16, 16, 8, 64, 32);
-        mLeg = getSkinMat(tex, 0, 16, 4, 4, 64, 32);
+        mHead = getBoxMats(tex, 0, 0, 8, 8, 8, 64, 32);
+        mBody = getBoxMats(tex, 28, 8, 10, 16, 8, 64, 32); 
+        mLeg = getBoxMats(tex, 0, 16, 4, 4, 4, 64, 32);
     } else if (type === 'cow') {
-        mHead = getSkinMat(tex, 0, 0, 8, 8, 64, 32);
-        mBody = getSkinMat(tex, 18, 14, 18, 10, 64, 32);
-        mLeg = getSkinMat(tex, 0, 16, 4, 4, 64, 32);
+        mHead = getBoxMats(tex, 0, 0, 8, 8, 6, 64, 32);
+        mBody = getBoxMats(tex, 18, 4, 12, 18, 10, 64, 32);
+        mLeg = getBoxMats(tex, 0, 16, 4, 12, 4, 64, 32);
     } else if (type === 'villager') {
-        mHead = getSkinMat(tex, 0, 0, 8, 10);
-        mBody = getSkinMat(tex, 18, 20, 12, 18);
-        mLeg = getSkinMat(tex, 0, 22, 4, 12);
+        mHead = getBoxMats(tex, 0, 0, 8, 10, 8);
+        mBody = getBoxMats(tex, 16, 20, 8, 12, 6);
+        mLeg = getBoxMats(tex, 0, 22, 4, 12, 4);
+        mArm = getBoxMats(tex, 44, 22, 4, 8, 4); 
     }
 
     if (isQuad) {
+        // Body is usually horizontal for animals
         const body = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.6, 1.2), mBody); body.position.y = 0.6; g.add(body);
         const head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), mHead); head.position.set(0, 0.9, 0.7); g.add(head);
         const legs = [];
