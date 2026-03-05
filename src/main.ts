@@ -163,10 +163,16 @@ function spawnMob(type: string, x: number, y: number, z: number) {
     mobs.push({ mesh: group, type, timer: Math.random() * 100 });
 }
 for (let i = 0; i < 30; i++) {
-    const x = (Math.random() - 0.5) * 200 + 8;
-    const z = (Math.random() - 0.5) * 200 + 8;
+    let x, z, groundY;
     const noise = terrain.noise;
-    const groundY = Math.floor(noise.get(x / noise.gap, z / noise.gap, noise.seed) * noise.amp) + 30;
+    let attempts = 0;
+    do {
+        x = (Math.random() - 0.5) * 200 + 8;
+        z = (Math.random() - 0.5) * 200 + 8;
+        groundY = Math.floor(noise.get(x / noise.gap, z / noise.gap, noise.seed) * noise.amp) + 30;
+        attempts++;
+    } while (groundY < 30 && attempts < 100);
+
     const rand = Math.random();
     let type = 'pig';
     if (rand < 0.2) type = 'pig';
@@ -470,6 +476,9 @@ let currentHeldBlock = -1;
             wings.forEach(w => w.rotation.z = Math.sin(m.timer * 10) * 0.5);
         } else {
             // Horizontal movement
+            const oldX = m.mesh.position.x;
+            const oldZ = m.mesh.position.z;
+
             m.mesh.rotation.y += Math.cos(m.timer * 0.5) * 0.005;
             m.mesh.position.x += Math.cos(m.timer * 0.5) * 0.01;
             m.mesh.position.z += Math.sin(m.timer * 0.5) * 0.01;
@@ -480,15 +489,17 @@ let currentHeldBlock = -1;
             const noise = terrain.noise;
             const groundY = Math.floor(noise.get(nx / noise.gap, nz / noise.gap, noise.seed) * noise.amp) + 30;
             
-            // Jumping in water (1 in 10 animals)
-            const shouldJump = (idx % 10 === 0);
-            let yBase = groundY + 0.5;
-            if (groundY < 30 && shouldJump) {
-                // If in water, jump up and down
-                yBase += Math.abs(Math.sin(m.timer * 3)) * 0.8;
-            } else {
-                yBase += Math.sin(m.timer) * 0.005;
+            // Prevent entering water
+            if (groundY < 30) {
+                m.mesh.position.x = oldX;
+                m.mesh.position.z = oldZ;
+                m.timer += Math.PI; // Change direction
+                return;
             }
+
+            // Jumping in water? No, animals stay on land now.
+            let yBase = groundY + 0.5;
+            yBase += Math.sin(m.timer) * 0.005;
             m.mesh.position.y = yBase;
 
             // Sounds

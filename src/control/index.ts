@@ -440,9 +440,24 @@ export default class Control {
 
     if (!this.mouseHolding) {
       this.mouseHolding = true
+      
+      // Calculate mining speed based on tool and block type
+      let interval = 333; // Default speed
+      if (block && block.object instanceof THREE.InstancedMesh) {
+        const targetedType = BlockType[block.object.name as any] as unknown as BlockType;
+        
+        const isStone = [BlockType.stone, BlockType.cobblestone, BlockType.coal, BlockType.iron, BlockType.diamond, BlockType.emeraldBlock, BlockType.goldBlock, BlockType.ironBlock, BlockType.lapisBlock, BlockType.quartz, BlockType.amethyst, BlockType.andesite, BlockType.diorite, BlockType.granite, BlockType.deepslate].includes(targetedType);
+        const isDirt = [BlockType.dirt, BlockType.grass, BlockType.sand, BlockType.gravel, BlockType.clay, BlockType.snow, BlockType.soulSand, BlockType.soulSoil].includes(targetedType);
+        const isLeaf = targetedType === BlockType.leaf;
+
+        if (this.holdingBlock === 100 && isStone) interval = 100; // Pickaxe fast for stone
+        else if (this.holdingBlock === 101 && isDirt) interval = 100; // Shovel fast for dirt/sand
+        else if (this.holdingBlock === 102 && isLeaf) interval = 50; // Sword very fast for leaves
+      }
+
       this.clickInterval = setInterval(() => {
         this.mousedownHandler(e)
-      }, 333)
+      }, interval)
     }
   }
   mouseupHandler = () => {
