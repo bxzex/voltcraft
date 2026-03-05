@@ -46,6 +46,11 @@ npm run build
 - **F:** Full screen
 - **E / ESC:** Open pause menu
 
+## Credits
+
+- **Original Developer:** [bxzex](https://github.com/bxzex)
+- **Built With:** Three.js, TypeScript, PeerJS
+
 ## Disclaimer
 
 This is an independent project and is not affiliated with Mojang or Microsoft.
