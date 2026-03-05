@@ -7,11 +7,13 @@ Voltcraft is an open-source, web-based voxel game crafted with Three.js and Type
 ## Features
 
 - **Procedural Voxel Terrain:** Infinitely generated worlds with caves, trees, and resources!
-- **Multiplayer Support:** Built-in WebRTC using PeerJS lets you connect instantly via a shared World ID.
-- **Weather System:** Clear, rain, and thunderstorms that synchronize across the entire server.
+- **Weather & Time System:** Toggle between Day/Night and Weather (Clear, Rain, Thunder) with a dynamic sun, moon, and 2,000-star field.
+- **Enhanced Visuals:** Larger, functional tools and corrected character skins.
+- **Distant Water Rendering:** Improved water visibility for a more expansive horizon.
 - **Entity System:** Enjoy procedurally generated pigs, cows, and other interactive entities.
-- **Minecraft Interface:** Immersive HUD, hotbar, and pause menu built with a retro aesthetic.
+- **Minecraft Interface:** Immersive HUD, hotbar, and inventory menu built with a retro aesthetic.
 - **Chat System:** Synchronized server chat overlay.
+- **Multiplayer Support:** Built-in WebRTC using PeerJS lets you connect instantly via a shared World ID.
 
 ## Installation
 
