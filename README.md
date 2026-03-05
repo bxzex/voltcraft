@@ -1,30 +1,49 @@
-# minecraft-threejs
+# Voltcraft
 
-English ｜ [中文](https://github.com/vyse12138/minecraft-threejs/blob/main/README_ZH.md)
+![Voltcraft Logo](src/static/bg.png)
 
-Minecraft clone made with Three.js and TypeScript
+Voltcraft is an open-source, web-based voxel game crafted with Three.js and TypeScript, designed by **bxzex**. 
 
-Check it out: [Minecraft - Three.js](https://mc.yulei.me/)
+## Features
 
-Recommend to use Chrome to get the best experience
+- **Procedural Voxel Terrain:** Infinitely generated worlds with caves, trees, and resources!
+- **Multiplayer Support:** Built-in WebRTC using PeerJS lets you connect instantly via a shared World ID.
+- **Weather System:** Clear, rain, and thunderstorms that synchronize across the entire server.
+- **Entity System:** Enjoy procedurally generated pigs, cows, and other interactive entities.
+- **Minecraft Interface:** Immersive HUD, hotbar, and pause menu built with a retro aesthetic.
+- **Chat System:** Synchronized server chat overlay.
 
-![preview](https://user-images.githubusercontent.com/88306344/154383952-9b33bad4-eebb-4a98-a12e-f5f137422d06.gif)
+## Installation
 
-## Features:
+```bash
+# Clone the repository
+git clone https://github.com/bxzex/voltcraft.git
 
-- Destroy block and place block
-- Mouse wheel (or number key) to select different block types
-- Movement and collision detection
-- Random terrain / blocks / tree generations
-- Infinite world
-- Game save / load
-- Sound effect and BGM
-- Highlight the block at crosshair
-- Basic UI and settings
-- Mobile friendly
+# Enter the directory
+cd voltcraft
 
-## Working on:
+# Install dependencies
+npm install
 
-- Multiplayer
-- Generates water
-- Higher performance algorithm
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+```
+
+## Controls
+
+- **Left-Click:** Destroy block
+- **Right-Click:** Place block
+- **Wheel / Number Key:** Change block in hotbar
+- **WASD:** Move
+- **Space:** Jump / Fly up
+- **Q:** Toggle normal / dev mode
+- **Shift:** Sneaking / Fly down
+- **F:** Full screen
+- **E / ESC:** Open pause menu
+
+## License
+
+MIT License. Copyright (c) 2026 bxzex.

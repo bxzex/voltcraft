@@ -78,14 +78,14 @@ export default class Multiplayer {
           chatInput.value = '';
           chatInputWrapper.style.display = 'none';
           chatInput.blur();
-          if (this.control.mode !== 'menu') {
+          if (!document.querySelector('.menu')?.classList.contains('start')) {
             document.body.requestPointerLock();
           }
         }
         if (e.code === 'Escape') {
           chatInputWrapper.style.display = 'none';
           chatInput.blur();
-          if (this.control.mode !== 'menu') {
+          if (!document.querySelector('.menu')?.classList.contains('start')) {
             document.body.requestPointerLock();
           }
         }
@@ -94,7 +94,7 @@ export default class Multiplayer {
       }
       
       if (e.code === 'KeyT' || e.code === 'Enter') {
-        if (this.control.mode !== 'menu') {
+        if (!document.querySelector('.menu')?.classList.contains('start')) {
           document.exitPointerLock();
           if (chatInputWrapper) chatInputWrapper.style.display = 'block';
           if (chatInput) chatInput.focus();
@@ -202,11 +202,11 @@ export default class Multiplayer {
   }
 
   update() {
-    if (Object.keys(this.connections).length > 0 && this.control.mode === 'playing') {
+    if (Object.keys(this.connections).length > 0 && this.control.control.isLocked) {
       this.broadcast({
         type: 'player_move',
-        pos: { x: this.player.position.x, y: this.player.position.y, z: this.player.position.z },
-        rot: { y: this.player.camera.rotation.y }
+        pos: { x: this.control.camera.position.x, y: this.control.camera.position.y, z: this.control.camera.position.z },
+        rot: { y: this.control.camera.rotation.y }
       });
     }
   }

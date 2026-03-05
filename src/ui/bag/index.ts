@@ -7,6 +7,11 @@ import quartz from '../../static/block-icon/quartz.png'
 import glass from '../../static/block-icon/glass.png'
 import { isMobile } from '../../utils'
 
+const ASSET_URL = 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.19.2/assets/minecraft/textures/block/';
+const dirt = ASSET_URL + 'dirt.png';
+const cobblestone = ASSET_URL + 'cobblestone.png';
+const bedrock = ASSET_URL + 'bedrock.png';
+
 export default class Bag {
   constructor() {
     if (isMobile) return
@@ -54,7 +59,7 @@ export default class Bag {
   }
   wheelGap = false
   current = 0
-  icon = [grass, stone, tree, wood, diamond, quartz, glass]
+  icon = [grass, stone, tree, wood, diamond, quartz, glass, dirt, cobblestone, bedrock]
   iconIndex = 0
   y = 0
 
@@ -68,6 +73,7 @@ export default class Bag {
     if (this.icon[this.iconIndex]) {
       img.className = 'icon'
       img.alt = 'block'
+      img.crossOrigin = 'anonymous'
       img.src = this.icon[this.iconIndex++]
       item.appendChild(img)
     }

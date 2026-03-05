@@ -1,6 +1,5 @@
 import * as THREE from 'three'
 import Control from '../../control'
-import { Mode } from '../../player'
 import { htmlToDom } from '../../utils'
 import UI from './joystick.html?raw'
 

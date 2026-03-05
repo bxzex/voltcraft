@@ -1,9 +1,9 @@
 {
-  "name": "minecraft-threejs",
-  "version": "0.0.0",
+  "name": "voltcraft",
+  "version": "1.0.0",
   "license": "MIT",
-  "author": "Yulei Zhu",
-  "description": "Minecraft clone made with Three.js and TypeScript",
+  "author": "bxzex",
+  "description": "Voltcraft - an open source voxel game built with Three.js and TypeScript",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

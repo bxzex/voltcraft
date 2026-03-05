@@ -241,6 +241,7 @@ export default class UI {
 
   onPause = () => {
     this.menu?.classList.remove('hidden')
+    this.menu?.classList.add('start')
     this.crossHair.classList.add('hidden')
     this.save && (this.save.innerHTML = 'Save and Exit')
     this.github && this.github.classList.remove('hidden')
