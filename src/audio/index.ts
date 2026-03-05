@@ -60,8 +60,6 @@ export default class Audio {
   soundVolume = 1
 
   constructor(camera: THREE.PerspectiveCamera) {
-    if (isMobile) return
-
     this.listener = new THREE.AudioListener()
     const audioLoader = new THREE.AudioLoader()
     camera.add(this.listener)
@@ -122,6 +120,12 @@ export default class Audio {
           this.mobSounds[key].push(audio)
         })
       }
+    }
+  }
+
+  unlock() {
+    if (this.listener?.context.state === 'suspended') {
+      this.listener.context.resume()
     }
   }
 
@@ -230,30 +234,37 @@ export default class Audio {
   index = 0
 
   playSound(type: BlockType) {
-    if (!this.disabled && !isMobile) {
+    if (!this.disabled) {
       this.index++ === 3 && (this.index = 0)
-      this.soundSet[type]?.[this.index]?.play()
+      const audio = this.soundSet[type]?.[this.index]
+      if (audio) {
+        audio.setVolume(this.soundVolume * 0.15)
+        audio.play()
+      }
     }
   }
 
   playMobSound(mob: 'cow' | 'pig', type: 'say' | 'step') {
-    if (this.disabled || isMobile) return
+    if (this.disabled) return
     const key = `${mob}_${type}`
     const sounds = this.mobSounds[key]
     if (sounds && sounds.length > 0) {
       const s = sounds[Math.floor(Math.random() * sounds.length)]
-      if (!s.isPlaying) s.play()
+      if (!s.isPlaying) {
+        s.setVolume(this.soundVolume * 0.1)
+        s.play()
+      }
     }
   }
 
   playSplash() {
-    if (this.disabled || isMobile) return
+    if (this.disabled) return
     const splashIdx = 12 // Water index
     const sounds = this.soundSet[splashIdx]
     if (sounds && sounds.length > 0) {
       const s = sounds[Math.floor(Math.random() * sounds.length)]
       if (!s.isPlaying) {
-        s.setVolume(0.1) // Slightly quieter for continuous movement
+        s.setVolume(this.soundVolume * 0.1) // Slightly quieter for continuous movement
         s.play()
       }
     }

@@ -20,6 +20,7 @@ export default class UI {
 
     // play
     this.play?.addEventListener('click', () => {
+      control.audio.unlock()
       const isStart = this.menu?.classList.contains('start')
       if (isStart && (this.play?.innerHTML === 'Singleplayer' || this.play?.innerHTML === 'Play')) {
         this.onPlay()
