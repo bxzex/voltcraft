@@ -29,12 +29,14 @@ const ASSET_URL = '/';
 const texLoader = new THREE.TextureLoader();
 const mobs: { mesh: THREE.Group, type: string, timer: number }[] = [];
 
-function buildAnimalBox(type: 'pig' | 'cow' | 'chicken', u: number, v: number, w: number, h: number, d: number) {
+function buildMobBox(type: string, u: number, v: number, w: number, h: number, d: number) {
     const getM = (ox: number, oy: number, mw: number, mh: number) => {
         const mat = new THREE.MeshLambertMaterial({ transparent: true, alphaTest: 0.5 });
         const img = new Image();
         let path = ASSET_URL + 'textures/entity/' + type + '/' + type + '.png';
         if (type === 'chicken') path = ASSET_URL + 'textures/entity/chicken.png';
+        if (type === 'creeper') path = ASSET_URL + 'textures/entity/creeper/creeper.png';
+        if (type === 'skeleton') path = ASSET_URL + 'textures/entity/skeleton/skeleton.png';
         
         img.src = path;
         img.crossOrigin = 'anonymous';
@@ -62,48 +64,92 @@ function buildAnimalBox(type: 'pig' | 'cow' | 'chicken', u: number, v: number, w
     ];
 }
 
-function spawnMob(type: 'pig' | 'cow' | 'chicken', x: number, y: number, z: number) {
+function spawnMob(type: string, x: number, y: number, z: number) {
     const group = new THREE.Group();
 
     if (type === 'chicken') {
         // Chicken Body
-        const body = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.4, 0.6), buildAnimalBox('chicken', 0, 9, 6, 6, 8));
+        const body = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.4, 0.6), buildMobBox('chicken', 0, 9, 6, 6, 8));
         body.position.set(0, 0.4, 0); group.add(body);
         // Chicken Head
-        const head = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.3, 0.2), buildAnimalBox('chicken', 0, 0, 4, 6, 3));
+        const head = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.3, 0.2), buildMobBox('chicken', 0, 0, 4, 6, 3));
         head.position.set(0, 0.7, 0.3); group.add(head);
         // Beak (14, 0, 4x2x2)
-        const beakMat = buildAnimalBox('chicken', 14, 0, 4, 2, 2);
+        const beakMat = buildMobBox('chicken', 14, 0, 4, 2, 2);
         const beak = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.1, 0.1), beakMat);
         beak.position.set(0, 0.65, 0.45); group.add(beak);
-    } else {
+        // Legs (40, 0, 3x3x3)
+        const legMat = buildMobBox('chicken', 40, 0, 3, 3, 3);
+        const legGeo = new THREE.BoxGeometry(0.1, 0.3, 0.1);
+        [[-0.1, 0], [0.1, 0]].forEach(p => {
+            const l = new THREE.Mesh(legGeo, legMat);
+            l.position.set(p[0], 0.15, p[1]);
+            group.add(l);
+        });
+    } else if (type === 'creeper') {
+        // Head
+        const head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), buildMobBox('creeper', 0, 0, 8, 8, 8));
+        head.position.set(0, 1.15, 0); group.add(head);
         // Body
-        const bodyMat = buildAnimalBox(type, 28, 8, 10, 16, 8);
+        const body = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.75, 0.25), buildMobBox('creeper', 16, 16, 8, 12, 4));
+        body.position.set(0, 0.525, 0); group.add(body);
+        // Feet
+        const footMat = buildMobBox('creeper', 0, 16, 4, 6, 4);
+        const footGeo = new THREE.BoxGeometry(0.25, 0.375, 0.25);
+        [[0.125, 0.125], [-0.125, 0.125], [0.125, -0.375], [-0.125, -0.375]].forEach(p => {
+            const f = new THREE.Mesh(footGeo, footMat);
+            f.position.set(p[0], 0.1875, p[1]);
+            group.add(f);
+        });
+    } else if (type === 'skeleton') {
+        // Head
+        const head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), buildMobBox('skeleton', 0, 0, 8, 8, 8));
+        head.position.set(0, 1.4, 0); group.add(head);
+        // Body
+        const body = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.75, 0.3), buildMobBox('skeleton', 16, 16, 8, 12, 4));
+        body.position.set(0, 0.775, 0); group.add(body);
+        // Arms
+        const armMat = buildMobBox('skeleton', 40, 16, 4, 12, 4);
+        const armGeo = new THREE.BoxGeometry(0.15, 0.75, 0.15);
+        [[-0.325, 0.775], [0.325, 0.775]].forEach(p => {
+            const a = new THREE.Mesh(armGeo, armMat);
+            a.position.set(p[0], p[1], 0);
+            group.add(a);
+        });
+        // Legs
+        const legMat = buildMobBox('skeleton', 0, 16, 4, 12, 4);
+        const legGeo = new THREE.BoxGeometry(0.15, 0.75, 0.15);
+        [[-0.175, 0.375], [0.175, 0.375]].forEach(p => {
+            const l = new THREE.Mesh(legGeo, legMat);
+            l.position.set(p[0], p[1], 0);
+            group.add(l);
+        });
+    } else {
+        // Body (pig, cow)
+        const bodyMat = buildMobBox(type, 28, 8, 10, 16, 8);
         const bodyGeo = new THREE.BoxGeometry(0.8, 0.6, 1.2);
         const body = new THREE.Mesh(bodyGeo, bodyMat);
-        body.position.set(0, 0.6, 0);
-        group.add(body);
+        body.position.set(0, 0.6, 0); group.add(body);
 
         // Head
-        const headMat = buildAnimalBox(type, 0, 0, 8, 8, 8);
+        const headMat = buildMobBox(type, 0, 0, 8, 8, 8);
         const headGeo = new THREE.BoxGeometry(0.5, 0.5, 0.5);
         const head = new THREE.Mesh(headGeo, headMat);
-        head.position.set(0, 0.9, 0.7);
-        group.add(head);
+        head.position.set(0, 0.9, 0.7); group.add(head);
 
         // Snout
         if (type === 'pig') {
-            const snoutMat = buildAnimalBox('pig', 16, 16, 4, 3, 1);
+            const snoutMat = buildMobBox('pig', 16, 16, 4, 3, 1);
             const snout = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.15, 0.1), snoutMat);
             snout.position.set(0, 0.85, 0.95); group.add(snout);
         } else if (type === 'cow') {
-            const snoutMat = buildAnimalBox('cow', 0, 0, 8, 8, 8); // simplified
+            const snoutMat = buildMobBox('cow', 0, 4, 8, 8, 8);
             const snout = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.2, 0.1), snoutMat);
             snout.position.set(0, 0.8, 0.95); group.add(snout);
         }
 
         // Legs
-        const legMat = buildAnimalBox(type, 0, 16, 4, 12, 4);
+        const legMat = buildMobBox(type, 0, 16, 4, 12, 4);
         const legGeo = new THREE.BoxGeometry(0.25, 0.4, 0.25);
         [[0.25, 0.4], [-0.25, 0.4], [0.25, -0.4], [-0.25, -0.4]].forEach(p => {
             const l = new THREE.Mesh(legGeo, legMat);
@@ -116,13 +162,18 @@ function spawnMob(type: 'pig' | 'cow' | 'chicken', x: number, y: number, z: numb
     scene.add(group);
     mobs.push({ mesh: group, type, timer: Math.random() * 100 });
 }
-for (let i = 0; i < 20; i++) {
-    const x = (Math.random() - 0.5) * 120 + 8;
-    const z = (Math.random() - 0.5) * 120 + 8;
+for (let i = 0; i < 30; i++) {
+    const x = (Math.random() - 0.5) * 200 + 8;
+    const z = (Math.random() - 0.5) * 200 + 8;
     const noise = terrain.noise;
     const groundY = Math.floor(noise.get(x / noise.gap, z / noise.gap, noise.seed) * noise.amp) + 30;
     const rand = Math.random();
-    const type = rand < 0.33 ? 'pig' : (rand < 0.66 ? 'cow' : 'chicken');
+    let type = 'pig';
+    if (rand < 0.2) type = 'pig';
+    else if (rand < 0.4) type = 'cow';
+    else if (rand < 0.6) type = 'chicken';
+    else if (rand < 0.8) type = 'creeper';
+    else type = 'skeleton';
     spawnMob(type, x, groundY + 0.5, z);
 }
 
@@ -207,7 +258,7 @@ function spawnParrot(x: number, y: number, z: number) {
     scene.add(group);
     mobs.push({ mesh: group, type: 'parrot', timer: Math.random() * 100 });
 }
-for (let i = 0; i < 8; i++) spawnParrot((Math.random() - 0.5) * 40 + 8, 35 + Math.random() * 10, (Math.random() - 0.5) * 40 + 8);
+for (let i = 0; i < 4; i++) spawnParrot((Math.random() - 0.5) * 40 + 8, 35 + Math.random() * 10, (Math.random() - 0.5) * 40 + 8);
 
 // Player Skin & 3rd Person
 const playerGroup = new THREE.Group();
@@ -456,13 +507,34 @@ let currentHeldBlock = -1;
                 }
             }
 
-            // Animate Legs (children 2 to 5)
-            if (m.mesh.children.length >= 6) {
-                const sCycle = Math.sin(m.timer * 5) * 0.5;
-                m.mesh.children[2].rotation.x = sCycle; // Front right
-                m.mesh.children[3].rotation.x = -sCycle; // Front left
-                m.mesh.children[4].rotation.x = -sCycle; // Back right
-                m.mesh.children[5].rotation.x = sCycle; // Back left
+            // Animate Legs/Arms
+            const sCycle = Math.sin(m.timer * 5) * 0.5;
+            if (m.type === 'pig' || m.type === 'cow') {
+                if (m.mesh.children.length >= 7) {
+                    m.mesh.children[3].rotation.x = sCycle; // Front right
+                    m.mesh.children[4].rotation.x = -sCycle; // Front left
+                    m.mesh.children[5].rotation.x = -sCycle; // Back right
+                    m.mesh.children[6].rotation.x = sCycle; // Back left
+                }
+            } else if (m.type === 'chicken') {
+                if (m.mesh.children.length >= 5) {
+                    m.mesh.children[3].rotation.x = sCycle;
+                    m.mesh.children[4].rotation.x = -sCycle;
+                }
+            } else if (m.type === 'creeper') {
+                if (m.mesh.children.length >= 6) {
+                    m.mesh.children[2].rotation.x = sCycle;
+                    m.mesh.children[3].rotation.x = -sCycle;
+                    m.mesh.children[4].rotation.x = -sCycle;
+                    m.mesh.children[5].rotation.x = sCycle;
+                }
+            } else if (m.type === 'skeleton') {
+                if (m.mesh.children.length >= 6) {
+                    m.mesh.children[2].rotation.x = -sCycle; // Arm L
+                    m.mesh.children[3].rotation.x = sCycle;  // Arm R
+                    m.mesh.children[4].rotation.x = sCycle;  // Leg L
+                    m.mesh.children[5].rotation.x = -sCycle; // Leg R
+                }
             }
         }
     });

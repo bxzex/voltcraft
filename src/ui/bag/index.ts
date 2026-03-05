@@ -148,8 +148,6 @@ const allBlocks = [
   { type: BlockType.rawGold, src: rawGold },
   { type: BlockType.rawCopper, src: rawCopper },
   { type: BlockType.torch, src: glowstone },
-  { type: BlockType.door, src: wood },
-  { type: BlockType.bed, src: wood },
   { type: BlockType.bedrock, src: bedrock },
   { type: 100, src: diamond_pickaxe },
   { type: 101, src: diamond_shovel },
@@ -234,12 +232,11 @@ export default class Bag {
         item.onclick = () => {
           control.audio.playSound(BlockType.stone); // Play click sound
           control.holdingBlock = block.type
-          const selectedItem = this.items[control.hotbarIndex]
-          selectedItem.innerHTML = ''
-          selectedItem.appendChild(createBlockIcon(block.type, block.src))
-
-          // Update the internal state of the hotbar item if necessary
-          // (The current implementation seems to just use innerHTML)
+          
+          // Clear current icon and add new one
+          const hotbarItem = this.items[control.hotbarIndex]
+          hotbarItem.innerHTML = ''
+          hotbarItem.appendChild(createBlockIcon(block.type, block.src))
 
           // Close inventory after selection
           const inv = document.getElementById('inventory-menu')
