@@ -120,9 +120,9 @@ function spawnMob(type: 'pig' | 'cow' | 'chicken', x: number, y: number, z: numb
     scene.add(group);
     mobs.push({ mesh: group, type, timer: Math.random() * 100 });
 }
-for (let i = 0; i < 15; i++) {
-    const x = (Math.random() - 0.5) * 60 + 8;
-    const z = (Math.random() - 0.5) * 60 + 8;
+for (let i = 0; i < 20; i++) {
+    const x = (Math.random() - 0.5) * 120 + 8;
+    const z = (Math.random() - 0.5) * 120 + 8;
     const noise = terrain.noise;
     const groundY = Math.floor(noise.get(x / noise.gap, z / noise.gap, noise.seed) * noise.amp) + 30;
     const rand = Math.random();

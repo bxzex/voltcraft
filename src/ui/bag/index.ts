@@ -96,6 +96,8 @@ const allBlocks = [
   { type: BlockType.tree, src: tree },
   { type: BlockType.leaf, src: leaf },
   { type: BlockType.glass, src: glass },
+  { type: BlockType.door, src: wood },
+  { type: BlockType.bed, src: wood },
   { type: BlockType.bricks, src: bricks },
   { type: BlockType.stoneBricks, src: stoneBricks },
   { type: BlockType.mossyCobblestone, src: mossyCobblestone },
