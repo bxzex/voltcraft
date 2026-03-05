@@ -144,6 +144,7 @@ const allBlocks = [
   { type: BlockType.rawIron, src: rawIron },
   { type: BlockType.rawGold, src: rawGold },
   { type: BlockType.rawCopper, src: rawCopper },
+  { type: BlockType.torch, src: glowstone },
   { type: BlockType.bedrock, src: bedrock }
 ];
 
