@@ -13,21 +13,28 @@
 </div>
 
 <style>
-  /* Mobile Controls */
+  /* Mobile Controls - Stone D-Pad Style */
   .joystick {
       position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
-      pointer-events: none; z-index: 5;
+      pointer-events: none; z-index: 5; font-family: Minecraft, sans-serif;
   }
   #dpad {
       position: absolute; bottom: 80px; left: 20px; width: 160px; height: 160px;
       pointer-events: auto;
   }
   .dbtn {
-      position: absolute; width: 50px; height: 50px; background: rgba(255,255,255,0.4);
-      border: 2px solid rgba(0,0,0,0.5); border-radius: 8px; display: flex; justify-content: center;
-      align-items: center; font-size: 24px; font-weight: bold; color: #000; cursor: pointer;
+      position: absolute; width: 50px; height: 50px; 
+      background: url('https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.21.11/assets/minecraft/textures/block/stone.png');
+      background-size: cover; image-rendering: pixelated;
+      border-top: 3px solid #fefefe; border-left: 3px solid #fefefe;
+      border-bottom: 3px solid #555; border-right: 3px solid #555;
+      display: flex; justify-content: center; align-items: center; 
+      font-size: 20px; color: #fff; text-shadow: 1px 1px 0px #000; cursor: pointer;
   }
-  .dbtn:active { background: rgba(255,255,255,0.8); }
+  .dbtn:active { 
+      border-top: 3px solid #555; border-left: 3px solid #555;
+      border-bottom: 3px solid #fefefe; border-right: 3px solid #fefefe;
+  }
   #action-front { top: 0; left: 55px; }
   #action-left { top: 55px; left: 0; }
   #action-right { top: 55px; left: 110px; }
@@ -38,10 +45,17 @@
       display: grid; grid-template-columns: 60px 60px; gap: 10px;
   }
   .abtn {
-      width: 60px; height: 60px; background: rgba(255,255,255,0.4);
-      border: 2px solid rgba(0,0,0,0.5); border-radius: 50%; display: flex; justify-content: center;
-      align-items: center; font-size: 16px; font-weight: bold; color: #000; cursor: pointer;
+      width: 60px; height: 60px; 
+      background: url('https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.21.11/assets/minecraft/textures/block/stone.png');
+      background-size: cover; image-rendering: pixelated;
+      border-top: 3px solid #fefefe; border-left: 3px solid #fefefe;
+      border-bottom: 3px solid #555; border-right: 3px solid #555;
+      display: flex; justify-content: center; align-items: center; 
+      font-size: 14px; color: #fff; text-shadow: 1px 1px 0px #000; cursor: pointer;
   }
-  .abtn:active { background: rgba(255,255,255,0.8); }
-  #action-jump { grid-column: span 2; width: 130px; border-radius: 12px; }
+  .abtn:active { 
+      border-top: 3px solid #555; border-left: 3px solid #555;
+      border-bottom: 3px solid #fefefe; border-right: 3px solid #fefefe;
+  }
+  #action-jump { grid-column: span 2; width: 130px; }
 </style>

@@ -14,7 +14,8 @@ enum BlockType {
   diamond = 8,
   quartz = 9,
   glass = 10,
-  bedrock = 11
+  bedrock = 11,
+  water = 12
 }
 
 const matrix = new THREE.Matrix4()
@@ -131,6 +132,16 @@ onmessage = (
             blocksCount[BlockType.sand]++,
             matrix
           )
+          
+          // Generate water above sand up to sea level (-3)
+          for (let wy = yOffset + 1; wy <= -3; wy++) {
+            matrix.setPosition(x, y + wy, z)
+            idMap.set(`${x}_${y + wy}_${z}`, blocksCount[BlockType.water])
+            blocks[BlockType.water].setMatrixAt(
+              blocksCount[BlockType.water]++,
+              matrix
+            )
+          }
         } else {
           // grass
           idMap.set(`${x}_${y + yOffset}_${z}`, blocksCount[BlockType.grass])

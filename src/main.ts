@@ -25,7 +25,7 @@ const multiplayer = new Multiplayer(scene, terrain, player, control)
 ;(window as any).multiplayer = multiplayer;
 
 // Animals
-const ASSET_URL = 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.19.2/assets/minecraft/';
+const ASSET_URL = 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.21.11/assets/minecraft/';
 const texLoader = new THREE.TextureLoader();
 const extTex = (path: string) => {
     const t = texLoader.load(ASSET_URL + 'textures/' + path);

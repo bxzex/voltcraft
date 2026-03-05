@@ -297,9 +297,10 @@ export default class UI {
     this.save && (this.save.innerHTML = 'Save and Exit')
     this.github && this.github.classList.remove('hidden')
     this.donate && this.donate.classList.remove('hidden')
-    this.mpButtons?.classList.add('hidden')
-    this.mpStatus?.classList.add('hidden')
-    document.getElementById('username')?.classList.add('hidden')
+    if (this.mpButtons) (this.mpButtons as HTMLElement).style.display = 'none'
+    if (this.mpStatus) (this.mpStatus as HTMLElement).style.display = 'none'
+    const username = document.getElementById('username');
+    if (username) username.style.display = 'none';
   }
 
   onExit = () => {
@@ -307,9 +308,10 @@ export default class UI {
     this.play && (this.play.innerHTML = 'Singleplayer')
     this.save && (this.save.innerHTML = 'Load Game')
     this.feature?.classList.remove('hidden')
-    this.mpButtons?.classList.remove('hidden')
-    this.mpStatus?.classList.remove('hidden')
-    document.getElementById('username')?.classList.remove('hidden')
+    if (this.mpButtons) (this.mpButtons as HTMLElement).style.display = 'flex'
+    if (this.mpStatus) (this.mpStatus as HTMLElement).style.display = 'block'
+    const username = document.getElementById('username');
+    if (username) username.style.display = 'inline-block';
     this.joinMenuContent?.classList.add('hidden')
     this.mainMenuContent?.classList.remove('hidden')
   }

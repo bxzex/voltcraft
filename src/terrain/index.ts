@@ -18,7 +18,8 @@ export enum BlockType {
   diamond = 8,
   quartz = 9,
   glass = 10,
-  bedrock = 11
+  bedrock = 11,
+  water = 12
 }
 export default class Terrain {
   constructor(scene: THREE.Scene, camera: THREE.PerspectiveCamera) {
@@ -79,13 +80,14 @@ export default class Terrain {
     MaterialType.diamond,
     MaterialType.quartz,
     MaterialType.glass,
-    MaterialType.bedrock
+    MaterialType.bedrock,
+    MaterialType.water
   ]
 
   // other properties
   blocks: THREE.InstancedMesh[] = []
   blocksCount: number[] = []
-  blocksFactor = [1, 0.2, 0.1, 0.7, 0.1, 0.2, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+  blocksFactor = [1, 0.2, 0.1, 0.7, 0.1, 0.2, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.3]
 
   customBlocks: Block[] = []
   highlight: Highlight
