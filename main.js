@@ -772,17 +772,15 @@ function handlePause() {
 function getTarget() {
     const dir = new THREE.Vector3(); camera.getWorldDirection(dir);
     const start = new THREE.Vector3(); camera.getWorldPosition(start);
+    let prevK = null;
     for (let d=0; d<8; d+=0.05) {
         const p = start.clone().addScaledVector(dir, d);
         const k = getBlockKey(p.x, p.y, p.z);
         if (world.has(k) && world.get(k).type !== 'water') {
-            const bPos = new THREE.Vector3(Math.round(p.x), Math.round(p.y), Math.round(p.z));
-            const diff = p.clone().sub(bPos);
-            let normal = new THREE.Vector3();
-            if (Math.abs(diff.x) > Math.abs(diff.y) && Math.abs(diff.x) > Math.abs(diff.z)) normal.x = Math.sign(diff.x);
-            else if (Math.abs(diff.y) > Math.abs(diff.z)) normal.y = Math.sign(diff.y);
-            else normal.z = Math.sign(diff.z);
-            return { k, pos: bPos, normal };
+            return { k, pk: prevK };
+        }
+        if (!world.has(k) || world.get(k).type === 'water') {
+            prevK = k;
         }
     }
     return null;
@@ -797,8 +795,8 @@ function handleBlockAction(type) {
             broadcast({ type: 'break', k: t.k });
         }
     } else if (type === 'place') {
-        if (t && state.selectedItem !== 'pickaxe' && state.selectedItem !== 'sword') {
-            const pk = getBlockKey(t.pos.x + t.normal.x, t.pos.y + t.normal.y, t.pos.z + t.normal.z);
+        if (t && t.pk && state.selectedItem !== 'pickaxe' && state.selectedItem !== 'sword') {
+            const pk = t.pk;
             if (!world.has(pk) || world.get(pk).type === 'water') {
                 const checkInside = (ox, oz) => {
                     const k = getBlockKey(player.position.x + ox, player.position.y - 1.8, player.position.z + oz);
