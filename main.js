@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 
-// --- 1. CORE CONFIG & STATE ---
 const CONFIG = {
     worldSize: 6, chunkSize: 16, maxInstances: 300000,
     mouseSensitivity: 0.002, playerSpeed: 6, jumpForce: 10,
@@ -13,7 +12,7 @@ let state = {
     actionTime: 0, prevTime: performance.now(), yaw: 0, pitch: 0,
     velocity: new THREE.Vector3(), move: { f: 0, b: 0, l: 0, r: 0, u: 0, d: 0 },
     lastTaps: {}, stepLatch: false, activeSlot: 0, selectedItem: 'grass',
-    worldTime: Math.PI / 4 // Morning
+    worldTime: Math.PI / 4
 };
 
 const inventoryItems = [
@@ -27,7 +26,6 @@ state.selectedItem = hotbarSlots[state.activeSlot];
 
 const isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 
-// --- 2. ASSETS & MATERIALS ---
 const ASSET_URL = 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.19.2/assets/minecraft/';
 const texLoader = new THREE.TextureLoader();
 texLoader.setCrossOrigin('anonymous');
@@ -96,7 +94,6 @@ const sounds = {
 Object.values(sounds).forEach(s => { s.crossOrigin = 'anonymous'; s.volume = 0.2; });
 const playSound = (n) => { if(sounds[n]) { sounds[n].currentTime = 0; sounds[n].play().catch(()=>{}); } };
 
-// --- 3. SCENE SETUP ---
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x87CEEB);
 scene.fog = new THREE.Fog(0x87CEEB, 20, 100);
@@ -116,7 +113,6 @@ dirLight.shadow.camera.top = 60; dirLight.shadow.camera.bottom = -60;
 dirLight.shadow.mapSize.set(2048, 2048);
 scene.add(dirLight);
 
-// --- 4. WORLD ENGINE ---
 const blockGeo = new THREE.BoxGeometry(1, 1, 1);
 const plantGeo = new THREE.PlaneGeometry(0.8, 0.8); plantGeo.translate(0, 0.4, 0);
 
@@ -238,7 +234,6 @@ function updateInstances() {
     allTypes.forEach(t => { if(blockMeshes[t]){ blockMeshes[t].count = counts[t]; blockMeshes[t].instanceMatrix.needsUpdate = true; } });
 }
 
-// --- 5. ENTITIES ---
 const entities = [];
 
 function createMobModel(type) {
@@ -313,7 +308,6 @@ function createTool(type) {
     return g;
 }
 
-// --- 6. UI LOGIC ---
 const hotbarEl = document.getElementById('hotbar-container');
 const invGrid = document.getElementById('inventory-grid');
 const invMenu = document.getElementById('inventory-menu');
@@ -407,7 +401,6 @@ function handlePause() {
     }
 }
 
-// --- 7. INTERACTION & CONTROLS ---
 function getTarget() {
     const dir = new THREE.Vector3(); camera.getWorldDirection(dir);
     const start = new THREE.Vector3(); camera.getWorldPosition(start);
@@ -450,7 +443,6 @@ function handleBlockAction(type) {
     }
 }
 
-// Desktop Mouse
 document.addEventListener('mousedown', (e) => {
     if (isMobile || document.pointerLockElement !== document.body) return;
     if (e.button === 0) handleBlockAction('break');
@@ -465,7 +457,6 @@ document.addEventListener('mousemove', (e) => {
     player.rotation.y = state.yaw; pitchPivot.rotation.x = state.pitch;
 });
 
-// Desktop Keyboard
 document.addEventListener('keydown', (e) => {
     if(e.code === 'Escape') { handlePause(); return; }
     if (e.code === 'KeyE') { toggleInventory(); return; }
@@ -486,7 +477,6 @@ document.addEventListener('keyup', (e) => {
     if (e.code === 'Space') state.move.u = 0; if (e.code === 'ShiftLeft') state.move.d = 0;
 });
 
-// Mobile Controls
 let touchStartX = 0, touchStartY = 0;
 document.addEventListener('touchstart', (e) => {
     if (!isMobile || !state.gameStarted || state.inventoryOpen) return;
@@ -497,7 +487,7 @@ document.addEventListener('touchstart', (e) => {
 document.addEventListener('touchmove', (e) => {
     if (!isMobile || !state.gameStarted || state.inventoryOpen) return;
     if(e.target.closest('#mobile-controls') || e.target.closest('#hotbar-container')) return;
-    e.preventDefault(); // Stop scrolling
+    e.preventDefault();
     const moveX = e.touches[0].clientX - touchStartX;
     const moveY = e.touches[0].clientY - touchStartY;
     touchStartX = e.touches[0].clientX; touchStartY = e.touches[0].clientY;
@@ -536,7 +526,6 @@ document.getElementById('btn-inv').addEventListener('touchstart', (e) => { e.pre
 document.getElementById('btn-cam').addEventListener('touchstart', (e) => { e.preventDefault(); toggleCamera(); });
 document.getElementById('btn-pause').addEventListener('touchstart', (e) => { e.preventDefault(); handlePause(); });
 
-// --- 8. ANIMATION LOOP ---
 function animate() {
     requestAnimationFrame(animate);
     const time = performance.now(); const delta = Math.min((time - state.prevTime)/1000, 0.1); state.prevTime = time;
@@ -618,6 +607,5 @@ function animate() {
     renderer.render(scene, camera);
 }
 
-// --- 9. STARTUP ---
 generateWorld(); renderUI(); animate();
 window.onresize = () => { camera.aspect = window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); };
