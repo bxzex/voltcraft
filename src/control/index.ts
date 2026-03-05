@@ -394,6 +394,7 @@ export default class Control {
       // right click to put block
       case 2:
         {
+          if (this.holdingBlock >= 100) return; // Don't place tools as blocks
           if (block && block.object instanceof THREE.InstancedMesh) {
             // calculate normal and position
             const normal = block.face!.normal

@@ -353,6 +353,16 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
+import diamond_pickaxe_url from './static/textures/item/diamond_pickaxe.png'
+import diamond_shovel_url from './static/textures/item/diamond_shovel.png'
+import diamond_sword_url from './static/textures/item/diamond_sword.png'
+
+const itemTextures: Record<number, string> = {
+    100: diamond_pickaxe_url,
+    101: diamond_shovel_url,
+    102: diamond_sword_url
+};
+
 let currentHeldBlock = -1;
 
 // Animation
@@ -368,16 +378,36 @@ let currentHeldBlock = -1;
         currentHeldBlock = control.holdingBlock;
         fpHand.clear();
         tpHand.clear();
-        const typeStr = terrain.materialType[currentHeldBlock];
-        if (typeStr !== undefined) {
-            const mat = terrain.materials.get(typeStr);
-            if (mat) {
-                const meshFP = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.3, 0.3), mat);
-                meshFP.rotation.set(0.3, 0.4, 0.1);
-                fpHand.add(meshFP);
-                const meshTP = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.3, 0.3), mat);
-                meshTP.rotation.set(0.3, 0.4, 0.1);
-                tpHand.add(meshTP);
+
+        if (currentHeldBlock >= 100) {
+            // Render Tool
+            const tex = textureLoader.load(itemTextures[currentHeldBlock]);
+            tex.magFilter = THREE.NearestFilter;
+            const mat = new THREE.MeshStandardMaterial({ map: tex, transparent: true, alphaTest: 0.5, side: THREE.DoubleSide });
+            const geo = new THREE.PlaneGeometry(0.4, 0.4);
+            
+            const meshFP = new THREE.Mesh(geo, mat);
+            meshFP.rotation.set(0, Math.PI / 4, 0);
+            meshFP.position.set(0, 0.1, 0);
+            fpHand.add(meshFP);
+
+            const meshTP = new THREE.Mesh(geo, mat);
+            meshTP.rotation.set(0, Math.PI / 4, 0);
+            meshTP.position.set(0, 0.1, 0);
+            tpHand.add(meshTP);
+        } else {
+            // Render Block
+            const typeStr = terrain.materialType[currentHeldBlock];
+            if (typeStr !== undefined) {
+                const mat = terrain.materials.get(typeStr);
+                if (mat) {
+                    const meshFP = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.3, 0.3), mat);
+                    meshFP.rotation.set(0.3, 0.4, 0.1);
+                    fpHand.add(meshFP);
+                    const meshTP = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.3, 0.3), mat);
+                    meshTP.rotation.set(0.3, 0.4, 0.1);
+                    tpHand.add(meshTP);
+                }
             }
         }
     }

@@ -161,18 +161,23 @@ import oak_log_top from '../../static/textures/block/oak_log_top.png'
 
 const blockTextures: Record<number, string[]> = {
   [BlockType.grass]: [grass, grass, grass_top, dirt_img, grass, grass],
-  [BlockType.tree]: [tree, tree, oak_log_top, oak_log_top, tree, tree]
+  [BlockType.tree]: [tree, tree, oak_log_top, oak_log_top, tree, tree],
+  [BlockType.dirt]: [dirt, dirt, dirt, dirt, dirt, dirt],
+  [BlockType.stone]: [stone, stone, stone, stone, stone, stone]
 }
 
 const createBlockIcon = (type: number, src: string) => {
   const container = document.createElement('div')
   container.className = 'cube-container'
 
-  if (type < 100 && (type === BlockType.grass || type === BlockType.tree)) {
+  // Types 100, 101, 102 are items (pickaxe, shovel, sword), others are blocks
+  if (type < 100) {
     const cube = document.createElement('div')
     cube.className = 'cube'
     const faces = ['right', 'left', 'top', 'bottom', 'front', 'back']
-    const textures = blockTextures[type]
+    
+    // Use specific textures if defined, otherwise use the same src for all faces
+    const textures = blockTextures[type] || [src, src, src, src, src, src]
 
     faces.forEach((face, i) => {
       const faceEl = document.createElement('div')
