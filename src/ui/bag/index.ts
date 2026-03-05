@@ -9,7 +9,7 @@ import { isMobile } from '../../utils'
 import Control from '../../control'
 import { BlockType } from '../../terrain'
 
-const ASSET_URL = '/src/static/textures/block/';
+const ASSET_URL = '/textures/block/';
 const dirt = ASSET_URL + 'dirt.png';
 const cobblestone = ASSET_URL + 'cobblestone.png';
 const bedrock = ASSET_URL + 'bedrock.png';
@@ -40,17 +40,17 @@ const createBlockIcon = (src: string) => {
     img.style.imageRendering = 'pixelated';
     return img;
   }
-  
+
   const wrapper = document.createElement('div');
   wrapper.style.width = '48px'; wrapper.style.height = '48px';
   wrapper.style.display = 'flex'; wrapper.style.justifyContent = 'center'; wrapper.style.alignItems = 'center';
-  
+
   const cube = document.createElement('div');
   cube.style.width = '24px'; cube.style.height = '24px';
   cube.style.position = 'relative';
   cube.style.transformStyle = 'preserve-3d';
   cube.style.transform = 'rotateX(-30deg) rotateY(45deg)';
-  
+
   const addFace = (transform: string, brightness: number) => {
     const face = document.createElement('div');
     face.style.position = 'absolute';
@@ -61,15 +61,15 @@ const createBlockIcon = (src: string) => {
     face.style.transform = transform;
     face.style.filter = `brightness(${brightness})`;
     if (src.includes('glass') || src.includes('water')) {
-        face.style.opacity = '0.7';
+      face.style.opacity = '0.7';
     }
     cube.appendChild(face);
   };
-  
+
   addFace('rotateX(90deg) translateZ(12px)', 1.2); // top
   addFace('rotateY(-90deg) translateZ(12px)', 0.8); // left
   addFace('translateZ(12px)', 0.6); // front
-  
+
   wrapper.appendChild(cube);
   return wrapper;
 };
@@ -89,28 +89,28 @@ export default class Bag {
     // Build Inventory Grid Overlay
     const grid = document.getElementById('inventory-grid');
     if (grid) {
-        allBlocks.forEach(b => {
-            const cell = document.createElement('div');
-            cell.style.width = '60px'; cell.style.height = '60px';
-            cell.style.cursor = 'pointer'; cell.style.border = '2px solid transparent';
-            cell.style.backgroundColor = '#8b8b8b'; cell.style.display = 'flex';
-            cell.style.justifyContent = 'center'; cell.style.alignItems = 'center';
-            
-            const iconNode = createBlockIcon(b.src);
-            cell.appendChild(iconNode);
-            
-            cell.onmouseover = () => cell.style.border = '2px solid white';
-            cell.onmouseout = () => cell.style.border = '2px solid transparent';
-            cell.onclick = () => {
-                control.holdingBlocks[this.current] = b.type;
-                control.holdingBlock = b.type;
-                this.icon[this.current] = b.src;
-                const slotDiv = this.items[this.current];
-                slotDiv.innerHTML = '';
-                slotDiv.appendChild(createBlockIcon(b.src));
-            };
-            grid.appendChild(cell);
-        });
+      allBlocks.forEach(b => {
+        const cell = document.createElement('div');
+        cell.style.width = '60px'; cell.style.height = '60px';
+        cell.style.cursor = 'pointer'; cell.style.border = '2px solid transparent';
+        cell.style.backgroundColor = '#8b8b8b'; cell.style.display = 'flex';
+        cell.style.justifyContent = 'center'; cell.style.alignItems = 'center';
+
+        const iconNode = createBlockIcon(b.src);
+        cell.appendChild(iconNode);
+
+        cell.onmouseover = () => cell.style.border = '2px solid white';
+        cell.onmouseout = () => cell.style.border = '2px solid transparent';
+        cell.onclick = () => {
+          control.holdingBlocks[this.current] = b.type;
+          control.holdingBlock = b.type;
+          this.icon[this.current] = b.src;
+          const slotDiv = this.items[this.current];
+          slotDiv.innerHTML = '';
+          slotDiv.appendChild(createBlockIcon(b.src));
+        };
+        grid.appendChild(cell);
+      });
     }
 
     document.body.addEventListener('keydown', (e: KeyboardEvent) => {

@@ -22,10 +22,10 @@ const control = new Control(scene, camera, player, terrain, audio)
 
 const ui = new UI(terrain, control)
 const multiplayer = new Multiplayer(scene, terrain, player, control)
-;(window as any).multiplayer = multiplayer;
+    ; (window as any).multiplayer = multiplayer;
 
 // Animals
-const ASSET_URL = '/src/static/';
+const ASSET_URL = '/';
 const texLoader = new THREE.TextureLoader();
 const mobs: { mesh: THREE.Group, type: string, timer: number }[] = [];
 
@@ -87,16 +87,16 @@ function spawnMob(type: 'pig' | 'cow', x: number, y: number, z: number) {
 
     group.position.set(x, y, z);
     scene.add(group);
-    mobs.push({ mesh: group, type, timer: Math.random()*100 });
+    mobs.push({ mesh: group, type, timer: Math.random() * 100 });
 }
-for(let i=0; i<12; i++) spawnMob(Math.random()>0.5 ? 'pig' : 'cow', (Math.random()-0.5)*40 + 8, 30, (Math.random()-0.5)*40 + 8);
+for (let i = 0; i < 12; i++) spawnMob(Math.random() > 0.5 ? 'pig' : 'cow', (Math.random() - 0.5) * 40 + 8, 30, (Math.random() - 0.5) * 40 + 8);
 
 // Weather
 let weather = 'clear';
 const rainGeo = new THREE.BufferGeometry();
 const rainCount = 1500;
 const rainPos = new Float32Array(rainCount * 3);
-for(let i=0;i<rainCount*3;i++) {
+for (let i = 0; i < rainCount * 3; i++) {
     rainPos[i] = (Math.random() - 0.5) * 100;
 }
 rainGeo.setAttribute('position', new THREE.BufferAttribute(rainPos, 3));
@@ -116,10 +116,10 @@ const thunderAudio = new window.Audio(ASSET_URL + 'sounds/ambient/weather/thunde
 
 function setWeather(w: string) {
     weather = w;
-    if(w === 'rain' || w === 'thunder') {
+    if (w === 'rain' || w === 'thunder') {
         rainSys.visible = true;
-        if(rainAudio.paused) rainAudio.play().catch(()=>{});
-        if(w === 'thunder') thunderAudio.play().catch(()=>{});
+        if (rainAudio.paused) rainAudio.play().catch(() => { });
+        if (w === 'thunder') thunderAudio.play().catch(() => { });
     } else {
         rainSys.visible = false;
         rainAudio.pause();
@@ -132,9 +132,9 @@ document.getElementById('weather-thunder')?.addEventListener('click', () => setW
 // Multiplayer ID Copy
 const myWorldId = document.getElementById('my-world-id') as HTMLInputElement;
 const copyIdBtn = document.getElementById('copy-id');
-if(myWorldId && copyIdBtn) {
+if (myWorldId && copyIdBtn) {
     setInterval(() => {
-        if(multiplayer.peer?.id) myWorldId.value = multiplayer.peer.id;
+        if (multiplayer.peer?.id) myWorldId.value = multiplayer.peer.id;
     }, 1000);
     copyIdBtn.addEventListener('click', () => {
         navigator.clipboard.writeText(myWorldId.value);
@@ -154,9 +154,9 @@ function spawnParrot(x: number, y: number, z: number) {
             t.repeat.set(mw / 32, mh / 32); t.offset.set(ox / 32, 1 - (oy + mh) / 32);
             return new THREE.MeshLambertMaterial({ map: t, transparent: true, alphaTest: 0.5 });
         };
-        return [getM(u+d+w, v+d, d, h), getM(u, v+d, d, h), getM(u+d, v, w, d), getM(u+d+w, v, w, d), getM(u+d, v+d, w, h), getM(u+d+w+d, v+d, w, h)];
+        return [getM(u + d + w, v + d, d, h), getM(u, v + d, d, h), getM(u + d, v, w, d), getM(u + d + w, v, w, d), getM(u + d, v + d, w, h), getM(u + d + w + d, v + d, w, h)];
     };
-    
+
     const head = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.3, 0.2), buildParrotBox(2, 2, 2, 3, 2));
     head.position.set(0, 0.4, 0); group.add(head);
     const body = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.4, 0.3), buildParrotBox(2, 8, 3, 4, 3));
@@ -168,9 +168,9 @@ function spawnParrot(x: number, y: number, z: number) {
 
     group.position.set(x, y, z);
     scene.add(group);
-    mobs.push({ mesh: group, type: 'parrot', timer: Math.random()*100 });
+    mobs.push({ mesh: group, type: 'parrot', timer: Math.random() * 100 });
 }
-for(let i=0; i<8; i++) spawnParrot((Math.random()-0.5)*40 + 8, 35 + Math.random()*10, (Math.random()-0.5)*40 + 8);
+for (let i = 0; i < 8; i++) spawnParrot((Math.random() - 0.5) * 40 + 8, 35 + Math.random() * 10, (Math.random() - 0.5) * 40 + 8);
 
 // Player Skin & 3rd Person
 const playerGroup = new THREE.Group();
@@ -180,7 +180,7 @@ let thirdPerson = false;
 function buildSkinBox(texUrl: string, u: number, v: number, w: number, h: number, d: number) {
     const getM = (ox: number, oy: number, mw: number, mh: number) => {
         const mat = new THREE.MeshLambertMaterial({ transparent: true, alphaTest: 0.5 });
-        
+
         const img = new Image();
         img.src = texUrl;
         img.crossOrigin = 'anonymous';
@@ -217,7 +217,7 @@ function buildSkinBox(texUrl: string, u: number, v: number, w: number, h: number
             mat.map = tex;
             mat.needsUpdate = true;
         };
-        
+
         return mat;
     };
     return [
@@ -240,7 +240,7 @@ tpHand.position.set(0, -0.6, -0.4);
 function createPlayerMesh(skinName: string) {
     playerGroup.clear();
     const texUrl = `/skins/${skinName}.png`;
-    
+
     const headMat = buildSkinBox(texUrl, 0, 0, 8, 8, 8);
     playerParts.head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), headMat);
     playerParts.head.position.set(0, 1.4, 0);
@@ -264,11 +264,11 @@ function createPlayerMesh(skinName: string) {
     const rightArm = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.8, 0.2), armMat);
     rightArm.position.y = -0.4;
     playerParts.rightArmGroup.add(rightArm);
-    
+
     // Add tpHand to the right arm group
     if (tpHand.parent) tpHand.parent.remove(tpHand);
     playerParts.rightArmGroup.add(tpHand);
-    
+
     playerGroup.add(playerParts.rightArmGroup);
 
     const legMat = buildSkinBox(texUrl, 0, 16, 4, 12, 4);
@@ -315,110 +315,110 @@ document.addEventListener('keydown', (e) => {
 let currentHeldBlock = -1;
 
 // Animation
-;(function animate() {
-  requestAnimationFrame(animate)
+; (function animate() {
+    requestAnimationFrame(animate)
 
-  control.update()
-  terrain.update()
-  ui.update()
-  multiplayer.update()
+    control.update()
+    terrain.update()
+    ui.update()
+    multiplayer.update()
 
-  if (currentHeldBlock !== control.holdingBlock) {
-      currentHeldBlock = control.holdingBlock;
-      fpHand.clear();
-      tpHand.clear();
-      const typeStr = terrain.materialType[currentHeldBlock];
-      if (typeStr !== undefined) {
-          const mat = terrain.materials.get(typeStr);
-          if (mat) {
-              const meshFP = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.3, 0.3), mat);
-              fpHand.add(meshFP);
-              const meshTP = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.3, 0.3), mat);
-              tpHand.add(meshTP);
-          }
-      }
-  }
-  fpHand.visible = !thirdPerson;
-  tpHand.visible = thirdPerson;
+    if (currentHeldBlock !== control.holdingBlock) {
+        currentHeldBlock = control.holdingBlock;
+        fpHand.clear();
+        tpHand.clear();
+        const typeStr = terrain.materialType[currentHeldBlock];
+        if (typeStr !== undefined) {
+            const mat = terrain.materials.get(typeStr);
+            if (mat) {
+                const meshFP = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.3, 0.3), mat);
+                fpHand.add(meshFP);
+                const meshTP = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.3, 0.3), mat);
+                tpHand.add(meshTP);
+            }
+        }
+    }
+    fpHand.visible = !thirdPerson;
+    tpHand.visible = thirdPerson;
 
-  // Animate Animals
-  mobs.forEach(m => {
-      m.timer += 0.01;
-      if (m.type === 'parrot') {
-          m.mesh.position.y += Math.sin(m.timer)*0.05;
-          m.mesh.position.x += Math.cos(m.timer)*0.05;
-          const wings = m.mesh.children.slice(2);
-          wings.forEach(w => w.rotation.z = Math.sin(m.timer * 10) * 0.5);
-      } else {
-          m.mesh.position.y += Math.sin(m.timer)*0.005;
-          m.mesh.rotation.y += Math.cos(m.timer*0.5)*0.005;
-          m.mesh.position.x += Math.cos(m.timer*0.5)*0.01;
-          m.mesh.position.z += Math.sin(m.timer*0.5)*0.01;
-          
-          // Animate Legs (children 2 to 5)
-          if (m.mesh.children.length >= 6) {
-              const sCycle = Math.sin(m.timer * 5) * 0.5;
-              m.mesh.children[2].rotation.x = sCycle; // Front right
-              m.mesh.children[3].rotation.x = -sCycle; // Front left
-              m.mesh.children[4].rotation.x = -sCycle; // Back right
-              m.mesh.children[5].rotation.x = sCycle; // Back left
-          }
-      }
-  });
+    // Animate Animals
+    mobs.forEach(m => {
+        m.timer += 0.01;
+        if (m.type === 'parrot') {
+            m.mesh.position.y += Math.sin(m.timer) * 0.05;
+            m.mesh.position.x += Math.cos(m.timer) * 0.05;
+            const wings = m.mesh.children.slice(2);
+            wings.forEach(w => w.rotation.z = Math.sin(m.timer * 10) * 0.5);
+        } else {
+            m.mesh.position.y += Math.sin(m.timer) * 0.005;
+            m.mesh.rotation.y += Math.cos(m.timer * 0.5) * 0.005;
+            m.mesh.position.x += Math.cos(m.timer * 0.5) * 0.01;
+            m.mesh.position.z += Math.sin(m.timer * 0.5) * 0.01;
 
-  // Player Mesh Update
-  playerGroup.position.copy(camera.position);
-  playerGroup.position.y -= 1.5;
-  playerGroup.rotation.y = camera.rotation.y;
-  if (playerParts.head) playerParts.head.rotation.x = camera.rotation.x;
+            // Animate Legs (children 2 to 5)
+            if (m.mesh.children.length >= 6) {
+                const sCycle = Math.sin(m.timer * 5) * 0.5;
+                m.mesh.children[2].rotation.x = sCycle; // Front right
+                m.mesh.children[3].rotation.x = -sCycle; // Front left
+                m.mesh.children[4].rotation.x = -sCycle; // Back right
+                m.mesh.children[5].rotation.x = sCycle; // Back left
+            }
+        }
+    });
 
-  if (control.velocity.x !== 0 || control.velocity.z !== 0) {
-      const sCycle = Math.sin(performance.now() * 0.015) * 0.8;
-      if (playerParts.leftLegGroup) playerParts.leftLegGroup.rotation.x = sCycle;
-      if (playerParts.rightLegGroup) playerParts.rightLegGroup.rotation.x = -sCycle;
-      if (playerParts.leftArmGroup) playerParts.leftArmGroup.rotation.x = -sCycle;
-      if (playerParts.rightArmGroup) playerParts.rightArmGroup.rotation.x = sCycle;
-  } else {
-      if (playerParts.leftLegGroup) playerParts.leftLegGroup.rotation.x = 0;
-      if (playerParts.rightLegGroup) playerParts.rightLegGroup.rotation.x = 0;
-      if (playerParts.leftArmGroup) playerParts.leftArmGroup.rotation.x = 0;
-      if (playerParts.rightArmGroup) playerParts.rightArmGroup.rotation.x = 0;
-  }
+    // Player Mesh Update
+    playerGroup.position.copy(camera.position);
+    playerGroup.position.y -= 1.5;
+    playerGroup.rotation.y = camera.rotation.y;
+    if (playerParts.head) playerParts.head.rotation.x = camera.rotation.x;
 
-  playerGroup.visible = thirdPerson;
+    if (control.velocity.x !== 0 || control.velocity.z !== 0) {
+        const sCycle = Math.sin(performance.now() * 0.015) * 0.8;
+        if (playerParts.leftLegGroup) playerParts.leftLegGroup.rotation.x = sCycle;
+        if (playerParts.rightLegGroup) playerParts.rightLegGroup.rotation.x = -sCycle;
+        if (playerParts.leftArmGroup) playerParts.leftArmGroup.rotation.x = -sCycle;
+        if (playerParts.rightArmGroup) playerParts.rightArmGroup.rotation.x = sCycle;
+    } else {
+        if (playerParts.leftLegGroup) playerParts.leftLegGroup.rotation.x = 0;
+        if (playerParts.rightLegGroup) playerParts.rightLegGroup.rotation.x = 0;
+        if (playerParts.leftArmGroup) playerParts.leftArmGroup.rotation.x = 0;
+        if (playerParts.rightArmGroup) playerParts.rightArmGroup.rotation.x = 0;
+    }
 
-  // Animate Weather
-  if(weather !== 'clear') {
-      const pArray = rainGeo.attributes.position.array as Float32Array;
-      for(let i=1; i<rainCount*3; i+=3) {
-          pArray[i] -= 1.0;
-          if(pArray[i] < -50) pArray[i] = 50;
-      }
-      rainGeo.attributes.position.needsUpdate = true;
-      rainSys.position.copy(camera.position);
-  }
-  
-  if (weather === 'thunder' && Math.random() < 0.01) {
-      scene.background = new THREE.Color(0xffffff);
-      scene.fog = new THREE.Fog(0xffffff, 1, 96);
-      setTimeout(() => {
-          scene.background = new THREE.Color(0x333333);
-          scene.fog = new THREE.Fog(0x333333, 1, 96);
-      }, 100);
-  } else if (weather !== 'clear') {
-      scene.background = new THREE.Color(0x333333);
-      scene.fog = new THREE.Fog(0x333333, 1, 96);
-  } else {
-      scene.background = new THREE.Color(0x87ceeb);
-      scene.fog = new THREE.Fog(0x87ceeb, 1, 96);
-  }
+    playerGroup.visible = thirdPerson;
 
-  if (thirdPerson) {
-      const backward = new THREE.Vector3(0, 0, 4).applyQuaternion(camera.quaternion);
-      camera.position.add(backward);
-      renderer.render(scene, camera);
-      camera.position.sub(backward);
-  } else {
-      renderer.render(scene, camera);
-  }
+    // Animate Weather
+    if (weather !== 'clear') {
+        const pArray = rainGeo.attributes.position.array as Float32Array;
+        for (let i = 1; i < rainCount * 3; i += 3) {
+            pArray[i] -= 1.0;
+            if (pArray[i] < -50) pArray[i] = 50;
+        }
+        rainGeo.attributes.position.needsUpdate = true;
+        rainSys.position.copy(camera.position);
+    }
+
+    if (weather === 'thunder' && Math.random() < 0.01) {
+        scene.background = new THREE.Color(0xffffff);
+        scene.fog = new THREE.Fog(0xffffff, 1, 96);
+        setTimeout(() => {
+            scene.background = new THREE.Color(0x333333);
+            scene.fog = new THREE.Fog(0x333333, 1, 96);
+        }, 100);
+    } else if (weather !== 'clear') {
+        scene.background = new THREE.Color(0x333333);
+        scene.fog = new THREE.Fog(0x333333, 1, 96);
+    } else {
+        scene.background = new THREE.Color(0x87ceeb);
+        scene.fog = new THREE.Fog(0x87ceeb, 1, 96);
+    }
+
+    if (thirdPerson) {
+        const backward = new THREE.Vector3(0, 0, 4).applyQuaternion(camera.quaternion);
+        camera.position.add(backward);
+        renderer.render(scene, camera);
+        camera.position.sub(backward);
+    } else {
+        renderer.render(scene, camera);
+    }
 })()
