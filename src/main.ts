@@ -519,6 +519,10 @@ let currentHeldBlock = -1;
     ui.update()
     multiplayer.update()
 
+    // Animate Water
+    terrain.materials.waterTex.offset.y += 0.001;
+    terrain.materials.waterTex.offset.x += 0.0005;
+
     if (currentHeldBlock !== control.holdingBlock) {
         currentHeldBlock = control.holdingBlock;
         fpHand.clear();

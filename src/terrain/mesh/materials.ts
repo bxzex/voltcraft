@@ -274,6 +274,7 @@ const rawCopperTex = loadTex(raw_copper_tex)
 const mat = (map: THREE.Texture, opts?: any) => new THREE.MeshStandardMaterial({ map, ...opts })
 
 export default class Materials {
+  waterTex = waterTex;
   materials: Record<string, THREE.MeshStandardMaterial | THREE.MeshStandardMaterial[]> = {
     grass: [
       mat(grassSideTex), mat(grassSideTex),
@@ -287,11 +288,11 @@ export default class Materials {
       mat(treeTopTex), mat(treeTopTex),
       mat(treeTex), mat(treeTex)
     ],
-    leaf: mat(leafTex, { color: new THREE.Color(0, 1, 0), transparent: true }),
+    leaf: mat(leafTex, { transparent: true, alphaTest: 0.5 }),
     water: mat(waterTex, { 
       transparent: true, 
-      opacity: 0.9, 
-      color: 0x0044ff,
+      opacity: 0.6, 
+      color: 0x4488ff,
       side: THREE.DoubleSide,
       depthWrite: false
     }),

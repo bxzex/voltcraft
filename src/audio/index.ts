@@ -303,7 +303,7 @@ export default class Audio {
     if (sounds && sounds.length > 0) {
       const s = sounds[Math.floor(Math.random() * sounds.length)]
       if (!s.isPlaying) {
-        s.setVolume(this.soundVolume * 0.1) // Slightly quieter for continuous movement
+        s.setVolume(this.soundVolume * 0.4) // Increased volume
         s.play()
       }
     }
