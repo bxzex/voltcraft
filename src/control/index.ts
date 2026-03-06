@@ -693,8 +693,17 @@ export default class Control {
       )
 
       // gravity
-      if (Math.abs(this.velocity.y) < this.player.falling) {
-        this.velocity.y -= 25 * delta
+      const inWater = this.camera.position.y < 30;
+      if (inWater) {
+        // Water physics
+        if (this.velocity.y < 2) {
+            this.velocity.y += 10 * delta // buoyancy
+        }
+        this.velocity.y *= 0.9 // drag
+      } else {
+        if (Math.abs(this.velocity.y) < this.player.falling) {
+          this.velocity.y -= 25 * delta
+        }
       }
 
       // up collide handler

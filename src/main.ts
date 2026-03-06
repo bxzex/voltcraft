@@ -652,22 +652,12 @@ let currentHeldBlock = -1;
     playerGroup.position.copy(camera.position);
     playerGroup.position.y -= 1.5;
     
-    // Only update body rotation if player is actually moving, so camera can orbit freely
-    const isMoving = control.velocity.x !== 0 || control.velocity.z !== 0;
-    if (isMoving) {
-        playerGroup.rotation.y = camera.rotation.y;
-    }
+    // Body always follows horizontal camera rotation
+    playerGroup.rotation.y = camera.rotation.y;
 
     if (playerParts.head) {
-        if (!thirdPerson) {
-            playerParts.head.rotation.x = -camera.rotation.x;
-            playerParts.head.rotation.y = 0;
-        } else {
-            // In 3rd person, head should stay looking forward relative to body 
-            // OR we can make it look at the target crosshair
-            playerParts.head.rotation.x = 0;
-            playerParts.head.rotation.y = 0;
-        }
+        // Head follows vertical camera rotation (look up/down)
+        playerParts.head.rotation.x = -camera.rotation.x;
     }
 
     // Sneaking animation

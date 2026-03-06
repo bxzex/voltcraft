@@ -190,9 +190,10 @@ const createBlockIcon = (type: number, src: string) => {
   } else {
     const img = document.createElement('img')
     img.src = src
-    img.style.width = '100%'
-    img.style.height = '100%'
+    img.style.width = '80%'
+    img.style.height = '80%'
     img.style.imageRendering = 'pixelated'
+    img.style.transform = 'rotate(-15deg)'
     container.appendChild(img)
   }
 

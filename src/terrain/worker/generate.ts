@@ -88,6 +88,13 @@ enum BlockType {
   // Simple house 5x5
   for (let dx = 0; dx < 5; dx++) {
     for (let dz = 0; dz < 5; dz++) {
+      // Wood Floor
+      const fx = x + dx;
+      const fz = z + dz;
+      matrix.setPosition(fx, y - 1, fz);
+      idMap.set(`${fx}_${y - 1}_${fz}`, blocksCount[BlockType.wood]);
+      blocks[BlockType.wood].setMatrixAt(blocksCount[BlockType.wood]++, matrix);
+
       for (let dy = 0; dy < 4; dy++) {
         // Walls and Roof
         const isWall = (dx === 0 || dx === 4 || dz === 0 || dz === 4) && dy < 3;
@@ -124,6 +131,12 @@ enum BlockType {
   matrix.setPosition(bx, by, bz);
   idMap.set(`${bx}_${by}_${bz}`, blocksCount[BlockType.bed]);
   blocks[BlockType.bed].setMatrixAt(blocksCount[BlockType.bed]++, matrix);
+
+  // Add a torch inside
+  const tx = x + 2, ty = y + 2, tz = z + 2;
+  matrix.setPosition(tx, ty, tz);
+  idMap.set(`${tx}_${ty}_${tz}`, blocksCount[BlockType.torch]);
+  blocks[BlockType.torch].setMatrixAt(blocksCount[BlockType.torch]++, matrix);
   }
 
 const matrix = new THREE.Matrix4()
@@ -266,7 +279,7 @@ onmessage = (
           )
 
           // Deterministic house generation
-          if (hash(x, z) < 0.001) {
+          if (hash(x, z) < 0.0003) {
             generateHouse(x, y + yOffset + 1, z, idMap, blocksCount, blocks, matrix);
           }
         }
