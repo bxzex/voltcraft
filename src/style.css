@@ -8,12 +8,12 @@ body {
 
 @font-face {
   font-family: Minecraft;
-  src: url(mc-font.otf);
+  src: url('./static/mc-font.otf');
   font-display: swap;
 }
 
 .start {
-  background-image: url(bg.png);
+  background-image: url('./static/bg.png');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
