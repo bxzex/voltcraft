@@ -60,7 +60,7 @@ import skeleton_step from '../static/sounds/mob/skeleton/step1.ogg'
 import creeper_say1 from '../static/sounds/mob/creeper/say1.ogg'
 import creeper_say2 from '../static/sounds/mob/creeper/say2.ogg'
 import creeper_say3 from '../static/sounds/mob/creeper/say3.ogg'
-import creeper_step from '../static/sounds/mob/creeper/step1.ogg'
+const creeper_step = skeleton_step
 
 // Ambient
 import cave1 from '../static/sounds/ambient/cave/cave1.ogg'
