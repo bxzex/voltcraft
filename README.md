@@ -58,3 +58,7 @@ This is an independent project and is not affiliated with Mojang or Microsoft.
 ## License
 
 MIT License. Copyright (c) 2026 bxzex.
+
+
+---
+Built by bxzex (https://github.com/bxzex).
