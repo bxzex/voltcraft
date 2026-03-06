@@ -15,7 +15,8 @@ body {
 .start {
   background-image: url(bg.png);
   background-repeat: no-repeat;
-  background-size: 100% 100%;
+  background-size: cover;
+  background-position: center;
 }
 
 .start #exit {
@@ -40,6 +41,9 @@ body {
 
   text-align: center;
   user-select: none;
+}
+
+.menu:not(.start) {
   background-color: hsla(0, 0%, 11%, 0.7);
 }
 

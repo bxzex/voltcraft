@@ -47,10 +47,33 @@ import pig_say2 from '../static/sounds/mob/pig/say2.ogg'
 import pig_say3 from '../static/sounds/mob/pig/say3.ogg'
 import pig_step from '../static/sounds/mob/pig/step1.ogg'
 
+import chicken_say1 from '../static/sounds/mob/chicken/say1.ogg'
+import chicken_say2 from '../static/sounds/mob/chicken/say2.ogg'
+import chicken_say3 from '../static/sounds/mob/chicken/say3.ogg'
+import chicken_step from '../static/sounds/mob/chicken/step1.ogg'
+
+import skeleton_say1 from '../static/sounds/mob/skeleton/say1.ogg'
+import skeleton_say2 from '../static/sounds/mob/skeleton/say2.ogg'
+import skeleton_say3 from '../static/sounds/mob/skeleton/say3.ogg'
+import skeleton_step from '../static/sounds/mob/skeleton/step1.ogg'
+
+import creeper_say1 from '../static/sounds/mob/creeper/say1.ogg'
+import creeper_say2 from '../static/sounds/mob/creeper/say2.ogg'
+import creeper_say3 from '../static/sounds/mob/creeper/say3.ogg'
+import creeper_step from '../static/sounds/mob/creeper/step1.ogg'
+
+// Ambient
+import cave1 from '../static/sounds/ambient/cave/cave1.ogg'
+import cave2 from '../static/sounds/ambient/cave/cave2.ogg'
+import cave3 from '../static/sounds/ambient/cave/cave3.ogg'
+
+import { isMobile } from '../utils'
+
 export default class Audio {
   bgm: THREE.Audio | null = null
   listener: THREE.AudioListener | null = null
   mobSounds: Record<string, THREE.Audio[]> = {}
+  ambientSounds: THREE.Audio[] = []
   landingSounds: THREE.Audio[] = []
   soundSet: THREE.Audio[][] = []
   index = 0
@@ -114,20 +137,36 @@ export default class Audio {
       cow_say: [cow_say1, cow_say2, cow_say3],
       cow_step: [cow_step],
       pig_say: [pig_say1, pig_say2, pig_say3],
-      pig_step: [pig_step]
+      pig_step: [pig_step],
+      chicken_say: [chicken_say1, chicken_say2, chicken_say3],
+      chicken_step: [chicken_step],
+      skeleton_say: [skeleton_say1, skeleton_say2, skeleton_say3],
+      skeleton_step: [skeleton_step],
+      creeper_say: [creeper_say1, creeper_say2, creeper_say3],
+      creeper_step: [creeper_step]
     }
 
     for (const key in mobSources) {
       this.mobSounds[key] = []
       for (const src of mobSources[key]) {
         audioLoader.load(src, buffer => {
-          const audio = new THREE.Audio(listener!)
+          const audio = new THREE.Audio(this.listener!)
           audio.setBuffer(buffer)
           audio.setVolume(this.soundVolume * 0.1)
           this.mobSounds[key].push(audio)
         })
       }
     }
+
+    // load ambient
+    [cave1, cave2, cave3].forEach(src => {
+      audioLoader.load(src, buffer => {
+        const audio = new THREE.Audio(this.listener!)
+        audio.setBuffer(buffer)
+        audio.setVolume(this.soundVolume * 0.05)
+        this.ambientSounds.push(audio)
+      })
+    })
   }
 
   unlock() {
@@ -150,6 +189,9 @@ export default class Audio {
       for (const audio of this.mobSounds[key]) {
         if (audio.isPlaying) audio.stop()
       }
+    }
+    for (const audio of this.ambientSounds) {
+      if (audio.isPlaying) audio.stop()
     }
   }
 
@@ -179,6 +221,9 @@ export default class Audio {
     }
     for (const audio of this.landingSounds) {
       audio.setVolume(v * 0.2)
+    }
+    for (const audio of this.ambientSounds) {
+      audio.setVolume(v * 0.05)
     }
   }
 
@@ -271,7 +316,7 @@ export default class Audio {
     }
   }
 
-  playMobSound(mob: 'cow' | 'pig', type: 'say' | 'step') {
+  playMobSound(mob: 'cow' | 'pig' | 'chicken' | 'skeleton' | 'creeper', type: 'say' | 'step') {
     if (this.disabled) return
     const key = `${mob}_${type}`
     const sounds = this.mobSounds[key]
@@ -281,6 +326,15 @@ export default class Audio {
         s.setVolume(this.soundVolume * 0.1)
         s.play()
       }
+    }
+  }
+
+  playAmbient() {
+    if (this.disabled || this.ambientSounds.length === 0) return
+    const s = this.ambientSounds[Math.floor(Math.random() * this.ambientSounds.length)]
+    if (!s.isPlaying) {
+      s.setVolume(this.soundVolume * 0.05)
+      s.play()
     }
   }
 
@@ -303,7 +357,7 @@ export default class Audio {
     if (sounds && sounds.length > 0) {
       const s = sounds[Math.floor(Math.random() * sounds.length)]
       if (!s.isPlaying) {
-        s.setVolume(this.soundVolume * 0.4) // Increased volume
+        s.setVolume(this.soundVolume * 0.1) 
         s.play()
       }
     }

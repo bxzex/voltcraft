@@ -69,9 +69,18 @@ const ASSET_URL = '/voltcraft/';
 const texLoader = new THREE.TextureLoader();
 const mobs: { mesh: THREE.Group, type: string, timer: number }[] = [];
 
+const mobTextureCache = new Map<string, THREE.CanvasTexture>();
+
 function buildMobBox(type: string, u: number, v: number, w: number, h: number, d: number) {
     const getM = (ox: number, oy: number, mw: number, mh: number) => {
         const mat = new THREE.MeshLambertMaterial({ transparent: true, alphaTest: 0.5 });
+        
+        const cacheKey = `${type}_${ox}_${oy}_${mw}_${mh}`;
+        if (mobTextureCache.has(cacheKey)) {
+            mat.map = mobTextureCache.get(cacheKey)!;
+            return mat;
+        }
+
         const img = new Image();
         let path = mobAssets[type] || (ASSET_URL + 'textures/entity/' + type + '/' + type + '.png');
         
@@ -88,6 +97,7 @@ function buildMobBox(type: string, u: number, v: number, w: number, h: number, d
             tex.offset.set(ox / 64, 1 - (oy + mh) / 64);
             mat.map = tex;
             mat.needsUpdate = true;
+            mobTextureCache.set(cacheKey, tex);
         }
         return mat;
     };
@@ -601,18 +611,14 @@ let currentHeldBlock = -1;
             m.mesh.position.y = yBase;
 
             // Sounds
-            if (m.type === 'pig' || m.type === 'cow' || m.type === 'chicken') {
+            if (m.type === 'pig' || m.type === 'cow' || m.type === 'chicken' || m.type === 'creeper' || m.type === 'skeleton') {
                 if (Math.random() < 0.0005) { // say sounds (approx every 30s at 60fps)
-                    if (m.type !== 'chicken') {
-                        control.audio.playMobSound(m.type as any, 'say');
-                    }
+                    control.audio.playMobSound(m.type as any, 'say');
                 }
                 if (m.mesh.position.y < 29.5) { // splash in water
-                    if (Math.random() < 0.005) control.audio.playSplash(); // reduced
-                } else if (Math.random() < 0.001) { // step sounds (reduced)
-                    if (m.type !== 'chicken') {
-                        control.audio.playMobSound(m.type as any, 'step');
-                    }
+                    if (Math.random() < 0.005) control.audio.playSplash(); 
+                } else if (Math.random() < 0.001) { // step sounds
+                    control.audio.playMobSound(m.type as any, 'step');
                 }
             }
 
@@ -794,5 +800,10 @@ let currentHeldBlock = -1;
         camera.position.sub(backward);
     } else {
         renderer.render(scene, camera);
+    }
+
+    // Play ambient sounds randomly
+    if (Math.random() < 0.0001) { // approx every 150s
+        control.audio.playAmbient();
     }
 })()
