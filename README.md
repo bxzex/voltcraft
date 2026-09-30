@@ -1,64 +1,28 @@
 # Voltcraft
 
-![Voltcraft Logo](src/static/bg.png)
+A block building game in the browser, inspired by Minecraft.
 
-Voltcraft is an open-source, web-based voxel game crafted with Three.js and TypeScript, designed by **bxzex**. 
+Play: https://bxzex.github.io/voltcraft/
 
-## Features
-
-- **Procedural Voxel Terrain:** Infinitely generated worlds with caves, trees, and resources!
-- **Weather & Time System:** Toggle between Day/Night and Weather (Clear, Rain, Thunder) with a dynamic sun, moon, and 2,000-star field.
-- **Enhanced Visuals:** Larger, functional tools and corrected character skins.
-- **Distant Water Rendering:** Improved water visibility for a more expansive horizon.
-- **Entity System:** Enjoy procedurally generated pigs, cows, and other interactive entities.
-- **Minecraft Interface:** Immersive HUD, hotbar, and inventory menu built with a retro aesthetic.
-- **Chat System:** Synchronized server chat overlay.
-- **Multiplayer Support:** Built-in WebRTC using PeerJS lets you connect instantly via a shared World ID.
-
-## Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/bxzex/voltcraft.git
-
-# Enter the directory
-cd voltcraft
-
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-
-# Build for production
-npm run build
-```
+The world generates as you walk, with caves, trees and water out to the horizon. There's a day and night cycle, rain and thunder, pigs and cows wandering around, and multiplayer over WebRTC: share your world ID and a friend can join you. Written in TypeScript with Three.js and PeerJS.
 
 ## Controls
 
-- **Left-Click:** Destroy block
-- **Right-Click:** Place block
-- **Wheel / Number Key:** Change block in hotbar
-- **WASD:** Move
-- **Space:** Jump / Fly up
-- **Q:** Toggle normal / dev mode
-- **Shift:** Sneaking / Fly down
-- **F:** Full screen
-- **E / ESC:** Open pause menu
+- Left click breaks a block, right click places one
+- Scroll or number keys pick from the hotbar
+- WASD to move, space to jump or fly up, shift to sneak or fly down
+- Q switches between normal and dev mode
+- F for full screen, E or Esc for the menu
 
-## Credits
+## Running it
 
-- **Original Developer:** [bxzex](https://github.com/bxzex)
-- **Built With:** Three.js, TypeScript, PeerJS
+```bash
+git clone https://github.com/bxzex/voltcraft.git
+cd voltcraft
+npm install
+npm run dev
+```
 
-## Disclaimer
+Not affiliated with Mojang or Microsoft. MIT licensed.
 
-This is an independent project and is not affiliated with Mojang or Microsoft.
-
-## License
-
-MIT License. Copyright (c) 2026 bxzex.
-
-
----
-Built by bxzex (https://github.com/bxzex).
+Made by [bxzex](https://bxzex.com).
